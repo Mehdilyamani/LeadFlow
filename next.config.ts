@@ -4,10 +4,6 @@ const nextConfig = {
     // !! ATTENTION !! Permet de déployer même s'il y a des erreurs de types
     ignoreBuildErrors: true,
   },
-  eslint: {
-    // Permet de déployer même s'il y a des avertissements/erreurs de lint
-    ignoreDuringBuilds: true,
-  },
   images: {
     remotePatterns: [
       {
