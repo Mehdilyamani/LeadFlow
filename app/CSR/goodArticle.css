@@ -1,0 +1,68 @@
+/* components/goodArticle.css */
+.good_articleCard {
+  width: 240px;
+  min-width: 240px;
+  height: 300px;
+  background: transparent; /* keep transparent so it blends with container */
+  border-radius: 12px;
+  box-shadow: none; /* removed so they "emerge from shadow" */
+  padding-bottom: 10px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 0px;
+  flex-direction: column;
+  align-items: stretch;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+  cursor: pointer;
+}
+
+.good_articleCard:hover {
+  transform: translateY(-6px);
+  /* keep shadow subtle or none */
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.good_articleCard .img {
+  width: 100%;
+  height: 225px;
+  object-fit: cover;
+  display: block;
+  border-radius: 10px 10px 0 0;
+}
+
+/* title */
+.good_articleCard h2 {
+  margin: 8px 12px;
+  font-size: 1.05rem;
+  line-height: 1.2;
+  color: #111;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* color dots container */
+.good_articleCard .dotRow {
+  margin-top: 8px;
+  margin-left: 8px;
+}
+
+/* small device tweaks */
+@media (max-width: 1024px) {
+  .good_articleCard { width: 200px; min-width: 200px; height: 300px; }
+  .good_articleCard .img { height: 170px; }
+  .good_articleCard h2 { font-size: 1rem; }
+}
+
+@media (max-width: 600px) {
+  .good_articleCard { width: 140px; min-width: 140px; height: 220px; border-radius: 10px; }
+  .good_articleCard .img { height: 120px; }
+  .good_articleCard h2 {
+    font-size: 0.9rem;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}

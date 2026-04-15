@@ -1,0 +1,154 @@
+.reviews-section {
+  padding: 60px 0;
+  background: #ffffff;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  /* Fix: isolate this section so animation doesn't affect parent layout */
+  isolation: isolate;
+  position: relative;
+}
+
+.reviews-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 0 20px;
+  /* Fix: keep header pinned, out of animation flow */
+  position: relative;
+  z-index: 2;
+  transform: none !important;
+}
+
+.reviews-badge {
+  background: #f0f7ff;
+  color: #0070f3;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.reviews-main-title {
+  font-size: clamp(1.8rem, 5vw, 2.5rem);
+  color: #1a1a1a;
+  margin: 15px 0 10px;
+  font-weight: 800;
+}
+
+.reviews-subtitle {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* CAROUSEL LOGIC */
+.carousel-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  /* Fix: clip overflow only here, not on the section */
+  overflow: hidden;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 25px;
+  padding: 20px 0;
+  /* Fix: will-change prevents layout recalculation bleeding upward */
+  will-change: transform;
+}
+
+.review-card-premium {
+  flex: 0 0 320px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 25px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+  transition: transform 0.3s ease;
+}
+
+.review-card-premium:hover {
+  border-color: #0070f3;
+  box-shadow: 0 20px 40px rgba(0,112,243,0.08);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.avatar {
+  width: 45px;
+  height: 45px;
+  background: linear-gradient(135deg, #0070f3, #00c6ff);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.reviewer-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1a1a1a;
+}
+
+.reviewer-info span {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.verified {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #2ecc71;
+  font-size: 1.2rem;
+}
+
+.stars {
+  color: #ffcc00;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.review-body {
+  color: #444;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  font-style: italic;
+}
+
+/* FADES */
+.edge-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.edge-fade.left {
+  left: 0;
+  background: linear-gradient(to right, white, transparent);
+}
+
+.edge-fade.right {
+  right: 0;
+  background: linear-gradient(to left, white, transparent);
+}
+
+@media (max-width: 768px) {
+  .review-card-premium {
+    flex: 0 0 280px;
+  }
+}

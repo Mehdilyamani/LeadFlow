@@ -1,0 +1,45 @@
+:root {
+  /* Tailles dynamiques : s'adaptent à la largeur de l'écran */
+  --card-width: clamp(140px, 18vw, 210px); 
+  --card-gap: clamp(12px, 2vw, 24px);
+}
+
+.Restau-bestsellers {
+  padding: 15px 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel-container {
+  display: flex;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.carousel-track {
+  display: flex;
+  gap: var(--card-gap);
+}
+
+.bs-item-wrapper {
+  /* On force l'ArticleCard à respecter ces dimensions */
+  flex: 0 0 var(--card-width);
+  width: var(--card-width);
+  max-width: var(--card-width);
+  
+  /* On réduit un peu l'échelle interne si nécessaire */
+  transform: scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.bs-item-wrapper:hover {
+  transform: scale(1); /* Effet de focus au survol */
+  z-index: 10;
+}
+
+/* Ajustement spécifique pour les petits mobiles */
+@media (max-width: 480px) {
+  .Restau-bestsellers {
+    padding: 10px 0;
+  }
+}

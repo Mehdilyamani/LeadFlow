@@ -1,0 +1,115 @@
+/* backToHome.css — revised, robust dark variant */
+:root{
+  --back-bg: #0b0b0b;          /* main button color (dark) */
+  --back-bg-2: #050505;        /* slightly darker bottom for subtle depth */
+  --back-fg: #ffffff;          /* text color */
+  --back-accent: #d6b77a;      /* warm-gold accent */
+  --back-radius: 12px;
+  --back-padding-y: 12px;
+  --back-padding-x: 22px;
+  --shadow-1: rgba(10,10,12,0.12);
+  --shadow-2: rgba(12,12,14,0.18);
+  --outline-accent: rgba(214,183,122,0.12);
+}
+
+/* wrapper keeps button centered */
+.back-home-wrapper{
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 48px 0;
+}
+
+/* main button */
+.back-home-btn{
+  position: relative;            /* needed for pseudo-elements/focus styles */
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--back-padding-y) var(--back-padding-x);
+
+  /* strong, reliable dark background (no fragile transparent gradients) */
+  background: linear-gradient(180deg, var(--back-bg) 0%, var(--back-bg-2) 100%);
+  color: var(--back-fg);
+  border: 1px solid rgba(255,255,255,0.06); /* subtle inner border for separation */
+  border-radius: var(--back-radius);
+
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+
+  /* elegant depth + gentle golden outline via box-shadow (cross-browser) */
+  box-shadow:
+    0 6px 18px var(--shadow-1),
+    0 0 0 3px var(--outline-accent); /* thin warm halo */
+
+  transition: transform 220ms cubic-bezier(.2,.9,.3,1),
+              box-shadow 220ms ease,
+              background-color 160ms ease;
+  z-index: 0; /* keep pseudo shadows behind focus rings */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* icon block — darker background for the icon so arrow is visible */
+.back-home-icon{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.03); /* tiny contrast, not white */
+  color: var(--back-fg);
+}
+
+/* text portion */
+.back-home-text{ display: inline-block; }
+
+/* hover/active states */
+.back-home-btn:hover{
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 18px 40px var(--shadow-2),
+    0 0 0 4px rgba(214,183,122,0.16); /* slightly stronger halo on hover */
+}
+
+.back-home-btn:active{
+  transform: translateY(-2px) scale(0.995);
+}
+
+/* accessible focus ring (not white) */
+.back-home-btn:focus-visible{
+  outline: none;
+  box-shadow:
+    0 0 0 6px rgba(214,183,122,0.10),
+    0 14px 30px var(--shadow-1);
+}
+
+/* disabled state */
+.back-home-btn[disabled]{
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* responsive tweaks */
+@media (max-width: 520px){
+  :root{ --back-padding-x: 18px; }
+  .back-home-btn{ gap: 10px; font-size: 0.95rem; }
+  .back-home-wrapper{ margin: 32px 0; }
+}
+
+/* optional variants */
+.back-home-btn.simple{
+  background: var(--back-bg);
+  box-shadow: 0 6px 18px var(--shadow-1);
+}
+.back-home-btn.small{
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border-radius: 10px;
+}

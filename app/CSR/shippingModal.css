@@ -1,0 +1,174 @@
+/* shippingModal.css - robust centered modal + overlay (replace previous file) */
+
+/* overlay: full-screen dimmed background */
+.shipping-overlay {
+  position: fixed !important;
+  inset: 0 !important; /* top/right/bottom/left: 0 */
+  background: rgba(0, 0, 0, 0.55) !important;
+  z-index: 4000 !important;
+  /* don't rely on flex here — panel is positioned fixed for robustness */
+  display: block !important;
+}
+
+/* panel: centered white box using fixed + transform to avoid flex interference */
+.shipping-panel {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: calc(100% - 48px);
+  max-width: 920px;
+  max-height: 90vh;
+  overflow: auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 28px 60px rgba(0,0,0,0.40);
+  padding: 22px;
+  box-sizing: border-box;
+  z-index: 4001 !important;
+}
+
+/* close button (X) */
+.modal-closebtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;              /* no border as requested */
+  color: #333;
+  font-size: 20px;
+  line-height: 1;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.modal-closebtn:hover,
+.modal-closebtn:focus {
+  background: rgba(0,0,0,0.04);
+  outline: none;
+  color: #000;
+}
+
+/* form base layout inside panel */
+.shipping-panel form {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding-top: 6px;
+  box-sizing: border-box;
+  color: #111;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* heading */
+.shipping-panel h2,
+.shipping-panel .text-lg {
+  margin: 0 0 12px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #111;
+}
+
+/* message text */
+.shipping-panel .text-red-600 { color: #b91c1c; margin-bottom: 6px; }
+.shipping-panel .text-green-600 { color: #15803d; margin-bottom: 6px; }
+
+/* grid helper (works with the form's grid classes) */
+.shipping-panel .grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* single-column fallback */
+.shipping-panel .grid .full {
+  grid-column: 1 / -1;
+}
+
+/* inputs / selects / textarea */
+.shipping-panel input[type="text"],
+.shipping-panel input[type="email"],
+.shipping-panel input[type="number"],
+.shipping-panel input[type="tel"],
+.shipping-panel textarea,
+.shipping-panel select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  color: #111;
+  transition: box-shadow .12s ease, border-color .12s ease, transform .08s ease;
+}
+
+/* larger textarea */
+.shipping-panel textarea { min-height: 100px; resize: vertical; }
+
+/* spacing between form rows (if not using .grid) */
+.shipping-panel > .row { margin-bottom: 10px; }
+
+/* focus style for accessibility */
+.shipping-panel input:focus,
+.shipping-panel select:focus,
+.shipping-panel textarea:focus,
+.shipping-panel button:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(11,120,255,0.12);
+  border-color: #0b78ff;
+}
+
+/* footer buttons container */
+.shipping-panel .flex {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 8px;
+}
+
+/* cancel button (secondary) */
+.shipping-panel button[type="button"] {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cfcfcf;
+  background: #fff;
+  color: #111;
+  cursor: pointer;
+  font-weight: 600;
+}
+.shipping-panel button[type="button"]:hover {
+  background: #f5f5f6;
+}
+
+/* submit button (primary) */
+.shipping-panel button[type="submit"] {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #0b78ff;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+}
+.shipping-panel button[type="submit"]:hover {
+  background: #0867db;
+}
+.shipping-panel button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* small responsive tweaks */
+@media (max-width: 720px) {
+  .shipping-panel {
+    width: calc(100% - 28px);
+    max-width: none;
+    padding: 16px;
+  }
+  .shipping-panel .grid {
+    grid-template-columns: 1fr; /* single column on narrow screens */
+  }
+}

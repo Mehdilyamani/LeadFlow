@@ -1,0 +1,553 @@
+/* articlePage.css
+   Restored desktop-first styles, plus conservative mobile rules.
+   Replace your existing file with this.
+*/
+
+/* page layout */
+.article-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+  box-sizing: border-box;
+  position: relative;
+  padding-bottom: 110px; /* room for fixed bottom bar */
+  /* do NOT force overflow-x hidden here — avoid breaking desktop layout */
+}
+
+/* top area: images + details (desktop) */
+.article-top {
+  display: grid;
+  grid-template-columns: 220px 1fr 360px; /* thumbnails | big image | details */
+  gap: 28px;
+  align-items: start;
+}
+
+/* thumbnails column */
+.small_images {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 640px;
+  overflow-y: auto;
+  align-items: center;
+}
+
+.small_images .thumb {
+  width: 76px;
+  height: 76px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.small_images .thumb:hover {
+  transform: translateY(-3px);
+}
+
+.small_images .thumb.selected {
+  border-color: #0b78ff;
+}
+
+/* main image container - desktop fixed width, centered */
+.big_images {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Desktop fixed width but allow scaling with max-width */
+.big_images .main-image {
+  width: 360px;          /* fixed desktop width */
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  background: #fff;
+  padding: 6px;
+  display: block;
+}
+
+/* details column */
+.article_details {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0; /* IMPORTANT: allow children to shrink on small screens */
+}
+
+/* Title and meta */
+.article-title {
+  font-size: 2.05rem;
+  margin: 0;
+  font-weight: 900;
+  line-height: 1.03;
+}
+
+.article-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.price {
+  background: #fff7e6;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #333;
+}
+
+.categorie {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* description */
+.article-description {
+  background: transparent;
+  padding: 10px 6px;
+  color: #222;
+  line-height: 1.5;
+  max-height: 260px;
+  overflow-y: auto;
+  border-left: 3px solid rgba(11,120,255,0.06);
+  padding-left: 12px;
+}
+
+/* options area - requested background color */
+.options-block {
+  margin-top: 6px;
+  padding: 12px;
+  background: hsl(34, 33%, 85%); /* <-- requested */
+  border-radius: 8px;
+  color: #000; /* dark text for contrast */
+}
+
+.options-block h3 {
+  margin: 0 0 8px 0;
+  font-size: 1rem;
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.opt-label {
+  width: 120px;
+  text-transform: capitalize;
+  font-weight: 700;
+  color: #111;
+}
+
+.opt-select, .opt-input {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  min-width: 180px;
+  background: #fff;
+}
+
+/* informational spans under options */
+.options-extra {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.options-extra .delivery-info,
+.options-extra .verified-info {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.03);
+  font-size: 0.95rem;
+}
+.options-extra .delivery-info strong,
+.options-extra .verified-info strong {
+  font-weight: 700;
+}
+
+/* FULL-WIDTH sticky bottom bar */
+.Total {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background: #ffffff;
+  box-shadow: 0 -8px 24px rgba(0,0,0,0.12);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2400;
+}
+
+/* inner wrapper */
+.Total .inner {
+  width: min(1100px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+/* total left should be allowed to shrink */
+.total-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  min-width: 0; /* allow truncation if needed */
+}
+
+.total-label {
+  font-size: 0.85rem;
+  color: #666;
+}
+.total-value {
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* ensure right area keeps its natural size */
+.total-right {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex: 0 0 auto;
+}
+
+/* add button - black text requested */
+.add-btn {
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: none;
+  background: hsl(34, 33%, 85%);
+  color: #000; /* requested: black font color */
+  font-weight: 800;
+  cursor: pointer;
+  min-width: 160px;
+  flex-shrink: 0; /* don't shrink the button */
+}
+
+/* small device tweaks (mobile) */
+/* These rules stack the layout and prevent horizontal overflow. */
+@media (max-width: 980px) {
+  /* stack content vertically: big image first, then thumbnails row, then details */
+  .article-top {
+    display: block;
+  }
+
+  /* big image on top */
+  .big_images {
+    order: 1;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    padding-inline: 16px; /* breathing room to avoid edge overflow */
+    box-sizing: border-box;
+  }
+
+  /* big image responsive width for mobile (will not exceed viewport) */
+  .big_images .main-image {
+    width: calc(100% - 32px);          /* 16px padding each side */
+    max-width: calc(100vw - 32px);
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+    background: #fff;
+    padding: 6px;
+  }
+
+  /* thumbnails become a horizontal row under the big image */
+  .small_images {
+    order: 2;
+    flex-direction: row;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 8px 12px;
+    gap: 8px;
+    justify-content: flex-start;
+    -webkit-overflow-scrolling: touch;
+  }
+  .small_images .thumb {
+    width: 56px;
+    height: 56px;
+    flex: 0 0 auto;
+  }
+
+  /* details follow */
+  .article_details {
+    order: 3;
+    padding: 0 16px 16px 16px;
+  }
+
+  /* adapt options inputs */
+  .opt-label { width: 90px; }
+  .opt-select, .opt-input { min-width: 120px; }
+
+  /* sticky bar adjustments: ensure elements don't overflow */
+  .Total .inner { width: calc(100% - 24px); padding-inline: 6px; }
+  .add-btn { margin-right: 12px; }
+}
+
+/* smaller phone tweaks */
+@media (max-width: 480px) {
+  .small_images .thumb { width: 48px; height: 48px; }
+  .opt-select, .opt-input { min-width: 100px; }
+  .article-title { font-size: 1.4rem; }
+  .options-extra .delivery-info,
+  .options-extra .verified-info {
+    font-size: 0.9rem;
+    padding: 6px 8px;
+  }
+}
+
+/* Safety: make sure images never exceed their container */
+.article-page img,
+.article-page .main-image,
+.article-page .thumb {
+  max-width: 100%;
+  display: block;
+  height: auto;
+}
+
+/* small utility: if any child causes tiny overflow due to rounding, allow page to visually hide 1px without breaking layout */
+/* Uncomment only if you still see a tiny horizontal scrollbar after testing */
+/*
+html, body, #__next {
+  overflow-x: hidden;
+}
+*/
+
+/* ===== Scoped mobile overflow hardening for article page only =====
+   Put this at the end of articlePage.css. This will not affect the carousel.
+*/
+@media (max-width: 980px) {
+  /* Prevent accidental page-wide horizontal scroll when viewing an article */
+  .article-page {
+    overflow-x: hidden;             /* only on article page */
+    padding-left: 12px;
+    padding-right: 12px;
+    box-sizing: border-box;
+    max-width: 100vw;
+  }
+
+  /* Big image: guarantee it never exceeds the viewport (account for safe padding) */
+  .article-page .big_images .main-image {
+    width: 100%;
+    max-width: calc(100vw - 24px); /* 12px left + 12px right padding */
+    height: auto;
+    box-sizing: border-box;
+    display: block;
+  }
+
+  /* Thumbnail row: allow horizontal scroll but don't enlarge the page */
+  .article-page .small_images {
+    padding-left: 8px;
+    padding-right: 8px;
+    box-sizing: border-box;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Sticky bar: make inner strictly fit the viewport (avoid calc overflow) */
+  .article-page .Total .inner {
+    width: 100%;
+    max-width: 100%;
+    padding-left: 8px;
+    padding-right: 8px;
+    box-sizing: border-box;
+  }
+
+  /* Make left column able to shrink to prevent pushing the button off-screen */
+  .article-page .total-left { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+  /* Ensure the main article page children can't exceed their container */
+  .article-page .article-top,
+  .article-page .big_images,
+  .article-page .small_images,
+  .article-page .article_details {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Defensive: any article-page child won't grow beyond viewport */
+  .article-page * { box-sizing: border-box; }
+}
+/* Reviews block (add to articlePage.css) */
+.reviews-block {
+  max-width: 1100px;
+  margin: 20px auto 80px; /* space below for sticky bar */
+  padding: 14px;
+  box-sizing: border-box;
+}
+
+.reviews-header {
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.reviews-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111;
+}
+
+.reviews-sub {
+  margin: 6px 0 0 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+/* list: vertical column (page will scroll to view more, no overflow inside block) */
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* single review card */
+.review-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+  display: flex;
+  min-width: 1000px;
+  flex-direction: column;
+  gap: 8px;
+  color: #222;
+}
+
+/* header row inside card */
+.review-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.review-author {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.review-name {
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: #111;
+}
+
+.review-location {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* meta (stars + date) */
+.review-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  min-width: 110px;
+}
+
+.review-date {
+  font-size: 0.82rem;
+  color: #666;
+}
+
+/* stars */
+.review-stars {
+  display: flex;
+  gap: 3px;
+  color: #f5b301; /* gold */
+}
+
+.review-stars .star {
+  color: #f5b301;
+}
+
+.review-stars .star.empty {
+  color: rgba(0,0,0,0.12);
+}
+
+/* review text */
+.review-text {
+  color: #333;
+  line-height: 1.45;
+  font-size: 0.98rem;
+}
+
+/* badge */
+.review-badge {
+  margin-top: 6px;
+}
+
+.verified {
+  display: inline-block;
+  background: #eef7f3;
+  color: #0b7a53;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+
+/* responsive: slightly tighter on mobile */
+@media (max-width: 980px) {
+  .reviews-block {
+    padding: 10px;
+    margin: 18px 12px 80px;
+  }
+
+  .review-meta {
+    min-width: 90px;
+    align-items: flex-end;
+  }
+
+  .review-card { padding: 10px; }
+}
+/* safer desktop grid but stack on small screens */
+.article-top {
+  display: grid;
+  grid-template-columns: 220px 1fr 360px;
+  gap: 28px;
+}
+
+/* ensure gap increases vertically on mobile stacking */
+@media (max-width: 980px) {
+  .article-top { display: block; gap: 18px; }
+  .article-top > * { margin-bottom: 14px; } /* vertical gap between sections */
+}
+
+/* ensure thumbs + main image don't overflow horizontally */
+.small_images, .big_images { max-width: 100%; box-sizing: border-box; }
+
+/* remove any fixed width on main image, let it be responsive */
+.big_images .main-image { width: 100%; max-width: calc(100vw - 32px); height: auto; }
+
+/* reviews: responsive */
+.review-card {
+  min-width: 0; /* allow shrinking */
+  width: 100%;
+  max-width: 100%;
+}

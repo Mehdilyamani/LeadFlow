@@ -1,0 +1,158 @@
+/* articlecard.css */
+:root{
+  --card-bg: #ffffff;
+  --card-radius: 8px;
+  --card-shadow: none; /* removed default shadow per request */
+  --muted: #6b6b6b;
+}
+
+
+
+.articleCard{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 420px;
+  min-width: 240px;
+  min-height: 520px; /* allow card to grow if content demands */
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow); /* now none */
+  overflow: hidden;
+  transition: transform 180ms ease; /* removed box-shadow transition */
+  cursor: pointer;
+}
+
+.articleCard:focus-visible{
+  outline: 3px solid rgba(21, 156, 228, 0.25);
+  outline-offset: 3px;
+}
+
+/* subtle movement on hover, no shadow */
+.articleCard:hover{
+  transform: translateY(-8px) scale(1.01);
+}
+
+.imgWrap{
+  width: 100%;
+  flex: 0 0 58%; /* image takes ~58% of card height */
+  max-height: 380px; /* prevents image from growing too tall in very large cards */
+  background: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.articleCard img.img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.meta{
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 110px; /* ensure there's always space for meta + button */
+}
+
+.colors{
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.colorDot{
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset;
+}
+
+.title{
+  margin: 0;
+  margin-left: 10px; /* added left margin per request */
+  font-size: 1.05rem;
+  line-height: 1.2;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.price{
+  margin: 0;
+  margin-left: 10px; /* added left margin per request */
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+.actions{
+  margin-top: auto; /* pushes button toward the bottom */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.add-to-cart{
+  border: none;
+  border-radius: 6px;
+  padding: 11px 16px;
+  font-size: 0.98rem;
+  background: hsl(0, 0%, 0%);
+  color: #fff;
+  cursor: pointer;
+  min-width: 150px;
+  transition: transform 120ms ease, background-color 120ms ease, opacity 120ms ease;
+}
+
+.add-to-cart:hover:enabled{
+  transform: translateY(-2px);
+  background: hsl(0, 0%, 20%);
+}
+
+.add-to-cart:disabled{
+  background: #e6e6e6;
+  color: #8a8a8a;
+  cursor: not-allowed;
+  opacity: 0.95;
+}
+
+/* Ensure the button is visible on small viewports (mobile). This will raise it a bit by reducing image height */
+@media (max-width: 480px){
+  .articleCard{
+    min-height: 480px;
+    max-width: 340px;
+    min-width: 200px;
+  }
+  .imgWrap{ flex: 0 0 54%; max-height: 230px; }
+  .add-to-cart{ min-width: 130px; padding: 10px 12px; }
+}
+
+/* Optional: absolute-anchored variant if you want guaranteed visibility regardless of card height.
+   To enable, uncomment the styles below and remove margin-top:auto from .actions above.
+.actions{ position: relative; }
+.add-to-cart{ position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; }
+*/
+
+@media (max-width: 480px){
+  .articleCard{
+    min-height: 420px; /* was 480+ */
+    max-width: 360px;  /* safe mobile width */
+    min-width: 160px;
+  }
+  .imgWrap{ flex: 0 0 48%; max-height: 210px; }
+  .add-to-cart{ min-width: 120px; padding: 10px 12px; }
+  .title { white-space: normal; overflow: visible; text-overflow: initial; font-size: 1rem; }
+}
+
+

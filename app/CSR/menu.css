@@ -1,0 +1,301 @@
+/* styles/menu.css - updated: full-screen on mobile */
+
+/* NAVBAR BUTTONS (works with your existing .navbar/logo setup) */
+.nav-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  backdrop-filter: blur(2px);
+  z-index: 1101; /* above drawer so buttons remain clickable when closed */
+}
+
+.nav-button.left { left: 14px; }
+.nav-button.right { right: 14px; }
+
+/* small improvement for logo centering (shouldn't break your rules) */
+.navbar .logo {
+  height: 45px;
+  width: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* overlay when drawer open */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+  z-index: 999;
+}
+.menu-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* drawer - desktop default */
+.drawer {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: min(33vw, 420px); /* covers about 33% of the screen but max 420px */
+  max-width: 90vw;
+  background: #fff;
+  box-shadow: 4px 0 18px rgba(0,0,0,0.12);
+  transform: translateX(-110%); /* hide left */
+  transition: transform 280ms cubic-bezier(.2,.9,.2,1), box-shadow 200ms;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* open/closed states */
+.drawer.open { transform: translateX(0); }
+.drawer.closed { transform: translateX(-110%); }
+
+/* header */
+.menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  position: relative;
+}
+.close-btn {
+  border: none;
+  background: transparent;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+/* body */
+.menu-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom)); /* mobile safe area */
+}
+
+/* search */
+.search-wrap {
+  display: flex;
+  width: 100%;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid rgba(0,0,0,0.09);
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* categories */
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.category-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #333;
+}
+.category-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.category-chip {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+.category-chip.active {
+  background: #111;
+  color: white;
+  border-color: rgba(0,0,0,0.06);
+}
+
+/* results area */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+.muted {
+  color: rgba(0,0,0,0.45);
+}
+.hint {
+  font-size: 13px;
+}
+
+/* when showing cards, we want them to display nicely in drawer */
+.found-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+/* not found message */
+.not-found {
+  padding: 20px;
+  border-radius: 10px;
+  background: #fff4f4;
+  color: #b00020;
+  font-weight: 600;
+}
+
+/* ---------------- MOBILE / SMALL SCREENS ----------------
+   On small screens the drawer becomes full-screen for a
+   native-app-like menu experience.
+--------------------------------------------------------- */
+@media (max-width: 768px) {
+  .menu-overlay {
+    background: rgba(0,0,0,0.45); /* slightly darker on mobile */
+  }
+
+  .drawer {
+    width: 100vw;      /* full viewport width */
+    max-width: 100vw;
+    height: 100vh;     /* full height */
+    left: 0;
+    top: 0;
+    transform: translateX(-100%); /* use -100% for full-width hide */
+    border-radius: 0;
+    box-shadow: none;
+    z-index: 2000;
+    overflow-y: auto;
+  }
+
+  .drawer.closed { transform: translateX(-100%); }
+  .drawer.open { transform: translateX(0); }
+
+  /* move close button to the top-left (more native feeling) */
+  .menu-header { justify-content: flex-start; padding-left: 10px; padding-right: 10px; }
+  .close-btn {
+    font-size: 28px;
+    padding: 8px 12px;
+  }
+
+  /* make body spacing comfortable on mobile */
+  .menu-body {
+    padding: 18px;
+    gap: 14px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  /* slightly larger search on mobile */
+  .search-input { padding: 12px 14px; font-size: 15px; }
+
+  /* increase hit area for category chips */
+  .category-chip { padding: 8px 12px; font-size: 15px; }
+
+  /* enlarge found list spacing */
+  .found-list { gap: 16px; }
+
+  /* allow full-height scrolling inside drawer for long content */
+  .drawer { -webkit-overflow-scrolling: touch; }
+}
+/* --- DRAWER STRUCTURE --- */
+.drawer {
+  display: flex;
+  flex-direction: column; /* Force le footer en bas */
+  height: 100%;
+}
+
+.menu-body {
+  flex: 1; /* Prend tout l'espace et pousse le footer */
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* --- ADMIN FOOTER STYLES --- */
+.admin-footer {
+  padding: 20px;
+  background: #ffffff;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
+}
+
+.admin-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1a1a1a; /* Noir pur pour le côté sérieux/admin */
+  color: white;
+  padding: 16px;
+  border-radius: 14px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.admin-button:hover {
+  background: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.admin-button:active {
+  transform: scale(0.98);
+}
+
+.admin-button-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-icon {
+  color: #3b82f6; /* Bleu électrique pour l'accentuation */
+}
+
+.admin-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.admin-subtext {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+.arrow-icon {
+  opacity: 0.5;
+  transition: transform 0.3s;
+}
+
+.admin-button:hover .arrow-icon {
+  opacity: 1;
+  transform: translateX(4px);
+}
