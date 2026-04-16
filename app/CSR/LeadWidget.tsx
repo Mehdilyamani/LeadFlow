@@ -28,10 +28,10 @@ const LABEL_STYLE = {
 const GREETING = (agencyName: string) =>
   `Bonjour ! 👋 Je suis l'assistant de **${agencyName}**.\n\nJe vous aide à trouver votre bien immobilier idéal en quelques questions rapides.\n\n**Vous cherchez à acheter ou à louer ?**`
 
-function renderMessage(text: string) {
-  // Bold **text**
+function renderMessage(text: string | undefined | null) {
+  if (!text) return null
   return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith('**') ? (
+    part.startsWith('**') && part.endsWith('**') ? (
       <strong key={i}>{part.slice(2, -2)}</strong>
     ) : (
       <span key={i}>{part}</span>
@@ -53,15 +53,17 @@ export default function LeadWidget({
   const [leadData, setLeadData] = useState<LeadData | null>(null)
   const [stage, setStage] = useState<'chat' | 'scored' | 'dashboard'>('chat')
   const [showNotif, setShowNotif] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Show greeting on open
+  useEffect(() => { setMounted(true) }, [])
+
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       setMessages([{ role: 'assistant', content: GREETING(agencyName) }])
     }
-  }, [isOpen])
+  }, [isOpen, agencyName, messages.length])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -91,12 +93,12 @@ export default function LeadWidget({
       const data = await res.json()
 
       if (data.done && data.lead) {
-        setMessages([...newMsgs, { role: 'assistant', content: data.message }])
+        setMessages([...newMsgs, { role: 'assistant', content: data.message || 'Merci pour ces informations !' }])
         setLeadData(data.lead)
         setStage('scored')
         setTimeout(() => setShowNotif(true), 1800)
       } else {
-        setMessages([...newMsgs, { role: 'assistant', content: data.message }])
+        setMessages([...newMsgs, { role: 'assistant', content: data.message || "Comment puis-je vous aider ?" }])
       }
     } catch {
       setMessages([...newMsgs, { role: 'assistant', content: "Désolé, une erreur s'est produite. Veuillez réessayer." }])
@@ -110,7 +112,6 @@ export default function LeadWidget({
   }
 
   function reset() {
-    setMessages([])
     setLeadData(null)
     setStage('chat')
     setShowNotif(false)
@@ -149,7 +150,7 @@ export default function LeadWidget({
     <>
       {/* Pulse badge */}
       <AnimatePresence>
-        {!isOpen && (
+        {mounted && !isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -163,21 +164,16 @@ export default function LeadWidget({
         )}
       </AnimatePresence>
 
-      {/* Toggle button */}
+      {/* Toggle button — always visible */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
         style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}
         aria-label="Ouvrir l'assistant"
       >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.span key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} className="text-white text-xl">✕</motion.span>
-          ) : (
-            <motion.span key="chat" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} className="text-white text-2xl">💬</motion.span>
-          )}
-        </AnimatePresence>
-        {/* Dot */}
+        <span className="text-white text-2xl leading-none select-none">
+          {isOpen ? '✕' : '💬'}
+        </span>
         <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
       </button>
 
@@ -220,7 +216,7 @@ export default function LeadWidget({
 
 function WidgetHeader({ agencyName, onClose }: { agencyName: string; onClose?: () => void }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 text-white" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}>
+    <div className="flex items-center justify-between px-4 py-3 text-white flex-shrink-0" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}>
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-lg">🏡</div>
         <div>
@@ -232,7 +228,7 @@ function WidgetHeader({ agencyName, onClose }: { agencyName: string; onClose?: (
         </div>
       </div>
       {onClose && (
-        <button onClick={onClose} className="text-white/60 hover:text-white transition-colors text-lg">✕</button>
+        <button onClick={onClose} className="text-white/60 hover:text-white transition-colors text-lg leading-none">✕</button>
       )}
     </div>
   )
@@ -324,11 +320,11 @@ function WidgetBody({
 
               <div className="space-y-1.5 text-sm">
                 {[
-                  { icon: '🏠', label: 'Bien', value: `${leadData.type} — ${leadData.propertyType}` },
-                  { icon: '💰', label: 'Budget', value: leadData.budget },
-                  { icon: '📍', label: 'Zone', value: leadData.location },
-                  { icon: '⏱', label: 'Délai', value: leadData.timeline },
-                  { icon: '👤', label: 'Contact', value: leadData.contact },
+                  { icon: '🏠', label: 'Bien', value: `${leadData.type} — ${leadData.propertyType || '—'}` },
+                  { icon: '💰', label: 'Budget', value: leadData.budget || '—' },
+                  { icon: '📍', label: 'Zone', value: leadData.location || '—' },
+                  { icon: '⏱', label: 'Délai', value: leadData.timeline || '—' },
+                  { icon: '👤', label: 'Contact', value: leadData.contact || leadData.type || '—' },
                 ].map(row => (
                   <div key={row.label} className="flex gap-2">
                     <span>{row.icon}</span>
@@ -338,7 +334,9 @@ function WidgetBody({
                 ))}
               </div>
 
-              <p className={`text-xs mt-3 italic ${style.text}`}>"{leadData.reason}"</p>
+              {leadData.reason && (
+                <p className={`text-xs mt-3 italic ${style.text}`}>&ldquo;{leadData.reason}&rdquo;</p>
+              )}
 
               {/* WhatsApp notification */}
               <AnimatePresence>
@@ -385,11 +383,11 @@ function WidgetBody({
               </div>
               <div className="p-4 space-y-2">
                 {[
-                  ['Contact', leadData.contact],
-                  ['Projet', `${leadData.type} — ${leadData.propertyType}`],
-                  ['Budget', leadData.budget],
-                  ['Zone', leadData.location],
-                  ['Délai', leadData.timeline],
+                  ['Contact', leadData.contact || '—'],
+                  ['Projet', `${leadData.type} — ${leadData.propertyType || '—'}`],
+                  ['Budget', leadData.budget || '—'],
+                  ['Zone', leadData.location || '—'],
+                  ['Délai', leadData.timeline || '—'],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between text-xs border-b border-slate-50 pb-1.5">
                     <span className="text-slate-400 font-medium">{k}</span>
@@ -417,7 +415,7 @@ function WidgetBody({
 
       {/* Input bar */}
       {stage === 'chat' && (
-        <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100">
+        <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 flex-shrink-0">
           <div className="flex gap-2">
             <input
               ref={inputRef}

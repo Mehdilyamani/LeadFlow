@@ -3,13 +3,6 @@ import { useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import LeadWidget from '../CSR/LeadWidget'
 
-const FEATURES = [
-  { icon: '🤖', title: 'IA de qualification', desc: 'Claude pose 5 questions ciblées et score chaque lead automatiquement.' },
-  { icon: '📱', title: 'Alerte WhatsApp', desc: "L'agent reçoit une notification instantanée avec les infos du prospect." },
-  { icon: '📊', title: 'Dashboard en temps réel', desc: 'Tableau de bord complet : score, budget, délai, coordonnées, tout en un.' },
-  { icon: '🔌', title: 'Installation en 5 min', desc: 'Un snippet de code sur votre site. Aucune compétence technique requise.' },
-]
-
 const FAQ = [
   { q: 'Est-ce que ça marche sur mon site existant ?', a: "Oui. Leadflow s'installe sur n'importe quel site web : WordPress, Squarespace, site custom, etc. Un simple copier-coller de code suffit." },
   { q: 'Et si un visiteur parle en darija ?', a: "L'IA s'adapte automatiquement à la langue du visiteur. Elle parle français, arabe et darija." },
@@ -18,12 +11,72 @@ const FAQ = [
   { q: 'Est-ce que les données sont sécurisées ?', a: 'Absolument. Toutes les données sont chiffrées et hébergées en Europe. Nous ne revendons jamais vos données.' },
 ]
 
+const SCORE_CARDS = [
+  {
+    label: 'Hot',
+    emoji: '🔥',
+    bg: 'bg-rose-500',
+    light: 'bg-rose-50',
+    border: 'border-rose-200',
+    text: 'text-rose-600',
+    bar: 'bg-rose-500',
+    score: 9,
+    name: 'Ahmed B.',
+    budget: '7 500 000 MAD',
+    type: 'Achat • Villa',
+    location: 'Casablanca',
+    timeline: '< 2 mois',
+    desc: 'Budget précis, délai court, projet très sérieux.',
+  },
+  {
+    label: 'Warm',
+    emoji: '⚡',
+    bg: 'bg-amber-500',
+    light: 'bg-amber-50',
+    border: 'border-amber-200',
+    text: 'text-amber-600',
+    bar: 'bg-amber-500',
+    score: 6,
+    name: 'Salma K.',
+    budget: '2 – 3 M MAD',
+    type: 'Achat • Appartement',
+    location: 'Marrakech',
+    timeline: '3 – 6 mois',
+    desc: 'Budget approximatif, délai raisonnable.',
+  },
+  {
+    label: 'Cold',
+    emoji: '❄️',
+    bg: 'bg-sky-400',
+    light: 'bg-sky-50',
+    border: 'border-sky-200',
+    text: 'text-sky-600',
+    bar: 'bg-sky-400',
+    score: 3,
+    name: 'Visiteur anonyme',
+    budget: 'Non précisé',
+    type: 'Location • Appartement',
+    location: 'Rabat',
+    timeline: '> 6 mois',
+    desc: 'Projet encore flou, pas de budget défini.',
+  },
+]
+
 function PitchContent() {
   const params = useSearchParams()
-  const agencyName = params.get('agency') || 'Votre Agence'
+  const agencyParam = params.get('agency')
+  const agencyName = agencyParam || 'Votre Agence'
   const city = params.get('city') || 'Maroc'
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [showPayment, setShowPayment] = useState(false)
+
+  const heroHeadline = agencyParam
+    ? <>On a analysé <span className="text-blue-600">{agencyName}</span><br />— voici ce que vous ratez</>
+    : <>Transformez vos visiteurs<br /><span className="text-blue-600">en leads qualifiés</span> automatiquement</>
+
+  const heroBadge = agencyParam
+    ? `Analyse personnalisée pour ${agencyName}`
+    : 'Démo interactive — essayez maintenant'
 
   return (
     <main className="bg-white text-slate-900 min-h-screen">
@@ -49,15 +102,19 @@ function PitchContent() {
       <section className="py-16 px-6 text-center max-w-4xl mx-auto">
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-4 py-2 rounded-full border border-blue-100 mb-6">
           <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-          Démo personnalisée pour {agencyName}
+          {heroBadge}
         </div>
+
         <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-5 leading-tight">
-          On a créé votre widget IA<br />
-          <span className="text-blue-600">pour {agencyName} à {city}</span>
+          {heroHeadline}
         </h1>
+
         <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Testez-le maintenant. Ce widget qualifie vos prospects en 2 minutes et envoie une alerte WhatsApp à votre agent — automatiquement, 24h/24.
+          {agencyParam
+            ? `Chaque nuit, des prospects visitent votre site et repartent sans laisser leurs coordonnées. Leadflow capture et qualifie ces leads pour ${agencyName} — automatiquement, 24h/24.`
+            : "Chaque nuit, des prospects visitent votre site et repartent sans laisser leurs coordonnées. Leadflow les capture, les qualifie et vous alerte en temps réel."}
         </p>
+
         <div className="flex flex-wrap gap-3 justify-center text-sm text-slate-600 mb-10">
           {['✅ Aucune carte de crédit pour tester', '✅ Installé en 5 minutes', '✅ Sans engagement'].map(f => (
             <span key={f} className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-full">{f}</span>
@@ -79,7 +136,7 @@ function PitchContent() {
         </div>
       </section>
 
-      {/* WHAT HAPPENS AFTER */}
+      {/* HOW IT WORKS */}
       <section className="py-16 bg-slate-50 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
@@ -106,20 +163,61 @@ function PitchContent() {
         </div>
       </section>
 
-      {/* FEATURES */}
+      {/* LEAD SCORE CARDS */}
       <section className="py-16 px-6 max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Tout ce dont vous avez besoin</h2>
-          <p className="text-slate-500">Un outil conçu spécifiquement pour les agences immobilières au Maroc.</p>
+        <div className="text-center mb-10">
+          <p className="text-blue-600 text-sm font-semibold uppercase tracking-widest mb-2">Scoring automatique</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">
+            Chaque lead reçoit un score instantané
+          </h2>
+          <p className="text-slate-500 max-w-xl mx-auto">
+            En 2 minutes de conversation, l&apos;IA évalue la maturité de chaque prospect et vous envoie un résumé complet.
+          </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-6">
-          {FEATURES.map(f => (
-            <div key={f.title} className="flex gap-4 p-5 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-sm transition-all">
-              <span className="text-3xl">{f.icon}</span>
-              <div>
-                <h3 className="font-semibold text-slate-900 mb-1">{f.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+
+        <div className="grid md:grid-cols-3 gap-5">
+          {SCORE_CARDS.map(card => (
+            <div key={card.label} className={`rounded-2xl p-5 border ${card.light} ${card.border}`}>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Profil Lead</span>
+                <span className={`text-xs font-bold px-2.5 py-1 rounded-full text-white ${card.bg}`}>
+                  {card.emoji} {card.label}
+                </span>
               </div>
+
+              {/* Score bar */}
+              <div className="mb-4">
+                <div className="flex justify-between text-xs text-slate-500 mb-1">
+                  <span>Score de qualification</span>
+                  <span className={`font-bold ${card.text}`}>{card.score}/10</span>
+                </div>
+                <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${card.bar} transition-all`}
+                    style={{ width: `${card.score * 10}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Info rows */}
+              <div className="space-y-1.5 text-xs mb-3">
+                {[
+                  { icon: '👤', label: 'Contact', value: card.name },
+                  { icon: '💰', label: 'Budget', value: card.budget },
+                  { icon: '🏠', label: 'Projet', value: card.type },
+                  { icon: '📍', label: 'Zone', value: card.location },
+                  { icon: '⏱', label: 'Délai', value: card.timeline },
+                ].map(row => (
+                  <div key={row.label} className="flex gap-2">
+                    <span>{row.icon}</span>
+                    <span className="text-slate-500">{row.label}:</span>
+                    <span className="text-slate-800 font-medium">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              <p className={`text-xs italic ${card.text}`}>&ldquo;{card.desc}&rdquo;</p>
             </div>
           ))}
         </div>
@@ -144,6 +242,30 @@ function PitchContent() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="py-16 px-6 max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-3">Tout ce dont vous avez besoin</h2>
+          <p className="text-slate-500">Un outil conçu spécifiquement pour les agences immobilières au Maroc.</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-6">
+          {[
+            { icon: '🤖', title: 'IA de qualification', desc: "L'IA pose 5 questions ciblées et score chaque lead automatiquement — Hot, Warm ou Cold." },
+            { icon: '📱', title: 'Alerte WhatsApp', desc: "L'agent reçoit une notification instantanée avec les infos du prospect dès la fin de la conversation." },
+            { icon: '📊', title: 'Dashboard en temps réel', desc: 'Tableau de bord complet : score, budget, délai, coordonnées, tout en un coup d\'œil.' },
+            { icon: '🔌', title: 'Installation en 5 min', desc: 'Un snippet de code sur votre site. Aucune compétence technique requise.' },
+          ].map(f => (
+            <div key={f.title} className="flex gap-4 p-5 rounded-2xl border border-slate-100 hover:border-blue-100 hover:shadow-sm transition-all">
+              <span className="text-3xl">{f.icon}</span>
+              <div>
+                <h3 className="font-semibold text-slate-900 mb-1">{f.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -179,7 +301,7 @@ function PitchContent() {
               'Installation & configuration incluses',
             ].map(f => (
               <div key={f} className="flex items-center gap-3 text-sm">
-                <span className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">✓</span>
+                <span className="w-5 h-5 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0">✓</span>
                 <span className="text-slate-700">{f}</span>
               </div>
             ))}
@@ -191,9 +313,7 @@ function PitchContent() {
           >
             Commencer maintenant — 1 490 MAD/mois
           </button>
-          <p className="text-xs text-slate-400 mt-3">
-            Paiement sécurisé • Annulable à tout moment
-          </p>
+          <p className="text-xs text-slate-400 mt-3">Paiement sécurisé • Annulable à tout moment</p>
         </div>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm text-slate-500">
@@ -202,46 +322,6 @@ function PitchContent() {
           <span>📞 Support humain inclus</span>
         </div>
       </section>
-
-      {/* PAYMENT MODAL */}
-      {showPayment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
-            <button onClick={() => setShowPayment(false)} className="float-right text-slate-400 hover:text-slate-700 text-xl">✕</button>
-            <div className="text-center mb-6">
-              <p className="text-2xl font-bold text-slate-900 mb-1">Démarrer Leadflow</p>
-              <p className="text-slate-500 text-sm">Pour {agencyName} — {city}</p>
-            </div>
-            <div className="bg-blue-50 rounded-2xl p-4 mb-6 text-center">
-              <p className="text-3xl font-bold text-blue-700">1 490 MAD<span className="text-lg font-normal text-slate-500">/mois</span></p>
-            </div>
-            <div className="space-y-3">
-              <a
-                href={`https://www.paypal.com/paypalme/leadflowai/1490MAD`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3.5 rounded-xl font-semibold text-center text-white bg-[#0070ba] hover:bg-[#005ea6] transition-colors"
-              >
-                💳 Payer avec PayPal
-              </a>
-              <a
-                href={`https://wa.me/212600000000?text=Bonjour, je souhaite activer Leadflow pour ${agencyName} à ${city}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full py-3.5 rounded-xl font-semibold text-center text-white bg-emerald-500 hover:bg-emerald-600 transition-colors"
-              >
-                📱 Contacter sur WhatsApp
-              </a>
-              <button onClick={() => setShowPayment(false)} className="block w-full py-3 text-slate-400 text-sm hover:text-slate-600 transition-colors">
-                Annuler
-              </button>
-            </div>
-            <p className="text-center text-xs text-slate-400 mt-4">
-              Notre équipe vous contacte sous 2h pour l&apos;installation.
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* FAQ */}
       <section className="py-16 px-6 max-w-2xl mx-auto">
@@ -254,7 +334,7 @@ function PitchContent() {
                 className="w-full text-left px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors"
               >
                 <span className="font-semibold text-sm text-slate-900">{item.q}</span>
-                <span className="text-slate-400 flex-shrink-0 ml-4">{openFaq === i ? '−' : '+'}</span>
+                <span className="text-slate-400 shrink-0 ml-4 text-lg leading-none">{openFaq === i ? '−' : '+'}</span>
               </button>
               {openFaq === i && (
                 <div className="px-5 pb-4 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
@@ -297,6 +377,46 @@ function PitchContent() {
           <a href="/" className="hover:text-slate-300 transition-colors">Voir la démo Prestige Immobilier</a>
         </p>
       </footer>
+
+      {/* PAYMENT MODAL */}
+      {showPayment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl">
+            <button onClick={() => setShowPayment(false)} className="float-right text-slate-400 hover:text-slate-700 text-xl leading-none">✕</button>
+            <div className="text-center mb-6">
+              <p className="text-2xl font-bold text-slate-900 mb-1">Démarrer Leadflow</p>
+              <p className="text-slate-500 text-sm">Pour {agencyName} — {city}</p>
+            </div>
+            <div className="bg-blue-50 rounded-2xl p-4 mb-6 text-center">
+              <p className="text-3xl font-bold text-blue-700">1 490 MAD<span className="text-lg font-normal text-slate-500">/mois</span></p>
+            </div>
+            <div className="space-y-3">
+              <a
+                href="https://www.paypal.com/paypalme/leadflowai/1490"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3.5 rounded-xl font-semibold text-center text-white bg-[#0070ba] hover:bg-[#005ea6] transition-colors"
+              >
+                💳 Payer avec PayPal
+              </a>
+              <a
+                href={`https://wa.me/212600000000?text=${encodeURIComponent(`Bonjour, je souhaite activer Leadflow pour ${agencyName} à ${city}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full py-3.5 rounded-xl font-semibold text-center text-white bg-emerald-500 hover:bg-emerald-600 transition-colors"
+              >
+                📱 Contacter sur WhatsApp
+              </a>
+              <button onClick={() => setShowPayment(false)} className="block w-full py-3 text-slate-400 text-sm hover:text-slate-600 transition-colors">
+                Annuler
+              </button>
+            </div>
+            <p className="text-center text-xs text-slate-400 mt-4">
+              Notre équipe vous contacte sous 2h pour l&apos;installation.
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

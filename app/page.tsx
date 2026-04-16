@@ -1,10 +1,12 @@
 'use client'
+import { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import LeadWidget from './CSR/LeadWidget'
 
 const PROPERTIES = [
   {
-    id: 1,
+    id: '1',
     title: 'Villa Contemporaine',
     location: 'Anfa, Casablanca',
     price: '8 500 000 MAD',
@@ -17,7 +19,7 @@ const PROPERTIES = [
     badgeColor: 'bg-amber-500',
   },
   {
-    id: 2,
+    id: '2',
     title: 'Penthouse Vue Mer',
     location: 'Aïn Diab, Casablanca',
     price: '4 200 000 MAD',
@@ -30,7 +32,7 @@ const PROPERTIES = [
     badgeColor: 'bg-emerald-500',
   },
   {
-    id: 3,
+    id: '3',
     title: 'Villa de Prestige',
     location: 'Palmeraie, Marrakech',
     price: '12 000 000 MAD',
@@ -65,30 +67,80 @@ const TESTIMONIALS = [
   },
 ]
 
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
+
 export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <main className="bg-white text-slate-900">
       {/* NAV */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Logo */}
           <div className="flex items-center gap-2">
             <span className="text-xl">🏛</span>
             <span className="font-bold text-slate-900 text-lg tracking-tight">
               Prestige <span className="text-amber-600">Immobilier</span>
             </span>
           </div>
+
+          {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <a href="#biens" className="hover:text-amber-600 transition-colors">Nos biens</a>
-            <a href="#apropos" className="hover:text-amber-600 transition-colors">À propos</a>
-            <a href="#temoignages" className="hover:text-amber-600 transition-colors">Avis clients</a>
+            <Link href="/biens" className="hover:text-amber-600 transition-colors">Nos biens</Link>
+            <button onClick={() => scrollTo('apropos')} className="hover:text-amber-600 transition-colors">À propos</button>
+            <button onClick={() => scrollTo('temoignages')} className="hover:text-amber-600 transition-colors">Avis clients</button>
           </nav>
-          <a
-            href="tel:+212600000000"
-            className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:border-amber-500 hover:text-amber-600 transition-colors"
-          >
-            📞 +212 6 00 00 00 00
-          </a>
+
+          <div className="flex items-center gap-3">
+            <a
+              href="tel:+212600000000"
+              className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:border-amber-500 hover:text-amber-600 transition-colors"
+            >
+              📞 +212 6 00 00 00 00
+            </a>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-slate-100 transition-colors"
+              aria-label="Menu"
+            >
+              <span className={`block w-5 h-0.5 bg-slate-900 transition-all duration-200 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-slate-900 transition-all duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-slate-900 transition-all duration-200 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            </button>
+          </div>
         </div>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 flex flex-col gap-4">
+            <Link href="/biens" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors">
+              🏠 Nos biens
+            </Link>
+            <button
+              onClick={() => { scrollTo('apropos'); setMenuOpen(false) }}
+              className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors text-left"
+            >
+              ℹ️ À propos
+            </button>
+            <button
+              onClick={() => { scrollTo('temoignages'); setMenuOpen(false) }}
+              className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors text-left"
+            >
+              ⭐ Avis clients
+            </button>
+            <a
+              href="tel:+212600000000"
+              className="text-sm font-semibold text-amber-600 border border-amber-200 rounded-lg px-4 py-2.5 text-center hover:bg-amber-50 transition-colors"
+            >
+              📞 +212 6 00 00 00 00
+            </a>
+          </div>
+        )}
       </header>
 
       {/* HERO */}
@@ -117,18 +169,18 @@ export default function Home() {
             Villas premium, appartements de standing et opportunités d&apos;investissement à Casablanca, Marrakech et Rabat.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <a
-              href="#biens"
+            <Link
+              href="/biens"
               className="px-7 py-3.5 rounded-xl font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors"
             >
               Voir nos biens
-            </a>
-            <a
-              href="#widget-cta"
+            </Link>
+            <button
+              onClick={() => scrollTo('widget-cta')}
               className="px-7 py-3.5 rounded-xl font-semibold text-white bg-white/20 backdrop-blur hover:bg-white/30 border border-white/30 transition-colors"
             >
               Parler à notre assistant ✨
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -188,13 +240,27 @@ export default function Home() {
                 </div>
                 <div className="flex items-center justify-between mt-4">
                   <p className="text-amber-600 font-bold text-lg">{p.price}</p>
-                  <button className="text-xs font-semibold text-slate-900 hover:text-amber-600 transition-colors">
+                  <Link
+                    href={`/biens/${p.id}`}
+                    className="text-xs font-semibold text-slate-900 hover:text-amber-600 transition-colors"
+                  >
                     Détails →
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        {/* View all button */}
+        <div className="text-center mt-10">
+          <Link
+            href="/biens"
+            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white transition-opacity hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
+          >
+            Voir tous nos biens →
+          </Link>
         </div>
       </section>
 
@@ -306,9 +372,10 @@ export default function Home() {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
               <div>
                 <p className="text-white font-semibold mb-3">Navigation</p>
-                {['Accueil', 'Nos biens', 'À propos', 'Contact'].map(l => (
-                  <p key={l} className="mb-2 hover:text-amber-400 cursor-pointer transition-colors">{l}</p>
-                ))}
+                <Link href="/" className="block mb-2 hover:text-amber-400 transition-colors">Accueil</Link>
+                <Link href="/biens" className="block mb-2 hover:text-amber-400 transition-colors">Nos biens</Link>
+                <button onClick={() => scrollTo('apropos')} className="block mb-2 hover:text-amber-400 transition-colors">À propos</button>
+                <button onClick={() => scrollTo('temoignages')} className="block hover:text-amber-400 transition-colors">Avis clients</button>
               </div>
               <div>
                 <p className="text-white font-semibold mb-3">Villes</p>
