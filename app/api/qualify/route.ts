@@ -1,155 +1,168 @@
-import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GoogleGenAI } from '@google/genai'
 import { NextRequest, NextResponse } from 'next/server'
+import supabaseServer from '../../DB/supabaseServer'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-interface IncomingMessage {
+interface Message {
   role: 'user' | 'assistant'
   content: string
 }
 
+interface SessionData {
+  agencyName?: string
+  [key: string]: unknown
+}
+
+interface RawLead {
+  name?: string
+  contact?: string
+  budget?: string
+  timeline?: string
+  property_type?: string
+  propertyType?: string
+  location?: string
+}
+
+type Score = 'HOT' | 'WARM' | 'COLD'
+
+// ── Server-side scoring ────────────────────────────────────────────────────────
+function calculateScore(lead: RawLead): Score {
+  const budget   = (lead.budget   || '').toLowerCase()
+  const timeline = (lead.timeline || '').toLowerCase()
+
+  const highBudget =
+    budget.includes('1m') ||
+    budget.includes("plus d'1m") ||
+    budget.includes('1 000 000') ||
+    budget.includes('500k-1m') ||
+    budget.includes('500k-1') ||
+    /[5-9]\d{5,}/.test(budget.replace(/\s/g, '')) ||
+    /[1-9]\d{6,}/.test(budget.replace(/\s/g, ''))
+
+  const shortTimeline =
+    timeline.includes('ce mois') ||
+    timeline.includes('mois-ci') ||
+    timeline.includes('immédiat') ||
+    timeline.includes('urgent')
+
+  const mediumTimeline =
+    shortTimeline ||
+    timeline.includes('3 mois') ||
+    timeline.includes('dans 3')
+
+  if (shortTimeline && highBudget) return 'HOT'
+  if (mediumTimeline || highBudget) return 'WARM'
+  return 'COLD'
+}
+
 // ── System prompt ──────────────────────────────────────────────────────────────
 function buildSystemPrompt(agencyName: string) {
-  return `Tu es l'assistant IA de "${agencyName}", une agence immobilière premium au Maroc.
-Ton rôle: qualifier les prospects immobiliers de manière naturelle et chaleureuse.
+  return `Tu es l'assistant de "${agencyName}".
+Qualifie le visiteur en 5 questions courtes.
+Ton style : simple, humain, 1-2 phrases max.
+Pour la toute première question, commence par une courte salutation puis demande le prénom.
 
-PROTOCOLE DE QUALIFICATION (5 questions, une à la fois):
-Q1 → "Vous cherchez à acheter ou à louer ?"
-Q2 → "Quel type de bien vous intéresse ? (villa, appartement, penthouse...)"
-Q3 → "Quel est votre budget approximatif ?"
-Q4 → "Dans quelle ville ou quartier ?"
-Q5 → "Dans quel délai souhaitez-vous concrétiser votre projet ? Et votre prénom ?"
+Collecte dans cet ordre :
+1. Prénom
+2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
+3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
+4. Type de bien (appartement / villa / terrain)
+5. Ville ou quartier
 
-RÈGLES:
-- Une seule question par message
-- Sois chaleureux, professionnel, concis (2-3 phrases max)
-- Confirme la réponse précédente avant de poser la question suivante
-- Réponds en français. Si le visiteur écrit en darija, adapte-toi naturellement
+Une question à la fois. Pas de formules corporate.
+Langue : français. Darija si le visiteur l'utilise.
 
-APRÈS AVOIR COLLECTÉ LES 5 RÉPONSES, réponds UNIQUEMENT avec ce JSON (rien d'autre):
-{"done":true,"message":"Message de remerciement personnalisé de 2 phrases","lead":{"name":"prénom du prospect","budget":"montant ou fourchette","type":"Achat ou Location","propertyType":"type de bien exact","location":"ville ou quartier","timeline":"délai précis","score":7,"temperature":"Hot","reason":"Justification courte du score"}}
-
-CRITÈRES DE SCORE:
-- Hot (score 8-10): Budget précis élevé + délai ≤ 3 mois + coordonnées complètes
-- Warm (score 5-7): Budget approximatif OU délai 3-6 mois OU contact partiel
-- Cold (score 1-4): Budget vague OU délai > 6 mois OU pas de contact`
+Quand tu as les 5 réponses, réponds UNIQUEMENT avec ce JSON :
+{"done":true,"message":"Parfait [prénom], un conseiller vous rappelle bientôt.","lead":{"name":"[prénom]","contact":"[prénom]","budget":"...","timeline":"...","property_type":"...","location":"..."}}`
 }
 
-// ── Mock fallback (when API key is absent) ─────────────────────────────────────
-const MOCK_QUESTIONS = [
-  "Parfait, merci ! Quel type de bien vous intéresse ? (villa, appartement, penthouse...)",
-  "Super choix ! Quel est votre budget approximatif pour ce projet ?",
-  "Excellent ! Dans quelle ville ou quartier cherchez-vous ce bien ?",
-  "Très bien ! Dans quel délai souhaitez-vous concrétiser votre projet ? Et quel est votre prénom ?",
-]
-
-const MOCK_LEAD = {
-  name: "Mohammed",
-  budget: "5 000 000 MAD",
-  type: "Achat",
-  propertyType: "Villa",
-  location: "Casablanca",
-  timeline: "3 mois",
-  score: 9,
-  temperature: "Hot" as const,
-  reason: "Budget précis élevé, délai court et prospect très motivé.",
+// ── Score → widget display mapping ────────────────────────────────────────────
+const SCORE_DISPLAY: Record<Score, { label: 'Hot' | 'Warm' | 'Cold'; numeric: number }> = {
+  HOT:  { label: 'Hot',  numeric: 9 },
+  WARM: { label: 'Warm', numeric: 6 },
+  COLD: { label: 'Cold', numeric: 2 },
 }
 
-function getMockResponse(messages: IncomingMessage[]) {
-  const userCount = messages.filter(m => m.role === 'user').length
-  if (userCount < MOCK_QUESTIONS.length) {
-    return { done: false, message: MOCK_QUESTIONS[userCount - 1] }
-  }
+function buildLeadPayload(lead: RawLead, score: Score) {
+  const { label, numeric } = SCORE_DISPLAY[score]
   return {
-    done: true,
-    message: `Merci ${MOCK_LEAD.name} ! Votre dossier a été transmis à notre équipe — un conseiller vous contacte sous 30 minutes. 🏠`,
-    lead: MOCK_LEAD,
+    name:          lead.name          ?? 'Prospect',
+    contact:       lead.contact       ?? lead.name ?? 'Non fourni',
+    budget:        lead.budget        ?? 'Non précisé',
+    timeline:      lead.timeline      ?? 'Non précisé',
+    property_type: lead.property_type ?? lead.propertyType ?? 'Non précisé',
+    location:      lead.location      ?? 'Non précisé',
+    label,
+    numericScore: numeric,
   }
 }
 
-// ── Normalize lead from Gemini JSON → widget format ────────────────────────────
-function normalizeLead(raw: Record<string, unknown>) {
-  const temp = (raw.temperature as string) || 'Warm'
-  return {
-    name: (raw.name as string) || 'Prospect',
-    budget: (raw.budget as string) || 'Non précisé',
-    type: (raw.type as string) || 'Achat',
-    propertyType: (raw.propertyType as string) || 'Bien immobilier',
-    location: (raw.location as string) || 'Maroc',
-    timeline: (raw.timeline as string) || 'Non précisé',
-    contact: (raw.name as string) || 'Non fourni',
-    score: typeof raw.score === 'number' ? raw.score : 7,
-    label: (temp === 'Hot' ? 'Hot' : temp === 'Cold' ? 'Cold' : 'Warm') as 'Hot' | 'Warm' | 'Cold',
-    reason: (raw.reason as string) || `Score basé sur les critères de qualification.`,
-  }
+// ── Insert lead into Supabase ──────────────────────────────────────────────────
+async function saveLead(lead: RawLead, score: Score) {
+  const { error } = await supabaseServer.from('leads').insert({
+    name:          lead.name          ?? 'Prospect',
+    contact:       lead.contact       ?? lead.name ?? 'Non fourni',
+    budget:        lead.budget        ?? 'Non précisé',
+    timeline:      lead.timeline      ?? 'Non précisé',
+    property_type: lead.property_type ?? lead.propertyType ?? 'Non précisé',
+    location:      lead.location      ?? 'Non précisé',
+    score,
+  })
+  if (error) console.error('Supabase insert error:', error.message)
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const body        = await req.json()
+  const messages: Message[] = Array.isArray(body.messages) ? body.messages : []
+  const sessionData: SessionData = body.sessionData ?? {}
+  const agencyName  = sessionData.agencyName ?? 'Prestige Immobilier'
+
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
+  if (!apiKey) {
+    return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
+  }
+
   try {
-    const { messages, agencyName } = await req.json()
+    const ai = new GoogleGenAI({ apiKey })
 
-    if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Invalid messages' }, { status: 400 })
-    }
-
-    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
-
-    // ── No API key → use mock so demo never breaks ──
-    if (!apiKey) {
-      const mock = getMockResponse(messages as IncomingMessage[])
-      if (mock.done && 'lead' in mock) {
-        return NextResponse.json({
-          message: mock.message,
-          done: true,
-          lead: {
-            ...mock.lead,
-            contact: mock.lead.name,
-            label: mock.lead.temperature,
-            reason: mock.lead.reason,
-          },
-        })
-      }
-      return NextResponse.json({ message: mock.message, done: false })
-    }
-
-    // ── Gemini call ──
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
-
-    const systemPrompt = buildSystemPrompt(agencyName || 'Prestige Immobilier')
-    const conversationHistory = (messages as IncomingMessage[])
+    const systemPrompt = buildSystemPrompt(agencyName)
+    const history = messages
       .map(m => `${m.role === 'user' ? 'Visiteur' : 'Assistant'}: ${m.content}`)
       .join('\n\n')
 
-    const prompt = `${systemPrompt}\n\n---\nHistorique de la conversation:\n${conversationHistory}\n\nAssistant:`
+    const prompt = `${systemPrompt}\n\n---\nHistorique:\n${history}\n\nAssistant:`
 
-    const result = await model.generateContent(prompt)
-    const text = result.response.text().trim()
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-lite',
+      contents: prompt,
+    })
+    const text = (result.text ?? '').trim()
 
-    // Try to extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
       try {
         const parsed = JSON.parse(jsonMatch[0])
         if (parsed.done && parsed.lead) {
+          const rawLead = parsed.lead as RawLead
+          const score   = calculateScore(rawLead)
+          await saveLead(rawLead, score)
           return NextResponse.json({
-            message: parsed.message || 'Merci pour ces informations !',
-            done: true,
-            lead: normalizeLead(parsed.lead),
+            reply:      parsed.message ?? 'Merci pour ces informations !',
+            isComplete: true,
+            score,
+            lead:       buildLeadPayload(rawLead, score),
           })
         }
       } catch {
-        // fall through to plain message
+        // not JSON, continue as plain reply
       }
     }
 
-    return NextResponse.json({ message: text, done: false })
-  } catch (err) {
-    console.error('qualify API error:', err)
-    // Return a safe fallback so the demo never shows a broken state
-    return NextResponse.json({
-      message: "Je suis là pour vous aider ! Quel type de bien vous intéresse ?",
-      done: false,
-    })
+    return NextResponse.json({ reply: text, isComplete: false })
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[qualify] error:', msg)
+    return NextResponse.json({ error: msg }, { status: 500 })
   }
 }

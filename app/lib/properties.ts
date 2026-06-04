@@ -1,5 +1,7 @@
 export type PropertyType = 'Villa' | 'Appartement' | 'Penthouse' | 'Riad'
 export type City = 'Casablanca' | 'Marrakech' | 'Rabat' | 'Tanger'
+// badge_color values — listed here so Tailwind includes them in the CSS bundle
+export type BadgeColor = 'bg-amber-500' | 'bg-emerald-500' | 'bg-rose-500'
 
 export interface Property {
   id: string
@@ -15,11 +17,12 @@ export interface Property {
   image: string
   images: string[]
   badge: string
-  badgeColor: string
+  badgeColor: BadgeColor
   description: string
   features: string[]
 }
 
+// Static fallback used only if DB is unreachable
 export const PROPERTIES: Property[] = [
   {
     id: '1',
