@@ -13,6 +13,7 @@ export default function PropertyDetail({
   similar: Property[]
 }) {
   const [activeImage, setActiveImage] = useState(0)
+  const [widgetOpen, setWidgetOpen]   = useState(false)
 
   return (
     <main className="bg-white text-slate-900 min-h-screen">
@@ -161,11 +162,11 @@ export default function PropertyDetail({
                   ))}
                 </div>
                 <button
-                  onClick={() => document.getElementById('widget-trigger')?.click()}
+                  onClick={() => setWidgetOpen(true)}
                   className="w-full py-3.5 rounded-xl font-bold text-white text-sm mb-3 transition-opacity hover:opacity-90"
                   style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
                 >
-                  💬 Parler à un conseiller
+                  Parler à un conseiller
                 </button>
                 <a
                   href="tel:+212600000000"
@@ -227,8 +228,11 @@ export default function PropertyDetail({
         <p className="mt-2">© 2025 Prestige Immobilier • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
       </footer>
 
-      <button id="widget-trigger" className="hidden" />
-      <LeadWidget agencyName="Prestige Immobilier" />
+      <LeadWidget
+        agencyName="Prestige Immobilier"
+        propertyContext={{ id: property.id, title: property.title }}
+        externalOpen={widgetOpen}
+      />
     </main>
   )
 }

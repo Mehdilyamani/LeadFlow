@@ -1,10 +1,7 @@
 'use client'
 import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  MessageSquare, X, Building2, Home, Banknote,
-  MapPin, Clock, User, Send, CheckCircle2, ChevronRight,
-} from 'lucide-react'
+import { MessageSquare, X, Building2, Send } from 'lucide-react'
 
 interface Message { role: 'user' | 'assistant'; content: string }
 
@@ -13,14 +10,10 @@ interface LeadData {
   timeline: string; property_type: string; numericScore: number; label: 'Hot' | 'Warm' | 'Cold'
 }
 
-const LABEL_STYLE = {
-  Hot:  { bg: 'bg-red-500',    light: 'bg-red-50',    border: 'border-red-200',    text: 'text-red-600',    bar: 'bg-red-500',   tag: 'HOT',  tagCls: 'bg-red-500'   },
-  Warm: { bg: 'bg-amber-500',  light: 'bg-amber-50',  border: 'border-amber-200',  text: 'text-amber-600',  bar: 'bg-amber-400', tag: 'WARM', tagCls: 'bg-amber-500' },
-  Cold: { bg: 'bg-slate-400',  light: 'bg-slate-100', border: 'border-slate-200',  text: 'text-slate-500',  bar: 'bg-slate-400', tag: 'COLD', tagCls: 'bg-slate-400' },
-}
-
-const GREETING = (agencyName: string) =>
-  `Bienvenue chez ${agencyName}. Je vais vous poser quelques questions rapides pour mieux vous orienter.`
+const GREETING = (agencyName: string, propertyContext?: { id: string; title: string } | null) =>
+  propertyContext
+    ? `Vous êtes intéressé par **${propertyContext.title}** ? Je vais vous poser quelques questions rapides pour vous mettre en relation avec un conseiller.`
+    : `Bienvenue chez ${agencyName}. Je vais vous poser quelques questions rapides pour mieux vous orienter.`
 
 function renderMessage(text: string | undefined | null) {
   if (!text) return null
@@ -35,17 +28,20 @@ function renderMessage(text: string | undefined | null) {
 export default function LeadWidget({
   agencyName = 'Prestige Immobilier',
   isEmbedded = false,
+  propertyContext = null,
+  externalOpen = false,
 }: {
   agencyName?: string
   isEmbedded?: boolean
+  propertyContext?: { id: string; title: string } | null
+  externalOpen?: boolean
 }) {
   const [isOpen, setIsOpen]     = useState(isEmbedded)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput]       = useState('')
   const [loading, setLoading]   = useState(false)
-  const [leadData, setLeadData] = useState<LeadData | null>(null)
-  const [stage, setStage]       = useState<'chat' | 'scored' | 'dashboard'>('chat')
-  const [showNotif, setShowNotif] = useState(false)
+  const [leadName, setLeadName] = useState<string | null>(null)
+  const [stage, setStage]       = useState<'chat' | 'done'>('chat')
   const [mounted, setMounted]   = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef  = useRef<HTMLInputElement>(null)
@@ -53,9 +49,13 @@ export default function LeadWidget({
   useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
+    if (externalOpen) setIsOpen(true)
+  }, [externalOpen])
+
+  useEffect(() => {
     if (isOpen && messages.length === 0)
-      setMessages([{ role: 'assistant', content: GREETING(agencyName) }])
-  }, [isOpen, agencyName, messages.length])
+      setMessages([{ role: 'assistant', content: GREETING(agencyName, propertyContext) }])
+  }, [isOpen, agencyName, propertyContext, messages.length])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -78,14 +78,18 @@ export default function LeadWidget({
       const res  = await fetch('/api/qualify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMsgs, sessionData: { agencyName } }),
+        body: JSON.stringify({ messages: newMsgs, sessionData: { agencyName, propertyContext } }),
       })
       const data = await res.json()
+
       if (data.isComplete && data.lead) {
-        setMessages([...newMsgs, { role: 'assistant', content: data.reply || 'Merci pour ces informations !' }])
-        setLeadData(data.lead)
-        setStage('scored')
-        setTimeout(() => setShowNotif(true), 1600)
+        const name = (data.lead as LeadData).name ?? ''
+        const thanks = name
+          ? `Merci ${name} ! Un conseiller vous recontacte très vite.`
+          : 'Merci ! Un conseiller vous recontacte très vite.'
+        setMessages([...newMsgs, { role: 'assistant', content: thanks }])
+        setLeadName(name)
+        setStage('done')
       } else {
         setMessages([...newMsgs, { role: 'assistant', content: data.reply || 'Comment puis-je vous aider ?' }])
       }
@@ -99,19 +103,12 @@ export default function LeadWidget({
 
   function handleKey(e: KeyboardEvent<HTMLInputElement>) { if (e.key === 'Enter') send() }
 
-  function reset() {
-    setLeadData(null); setStage('chat'); setShowNotif(false)
-    setMessages([{ role: 'assistant', content: GREETING(agencyName) }])
-  }
-
-  const style = leadData ? LABEL_STYLE[leadData.label] : null
-
   // ── Embedded ───────────────────────────────────────────────────────────────
   if (isEmbedded) {
     return (
       <div className="w-full max-w-md mx-auto rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col" style={{ height: 540 }}>
         <WidgetHeader agencyName={agencyName} />
-        <WidgetBody {...{ messages, loading, stage, leadData, showNotif, style, input, setInput, send, handleKey, reset, setStage, bottomRef, inputRef }} />
+        <WidgetBody {...{ messages, loading, stage, leadName, input, setInput, send, handleKey, bottomRef, inputRef }} />
       </div>
     )
   }
@@ -119,7 +116,6 @@ export default function LeadWidget({
   // ── Floating ───────────────────────────────────────────────────────────────
   return (
     <>
-      {/* Toggle button */}
       {mounted && (
         <button
           onClick={() => {
@@ -147,7 +143,6 @@ export default function LeadWidget({
         </button>
       )}
 
-      {/* Panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -155,11 +150,11 @@ export default function LeadWidget({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ type: 'spring', damping: 26, stiffness: 320 }}
-            className="fixed bottom-24 right-6 z-50 w-[375px] rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 flex flex-col"
+            className="fixed bottom-24 right-6 z-50 w-93.75 rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 flex flex-col"
             style={{ height: 530 }}
           >
             <WidgetHeader agencyName={agencyName} onClose={() => setIsOpen(false)} />
-            <WidgetBody {...{ messages, loading, stage, leadData, showNotif, style, input, setInput, send, handleKey, reset, setStage, bottomRef, inputRef }} />
+            <WidgetBody {...{ messages, loading, stage, leadName, input, setInput, send, handleKey, bottomRef, inputRef }} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -171,12 +166,12 @@ export default function LeadWidget({
 function WidgetHeader({ agencyName, onClose }: { agencyName: string; onClose?: () => void }) {
   return (
     <div
-      className="flex items-center justify-between px-4 py-3 flex-shrink-0"
+      className="flex items-center justify-between px-4 py-3 shrink-0"
       style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}
     >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center shrink-0">
-          <Building2 className="w-4.5 h-4.5 text-white" style={{ width: 18, height: 18 }} />
+          <Building2 style={{ width: 18, height: 18 }} className="text-white" />
         </div>
         <div>
           <p className="font-semibold text-white text-sm leading-tight">{agencyName}</p>
@@ -197,22 +192,18 @@ function WidgetHeader({ agencyName, onClose }: { agencyName: string; onClose?: (
 
 // ── Body ───────────────────────────────────────────────────────────────────────
 function WidgetBody({
-  messages, loading, stage, leadData, showNotif, style,
-  input, setInput, send, handleKey, reset, setStage, bottomRef, inputRef,
+  messages, loading, stage, leadName,
+  input, setInput, send, handleKey, bottomRef, inputRef,
 }: {
-  messages: Message[]; loading: boolean; stage: string
-  leadData: LeadData | null; showNotif: boolean
-  style: typeof LABEL_STYLE['Hot'] | null
+  messages: Message[]; loading: boolean; stage: string; leadName: string | null
   input: string; setInput: (v: string) => void
   send: () => void; handleKey: (e: KeyboardEvent<HTMLInputElement>) => void
-  reset: () => void; setStage: (s: 'chat' | 'scored' | 'dashboard') => void
   bottomRef: React.RefObject<HTMLDivElement | null>
   inputRef: React.RefObject<HTMLInputElement | null>
 }) {
   return (
     <div className="flex flex-col flex-1 overflow-hidden" style={{ background: '#f8fafc' }}>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -247,143 +238,26 @@ function WidgetBody({
           </div>
         )}
 
-        {/* Score card */}
-        <AnimatePresence>
-          {stage === 'scored' && leadData && style && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`rounded-2xl border overflow-hidden mt-1 ${style.border}`}
-            >
-              {/* Card header */}
-              <div className={`px-4 py-3 flex items-center justify-between ${style.light}`}>
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Profil qualifié</p>
-                <span className={`text-xs font-bold text-white px-2.5 py-0.5 rounded-full ${style.tagCls}`}>
-                  {style.tag}
-                </span>
-              </div>
-
-              {/* Score bar */}
-              <div className="px-4 py-3 bg-white border-b border-slate-100">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-xs text-slate-400 font-medium">Score de qualification</span>
-                  <span className={`text-xs font-bold ${style.text}`}>{leadData.numericScore}/10</span>
-                </div>
-                <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${leadData.numericScore * 10}%` }}
-                    transition={{ duration: 0.9, delay: 0.2, ease: 'easeOut' }}
-                    className={`h-full rounded-full ${style.bar}`}
-                  />
-                </div>
-              </div>
-
-              {/* Lead fields */}
-              <div className="bg-white px-4 py-3 space-y-2.5">
-                {[
-                  { Icon: Home,    label: 'Bien',    value: leadData.property_type },
-                  { Icon: Banknote, label: 'Budget', value: leadData.budget },
-                  { Icon: MapPin,  label: 'Zone',    value: leadData.location },
-                  { Icon: Clock,   label: 'Délai',   value: leadData.timeline },
-                  { Icon: User,    label: 'Contact', value: leadData.contact },
-                ].map(({ Icon, label, value }) => (
-                  <div key={label} className="flex items-center gap-2.5">
-                    <Icon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span className="text-xs text-slate-400 w-14 shrink-0">{label}</span>
-                    <span className="text-xs font-semibold text-slate-800 truncate">{value || '—'}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Confirmation */}
-              <AnimatePresence>
-                {showNotif && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="px-4 py-3 bg-emerald-50 border-t border-emerald-100 flex items-start gap-2.5"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-semibold text-emerald-700">Dossier transmis avec succès</p>
-                      <p className="text-xs text-emerald-600 mt-0.5">Un conseiller vous rappelle sous 30 minutes.</p>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* CTA */}
-              <div className="px-4 py-3 bg-white border-t border-slate-100">
-                <button
-                  onClick={() => setStage('dashboard')}
-                  className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-semibold text-white transition-opacity hover:opacity-90"
-                  style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-                >
-                  Aperçu tableau de bord agent
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Agent dashboard preview */}
-        <AnimatePresence>
-          {stage === 'dashboard' && leadData && style && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm mt-1"
-            >
-              <div
-                className="px-4 py-3 flex items-center justify-between"
-                style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-              >
-                <div>
-                  <p className="text-[10px] text-white/50 uppercase tracking-wider font-medium">Dashboard Agent</p>
-                  <p className="text-sm font-semibold text-white mt-0.5">Nouveau lead entrant</p>
-                </div>
-                <span className={`text-xs font-bold text-white px-2.5 py-1 rounded-full ${style.tagCls}`}>
-                  {style.tag}
-                </span>
-              </div>
-
-              <div className="divide-y divide-slate-50">
-                {[
-                  ['Contact',  leadData.contact],
-                  ['Bien',     leadData.property_type],
-                  ['Budget',   leadData.budget],
-                  ['Zone',     leadData.location],
-                  ['Délai',    leadData.timeline],
-                ].map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between px-4 py-2.5 text-xs">
-                    <span className="text-slate-400 font-medium">{k}</span>
-                    <span className="text-slate-800 font-semibold">{v || '—'}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="px-4 py-3 border-t border-slate-100">
-                <button
-                  onClick={reset}
-                  className="w-full py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
-                >
-                  Recommencer la démo →
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Done state: subtle confirmation strip */}
+        {stage === 'done' && !loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="flex justify-center pt-2"
+          >
+            <span className="text-xs text-slate-400 px-3 py-1.5 bg-white border border-slate-100 rounded-full shadow-sm">
+              {leadName ? `À très vite, ${leadName}.` : 'À très vite.'}
+            </span>
+          </motion.div>
+        )}
 
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar */}
+      {/* Input bar — hidden once done */}
       {stage === 'chat' && (
-        <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 flex-shrink-0">
+        <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 shrink-0">
           <div className="flex gap-2 items-center">
             <input
               ref={inputRef}

@@ -14,6 +14,7 @@ interface Lead {
   timeline: string
   property_type: string
   location: string
+  property_interest?: string | null
   created_at: string
 }
 
@@ -32,9 +33,10 @@ function timeAgo(iso: string) {
 }
 
 function exportCSV(leads: Lead[]) {
-  const headers = ['Nom', 'Contact', 'Score', 'Budget', 'Délai', 'Bien', 'Lieu', 'Date']
+  const headers = ['Nom', 'Contact', 'Score', 'Budget', 'Délai', 'Bien', 'Bien demandé', 'Lieu', 'Date']
   const rows = leads.map(l => [
-    l.name, l.contact, l.score, l.budget, l.timeline, l.property_type, l.location,
+    l.name, l.contact, l.score, l.budget, l.timeline, l.property_type,
+    l.property_interest ?? '—', l.location,
     new Date(l.created_at).toLocaleDateString('fr-MA'),
   ])
   const csv = [headers, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n')
@@ -245,7 +247,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/"
-              className="hidden md:flex items-center gap-1.5 text-sm font-medium text-slate-400 hover:text-white px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors"
+              className="hidden md:flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Retour au site
             </Link>
@@ -340,7 +342,7 @@ export default function DashboardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-100">
-                    {['Prospect', 'Contact', 'Score', 'Budget', 'Délai', 'Bien', 'Localisation', 'Reçu'].map(h => (
+                    {['Prospect', 'Contact', 'Score', 'Budget', 'Délai', 'Bien', 'Bien demandé', 'Localisation', 'Reçu'].map(h => (
                       <th key={h} className="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide whitespace-nowrap">
                         {h}
                       </th>
@@ -370,6 +372,13 @@ export default function DashboardPage() {
                         <span className="bg-slate-100 text-slate-600 text-xs font-medium px-2.5 py-1 rounded-lg">
                           {lead.property_type}
                         </span>
+                      </td>
+                      {/* Property interest */}
+                      <td className="px-5 py-3.5 max-w-40">
+                        {lead.property_interest
+                          ? <span className="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md truncate block">{lead.property_interest}</span>
+                          : <span className="text-xs text-slate-300">—</span>
+                        }
                       </td>
                       {/* Location */}
                       <td className="px-5 py-3.5">

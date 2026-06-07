@@ -8,8 +8,14 @@ interface Message {
   content: string
 }
 
+interface PropertyContext {
+  id: string
+  title: string
+}
+
 interface SessionData {
   agencyName?: string
+  propertyContext?: PropertyContext | null
   [key: string]: unknown
 }
 
@@ -56,24 +62,53 @@ function calculateScore(lead: RawLead): Score {
 }
 
 // ── System prompt ──────────────────────────────────────────────────────────────
-function buildSystemPrompt(agencyName: string) {
-  return `Tu es l'assistant de "${agencyName}".
-Qualifie le visiteur en 5 questions courtes.
-Ton style : simple, humain, 1-2 phrases max.
-Pour la toute première question, commence par une courte salutation puis demande le prénom.
+function buildSystemPrompt(
+  agencyName: string,
+  propertyContext?: PropertyContext | null,
+  knownLocation?: string | null,
+) {
+  const contextLine = propertyContext
+    ? `\nContexte : le visiteur consulte "${propertyContext.title}".`
+    : ''
 
-Collecte dans cet ordre :
+  // Fix 1: when widget already greeted the visitor, Gemini must NOT add its own welcome
+  const greetingInstruction = propertyContext
+    ? `IMPORTANT : le widget a déjà accueilli le visiteur et mentionné ce bien. Ta toute première réponse doit être UNIQUEMENT la question du prénom — sans salutation, sans introduction, sans répétition du nom du bien.`
+    : `Pour la toute première question, commence par une courte salutation puis demande le prénom.`
+
+  // Fix 2: skip location question when we already know it
+  const questionCount = knownLocation ? 4 : 5
+  const questions = knownLocation
+    ? `Collecte dans cet ordre :
 1. Prénom
 2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
 4. Type de bien (appartement / villa / terrain)
-5. Ville ou quartier
+
+NE pose PAS de question sur la ville ou le quartier — la localisation est déjà connue : ${knownLocation}.`
+    : `Collecte dans cet ordre :
+1. Prénom
+2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
+3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
+4. Type de bien (appartement / villa / terrain)
+5. Ville ou quartier`
+
+  const locationInJson = knownLocation
+    ? `"location":"${knownLocation.replace(/"/g, '\\"')}"`
+    : `"location":"..."`
+
+  return `Tu es l'assistant de "${agencyName}".${contextLine}
+Qualifie le visiteur en ${questionCount} questions courtes.
+Ton style : simple, humain, 1-2 phrases max.
+${greetingInstruction}
+
+${questions}
 
 Une question à la fois. Pas de formules corporate.
 Langue : français. Darija si le visiteur l'utilise.
 
-Quand tu as les 5 réponses, réponds UNIQUEMENT avec ce JSON :
-{"done":true,"message":"Parfait [prénom], un conseiller vous rappelle bientôt.","lead":{"name":"[prénom]","contact":"[prénom]","budget":"...","timeline":"...","property_type":"...","location":"..."}}`
+Quand tu as les ${questionCount} réponses, réponds UNIQUEMENT avec ce JSON :
+{"done":true,"message":"Parfait [prénom], un conseiller vous rappelle bientôt.","lead":{"name":"[prénom]","contact":"[prénom]","budget":"...","timeline":"...","property_type":"...",${locationInJson}}}`
 }
 
 // ── Score → widget display mapping ────────────────────────────────────────────
@@ -83,7 +118,7 @@ const SCORE_DISPLAY: Record<Score, { label: 'Hot' | 'Warm' | 'Cold'; numeric: nu
   COLD: { label: 'Cold', numeric: 2 },
 }
 
-function buildLeadPayload(lead: RawLead, score: Score) {
+function buildLeadPayload(lead: RawLead, score: Score, knownLocation?: string | null) {
   const { label, numeric } = SCORE_DISPLAY[score]
   return {
     name:          lead.name          ?? 'Prospect',
@@ -91,42 +126,62 @@ function buildLeadPayload(lead: RawLead, score: Score) {
     budget:        lead.budget        ?? 'Non précisé',
     timeline:      lead.timeline      ?? 'Non précisé',
     property_type: lead.property_type ?? lead.propertyType ?? 'Non précisé',
-    location:      lead.location      ?? 'Non précisé',
+    location:      knownLocation      ?? lead.location ?? 'Non précisé',
     label,
-    numericScore: numeric,
+    numericScore:  numeric,
   }
 }
 
 // ── Insert lead into Supabase ──────────────────────────────────────────────────
-async function saveLead(lead: RawLead, score: Score) {
+async function saveLead(
+  lead: RawLead,
+  score: Score,
+  propertyInterest?: string | null,
+  knownLocation?: string | null,
+) {
   const { error } = await supabaseServer.from('leads').insert({
-    name:          lead.name          ?? 'Prospect',
-    contact:       lead.contact       ?? lead.name ?? 'Non fourni',
-    budget:        lead.budget        ?? 'Non précisé',
-    timeline:      lead.timeline      ?? 'Non précisé',
-    property_type: lead.property_type ?? lead.propertyType ?? 'Non précisé',
-    location:      lead.location      ?? 'Non précisé',
+    name:              lead.name          ?? 'Prospect',
+    contact:           lead.contact       ?? lead.name ?? 'Non fourni',
+    budget:            lead.budget        ?? 'Non précisé',
+    timeline:          lead.timeline      ?? 'Non précisé',
+    property_type:     lead.property_type ?? lead.propertyType ?? 'Non précisé',
+    location:          knownLocation      ?? lead.location ?? 'Non précisé',
     score,
+    property_interest: propertyInterest   ?? null,
   })
   if (error) console.error('Supabase insert error:', error.message)
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const body        = await req.json()
+  const body            = await req.json()
   const messages: Message[] = Array.isArray(body.messages) ? body.messages : []
   const sessionData: SessionData = body.sessionData ?? {}
-  const agencyName  = sessionData.agencyName ?? 'Prestige Immobilier'
+  const agencyName      = sessionData.agencyName ?? 'Prestige Immobilier'
+  const propertyContext = sessionData.propertyContext ?? null
 
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
   }
 
+  // Fix 2: look up the property's location from DB to skip the location question
+  let knownLocation: string | null = null
+  if (propertyContext?.id) {
+    const { data } = await supabaseServer
+      .from('properties')
+      .select('location, city')
+      .eq('id', propertyContext.id)
+      .single()
+    if (data?.location) {
+      knownLocation = [data.location, data.city].filter(Boolean).join(', ')
+    }
+  }
+
   try {
     const ai = new GoogleGenAI({ apiKey })
 
-    const systemPrompt = buildSystemPrompt(agencyName)
+    const systemPrompt = buildSystemPrompt(agencyName, propertyContext, knownLocation)
     const history = messages
       .map(m => `${m.role === 'user' ? 'Visiteur' : 'Assistant'}: ${m.content}`)
       .join('\n\n')
@@ -134,7 +189,7 @@ export async function POST(req: NextRequest) {
     const prompt = `${systemPrompt}\n\n---\nHistorique:\n${history}\n\nAssistant:`
 
     const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-lite',
+      model: 'gemini-2.5-flash',
       contents: prompt,
     })
     const text = (result.text ?? '').trim()
@@ -146,12 +201,12 @@ export async function POST(req: NextRequest) {
         if (parsed.done && parsed.lead) {
           const rawLead = parsed.lead as RawLead
           const score   = calculateScore(rawLead)
-          await saveLead(rawLead, score)
+          await saveLead(rawLead, score, propertyContext?.title, knownLocation)
           return NextResponse.json({
             reply:      parsed.message ?? 'Merci pour ces informations !',
             isComplete: true,
             score,
-            lead:       buildLeadPayload(rawLead, score),
+            lead:       buildLeadPayload(rawLead, score, knownLocation),
           })
         }
       } catch {
