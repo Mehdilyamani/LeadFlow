@@ -73,21 +73,25 @@ function buildSystemPrompt(
 
   // Fix 1: when widget already greeted the visitor, Gemini must NOT add its own welcome
   const greetingInstruction = propertyContext
-    ? `IMPORTANT : le widget a déjà accueilli le visiteur et mentionné ce bien. Ta toute première réponse doit être UNIQUEMENT la question du prénom — sans salutation, sans introduction, sans répétition du nom du bien.`
-    : `Pour la toute première question, commence par une courte salutation puis demande le prénom.`
+    ? `IMPORTANT : le widget a déjà accueilli le visiteur et mentionné ce bien. Ta toute première réponse doit être UNIQUEMENT la question du prénom et du contact (question 1) — sans salutation, sans introduction, sans répétition du nom du bien.`
+    : `Pour la toute première question, commence par une courte salutation puis pose la question 1 (prénom + contact).`
 
   // Fix 2: skip location question when we already know it
   const questionCount = knownLocation ? 4 : 5
   const questions = knownLocation
     ? `Collecte dans cet ordre :
-1. Prénom
+1. Prénom ET contact — pose exactement : "Quel est votre prénom et votre numéro WhatsApp (ou email) pour qu'un conseiller vous recontacte ?"
+   → Si le visiteur donne seulement un prénom sans numéro ni email, redemande-lui le contact AVANT de continuer.
+   → name = prénom uniquement / contact = numéro de téléphone ou adresse email
 2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
 4. Type de bien (appartement / villa / terrain)
 
 NE pose PAS de question sur la ville ou le quartier — la localisation est déjà connue : ${knownLocation}.`
     : `Collecte dans cet ordre :
-1. Prénom
+1. Prénom ET contact — pose exactement : "Quel est votre prénom et votre numéro WhatsApp (ou email) pour qu'un conseiller vous recontacte ?"
+   → Si le visiteur donne seulement un prénom sans numéro ni email, redemande-lui le contact AVANT de continuer.
+   → name = prénom uniquement / contact = numéro de téléphone ou adresse email
 2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
 4. Type de bien (appartement / villa / terrain)
