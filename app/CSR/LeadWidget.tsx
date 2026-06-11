@@ -10,10 +10,16 @@ interface LeadData {
   timeline: string; property_type: string; numericScore: number; label: 'Hot' | 'Warm' | 'Cold'
 }
 
-const GREETING = (agencyName: string, propertyContext?: { id: string; title: string } | null) =>
+interface PropertyCtx {
+  id: string; title: string; price?: string; location?: string; city?: string
+  area?: string; beds?: number; baths?: number; type?: string
+  description?: string; features?: string[]
+}
+
+const GREETING = (agencyName: string, propertyContext?: PropertyCtx | null) =>
   propertyContext
-    ? `Vous êtes intéressé par **${propertyContext.title}** ? Je vais vous poser quelques questions rapides pour vous mettre en relation avec un conseiller.`
-    : `Bienvenue chez ${agencyName}. Je vais vous poser quelques questions rapides pour mieux vous orienter.`
+    ? `Excellent choix ! **${propertyContext.title}** est un très beau bien. Avez-vous des questions à son sujet avant que je vous mette en relation avec un conseiller ?`
+    : `Bienvenue chez **${agencyName}**. Je suis là pour vous aider — n'hésitez pas à me poser vos questions.`
 
 function renderMessage(text: string | undefined | null) {
   if (!text) return null
@@ -33,7 +39,7 @@ export default function LeadWidget({
 }: {
   agencyName?: string
   isEmbedded?: boolean
-  propertyContext?: { id: string; title: string } | null
+  propertyContext?: PropertyCtx | null
   externalOpen?: boolean
 }) {
   const [isOpen, setIsOpen]     = useState(isEmbedded)
