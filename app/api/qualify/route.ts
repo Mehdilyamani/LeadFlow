@@ -176,6 +176,23 @@ async function saveLead(
   if (error) console.error('Supabase insert error:', error.message)
 }
 
+// ── Retry helpers ─────────────────────────────────────────────────────────────
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+
+function isRetryable(err: unknown): boolean {
+  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
+  return msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted') ||
+         msg.includes('500') || msg.includes('503') || msg.includes('unavailable')
+}
+
+function retryDelay(err: unknown, attempt: number): number {
+  const msg = err instanceof Error ? err.message : String(err)
+  const parsed = msg.match(/retry in ([\d.]+)s/i)
+  if (parsed) return Math.ceil(parseFloat(parsed[1]) * 1000) + 1000
+  const is429 = /429|quota|resource_exhausted/i.test(msg)
+  return is429 ? [15000, 30000][attempt - 1] ?? 30000 : [2000, 4000][attempt - 1] ?? 4000
+}
+
 // ── Handler ────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   const body            = await req.json()
@@ -202,11 +219,31 @@ export async function POST(req: NextRequest) {
 
     const prompt = `${systemPrompt}\n\n---\nHistorique:\n${history}\n\nAssistant:`
 
-    const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-    })
-    const text = (result.text ?? '').trim()
+    let text = ''
+    let lastErr: unknown
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      try {
+        const result = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: prompt,
+        })
+        text = (result.text ?? '').trim()
+        lastErr = undefined
+        break
+      } catch (err) {
+        lastErr = err
+        if (!isRetryable(err) || attempt === 2) break
+        await sleep(retryDelay(err, attempt + 1))
+      }
+    }
+    if (lastErr) {
+      if (isRetryable(lastErr))
+        return NextResponse.json({
+          reply: "Je rencontre un souci technique momentané, pouvez-vous reformuler votre message ?",
+          isComplete: false,
+        })
+      throw lastErr
+    }
 
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
