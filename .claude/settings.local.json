@@ -15,7 +15,10 @@
       "Bash(curl -s -o /dev/null -w \"/biens/1 → %{http_code}\\\\n\" http://localhost:3000/biens/1)",
       "Bash(node -e \"const p=require\\('./package.json'\\); const deps={...p.dependencies,...p.devDependencies}; console.log\\('@google/generative-ai:', deps['@google/generative-ai'] || 'NOT INSTALLED'\\)\")",
       "Bash(node -e \"const {GoogleGenerativeAI}=require\\('@google/generative-ai'\\); console.log\\('import OK, version:', require\\('@google/generative-ai/package.json'\\).version\\)\")",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "PowerShell(powershell -ExecutionPolicy ByPass -c \"irm https://astral.sh/uv/install.ps1 | iex\")",
+      "Bash(Select-String -Pattern \"embed|widget|loader|\\\\.js$\")",
+      "Bash(grep -iE \"leadflow|embed|widget|\\\\.js$\")"
     ]
   }
 }

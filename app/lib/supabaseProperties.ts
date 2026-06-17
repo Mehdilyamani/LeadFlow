@@ -28,8 +28,8 @@ export async function getProperties(): Promise<Property[]> {
     .from('properties')
     .select('*')
     .order('price_num', { ascending: false })
-  if (error || !data) return []
-  return data.map(mapRow)
+  if (error) throw error
+  return (data ?? []).map(mapRow)
 }
 
 export async function getFeaturedProperties(): Promise<Property[]> {
@@ -38,8 +38,8 @@ export async function getFeaturedProperties(): Promise<Property[]> {
     .select('*')
     .eq('is_featured', true)
     .order('price_num', { ascending: false })
-  if (error || !data) return []
-  return data.map(mapRow)
+  if (error) throw error
+  return (data ?? []).map(mapRow)
 }
 
 export async function getProperty(id: string): Promise<Property | null> {

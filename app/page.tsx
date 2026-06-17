@@ -3,6 +3,7 @@ import { PROPERTIES } from './lib/properties'
 import HomeClient from './HomeClient'
 
 export default async function Home() {
-  const properties = await getFeaturedProperties().catch(() => PROPERTIES.slice(0, 3))
+  const fetched = await getFeaturedProperties().catch(() => [])
+  const properties = fetched.length > 0 ? fetched : PROPERTIES.slice(0, 3)
   return <HomeClient properties={properties} />
 }

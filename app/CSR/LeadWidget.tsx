@@ -30,11 +30,13 @@ export default function LeadWidget({
   isEmbedded = false,
   propertyContext = null,
   externalOpen = false,
+  clientId,
 }: {
   agencyName?: string
   isEmbedded?: boolean
   propertyContext?: { id: string; title: string } | null
   externalOpen?: boolean
+  clientId?: string
 }) {
   const [isOpen, setIsOpen]     = useState(isEmbedded)
   const [messages, setMessages] = useState<Message[]>([])
@@ -78,7 +80,7 @@ export default function LeadWidget({
       const res  = await fetch('/api/qualify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMsgs, sessionData: { agencyName, propertyContext } }),
+        body: JSON.stringify({ messages: newMsgs, sessionData: { agencyName, propertyContext, clientId } }),
       })
       const data = await res.json()
 
