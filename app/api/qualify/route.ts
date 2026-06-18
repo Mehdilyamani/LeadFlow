@@ -118,7 +118,7 @@ Le widget a déjà accueilli le visiteur. Ta PREMIÈRE réponse doit s'enchaîne
 
 ${agencyDescription
   ? `Ce visiteur explore le site. Voici le contexte de l'agence pour répondre à ses questions. Sois chaleureux et utile.\n\nCONTEXTE DE L'AGENCE :\n${agencyDescription}`
-  : `Ce visiteur explore le site. Réponds à ses questions sur l'agence ou les biens si tu as l'information. Sois chaleureux et utile.\nN'invente jamais de biens spécifiques ni de prix. Si le visiteur demande quelles propriétés sont disponibles, dis-lui que le conseiller lui enverra une sélection personnalisée.`}
+  : `Ce visiteur explore le site. Réponds à ses questions sur l'agence si tu as l'information. Sois chaleureux et utile.\nN'invente jamais de biens ni de prix, même de façon générale. Ne dis pas que l'agence "a" des propriétés si tu ne les connais pas. Si le visiteur demande quelles propriétés sont disponibles, dis-lui simplement qu'un conseiller lui enverra une sélection personnalisée.`}
 
 Puis qualifie-le naturellement, UN champ à la fois.
 Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochaine question :
