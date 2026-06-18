@@ -65,7 +65,7 @@ function calculateScore(lead: RawLead): Score {
 }
 
 // ── System prompts ─────────────────────────────────────────────────────────────
-function buildSystemPrompt(agencyName: string, propertyContext?: PropertyContext | null): string {
+function buildSystemPrompt(agencyName: string, propertyContext?: PropertyContext | null, agencyDescription?: string | null): string {
 
   if (propertyContext) {
     // ── ENTRY 2: visitor came from a property page ────────────────────────────
@@ -116,8 +116,9 @@ Quand tu as les 4 réponses, réponds UNIQUEMENT avec ce JSON :
 
 Le widget a déjà accueilli le visiteur. Ta PREMIÈRE réponse doit s'enchaîner naturellement — PAS de "Bonjour", PAS de message d'accueil séparé. Continue directement depuis là.
 
-Ce visiteur explore le site. Réponds à ses questions sur l'agence ou les biens si tu as l'information. Sois chaleureux et utile.
-N'invente jamais de biens spécifiques ni de prix. Si le visiteur demande quelles propriétés sont disponibles, dis-lui que le conseiller lui enverra une sélection personnalisée.
+${agencyDescription
+  ? `Ce visiteur explore le site. Voici le contexte de l'agence pour répondre à ses questions. Sois chaleureux et utile.\n\nCONTEXTE DE L'AGENCE :\n${agencyDescription}`
+  : `Ce visiteur explore le site. Réponds à ses questions sur l'agence ou les biens si tu as l'information. Sois chaleureux et utile.\nN'invente jamais de biens spécifiques ni de prix. Si le visiteur demande quelles propriétés sont disponibles, dis-lui que le conseiller lui enverra une sélection personnalisée.`}
 
 Puis qualifie-le naturellement, UN champ à la fois.
 Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochaine question :
@@ -214,10 +215,25 @@ export async function POST(req: NextRequest) {
     ? [propertyContext.location, propertyContext.city].filter(Boolean).join(', ') || null
     : null
 
+  // Per-client context for Entry 1 — skipped when Entry 2 applies (propertyContext present)
+  let agencyDescription: string | null = null
+  if (clientId && !propertyContext) {
+    try {
+      const { data } = await supabaseServer
+        .from('clients')
+        .select('description')
+        .eq('client_id', clientId)
+        .maybeSingle()
+      if (data?.description) agencyDescription = data.description
+    } catch {
+      // non-fatal: fall back to generic no-hallucination instruction
+    }
+  }
+
   try {
     const ai = new GoogleGenAI({ apiKey })
 
-    const systemPrompt = buildSystemPrompt(agencyName, propertyContext)
+    const systemPrompt = buildSystemPrompt(agencyName, propertyContext, agencyDescription)
     const history = messages
       .map(m => `${m.role === 'user' ? 'Visiteur' : 'Assistant'}: ${m.content}`)
       .join('\n\n')
