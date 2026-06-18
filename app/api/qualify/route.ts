@@ -25,6 +25,7 @@ interface PropertyContext {
 interface SessionData {
   agencyName?: string
   propertyContext?: PropertyContext | null
+  clientId?: string
   [key: string]: unknown
 }
 
@@ -162,6 +163,7 @@ async function saveLead(
   score: Score,
   propertyInterest?: string | null,
   knownLocation?: string | null,
+  clientId?: string | null,
 ) {
   const { error } = await supabaseServer.from('leads').insert({
     name:              lead.name          ?? 'Prospect',
@@ -172,6 +174,7 @@ async function saveLead(
     location:          knownLocation      ?? lead.location ?? 'Non précisé',
     score,
     property_interest: propertyInterest   ?? null,
+    client_id:         clientId           ?? null,
   })
   if (error) console.error('Supabase insert error:', error.message)
 }
@@ -200,6 +203,7 @@ export async function POST(req: NextRequest) {
   const sessionData: SessionData = body.sessionData ?? {}
   const agencyName      = sessionData.agencyName ?? 'Prestige Immobilier'
   const propertyContext = sessionData.propertyContext ?? null
+  const clientId        = typeof sessionData.clientId === 'string' ? sessionData.clientId : null
 
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
@@ -252,7 +256,7 @@ export async function POST(req: NextRequest) {
         if (parsed.done && parsed.lead) {
           const rawLead = parsed.lead as RawLead
           const score   = calculateScore(rawLead)
-          await saveLead(rawLead, score, propertyContext?.title, knownLocation)
+          await saveLead(rawLead, score, propertyContext?.title, knownLocation, clientId)
           return NextResponse.json({
             reply:      parsed.message ?? 'Merci pour ces informations !',
             isComplete: true,

@@ -36,11 +36,13 @@ export default function LeadWidget({
   isEmbedded = false,
   propertyContext = null,
   externalOpen = false,
+  clientId,
 }: {
   agencyName?: string
   isEmbedded?: boolean
   propertyContext?: PropertyCtx | null
   externalOpen?: boolean
+  clientId?: string
 }) {
   const [isOpen, setIsOpen]     = useState(isEmbedded)
   const [messages, setMessages] = useState<Message[]>([])
@@ -54,8 +56,18 @@ export default function LeadWidget({
 
   useEffect(() => { setMounted(true) }, [])
 
+  function notifyParent(open: boolean) {
+    if (typeof window !== 'undefined' && window.parent !== window)
+      window.parent.postMessage(open ? 'leadflow:open' : 'leadflow:close', '*')
+  }
+
+  function toggleOpen(next: boolean) {
+    setIsOpen(next)
+    notifyParent(next)
+  }
+
   useEffect(() => {
-    if (externalOpen) setIsOpen(true)
+    if (externalOpen) toggleOpen(true)
   }, [externalOpen])
 
   useEffect(() => {
@@ -84,7 +96,7 @@ export default function LeadWidget({
       const res  = await fetch('/api/qualify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: newMsgs, sessionData: { agencyName, propertyContext } }),
+        body: JSON.stringify({ messages: newMsgs, sessionData: { agencyName, propertyContext, clientId } }),
       })
       const data = await res.json()
 
@@ -124,12 +136,7 @@ export default function LeadWidget({
     <>
       {mounted && (
         <button
-          onClick={() => {
-            const next = !isOpen
-            setIsOpen(next)
-            if (window.parent !== window)
-              window.parent.postMessage(next ? 'leadflow:enable-pointer' : 'leadflow:disable-pointer', '*')
-          }}
+          onClick={() => toggleOpen(!isOpen)}
           className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
           style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}
           aria-label="Ouvrir l'assistant"
@@ -159,7 +166,7 @@ export default function LeadWidget({
             className="fixed bottom-24 right-6 z-50 w-93.75 rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 flex flex-col"
             style={{ height: 530 }}
           >
-            <WidgetHeader agencyName={agencyName} onClose={() => setIsOpen(false)} />
+            <WidgetHeader agencyName={agencyName} onClose={() => toggleOpen(false)} />
             <WidgetBody {...{ messages, loading, stage, leadName, input, setInput, send, handleKey, bottomRef, inputRef }} />
           </motion.div>
         )}
