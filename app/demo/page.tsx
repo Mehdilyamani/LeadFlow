@@ -171,6 +171,7 @@ export default function DemoPage() {
       <Script
         src="/leadflow-widget.js"
         data-agency="Immo Marrakech"
+        data-client-id="demo-client"
         strategy="afterInteractive"
       />
     </>
