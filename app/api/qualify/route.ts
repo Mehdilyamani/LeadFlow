@@ -108,7 +108,7 @@ NE pose PAS de question sur le type de bien ni la localisation — déjà connus
 Une question à la fois. Langue : français. Darija si utilisée.
 
 Quand tu as les 4 réponses, réponds UNIQUEMENT avec ce JSON :
-{"done":true,"message":"Merci [prénom] ! Un conseiller vous rappelle très bientôt concernant ${propertyContext.title}. Avez-vous d'autres questions en attendant ?","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"${knownType}","location":"${knownLoc}"}}`
+{"done":true,"message":"Parfait [prénom], merci ! Un conseiller va vous recontacter très vite concernant ${propertyContext.title}. En attendant, je reste à votre disposition si vous avez d'autres questions — n'hésitez pas.","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"${knownType}","location":"${knownLoc}"}}`
   }
 
   // ── ENTRY 1: floating widget, no property context ─────────────────────────
@@ -135,7 +135,7 @@ Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochai
 Une question à la fois. Langue : français. Darija si utilisée.
 
 Quand tu as les 6 réponses, réponds UNIQUEMENT avec ce JSON :
-{"done":true,"message":"Merci [prénom] ! Un conseiller vous contactera bientôt avec une sélection adaptée à votre projet. Avez-vous d'autres questions en attendant ?","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"...","location":"..."}}`
+{"done":true,"message":"Parfait [prénom], merci ! Un conseiller va vous recontacter très vite pour avancer ensemble. En attendant, je reste à votre disposition si vous avez d'autres questions ou un autre projet en tête — n'hésitez pas.","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"...","location":"..."}}`
 }
 
 // ── Score → widget payload ─────────────────────────────────────────────────────
