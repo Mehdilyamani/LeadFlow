@@ -87,7 +87,8 @@
   applySize('collapsed');
 
   window.addEventListener('message', function (e) {
-    if (e.origin !== baseUrl) return;
+    // Verify the message is from our iframe (works cross-domain, unlike origin string matching).
+    if (e.source !== iframe.contentWindow) return;
     if (e.data === 'leadflow:open')  applySize('open');
     if (e.data === 'leadflow:close') applySize('collapsed');
     // Back-compat with the previous message names:
