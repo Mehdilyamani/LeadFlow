@@ -102,10 +102,10 @@ export default function LeadWidget({
 
       if (data.isComplete && data.lead) {
         const name = (data.lead as LeadData).name ?? ''
-        const thanks = name
+        const fallback = name
           ? `Merci ${name} ! Un conseiller vous recontacte très vite.`
           : 'Merci ! Un conseiller vous recontacte très vite.'
-        setMessages([...newMsgs, { role: 'assistant', content: thanks }])
+        setMessages([...newMsgs, { role: 'assistant', content: data.reply || fallback }])
         setLeadName(name)
         setStage('done')
       } else {
@@ -268,30 +268,28 @@ function WidgetBody({
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar — hidden once done */}
-      {stage === 'chat' && (
-        <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 shrink-0">
-          <div className="flex gap-2 items-center">
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="Votre réponse…"
-              disabled={loading}
-              className="flex-1 text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-slate-400 focus:bg-white transition-colors placeholder:text-slate-400"
-            />
-            <button
-              onClick={send}
-              disabled={loading || !input.trim()}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-white disabled:opacity-30 transition-opacity hover:opacity-90 shrink-0"
-              style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
+      {/* Input bar — always visible so visitor can keep chatting after lead is captured */}
+      <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 shrink-0">
+        <div className="flex gap-2 items-center">
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKey}
+            placeholder="Votre réponse…"
+            disabled={loading}
+            className="flex-1 text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-slate-400 focus:bg-white transition-colors placeholder:text-slate-400"
+          />
+          <button
+            onClick={send}
+            disabled={loading || !input.trim()}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white disabled:opacity-30 transition-opacity hover:opacity-90 shrink-0"
+            style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
+          >
+            <Send className="w-4 h-4" />
+          </button>
         </div>
-      )}
+      </div>
     </div>
   )
 }
