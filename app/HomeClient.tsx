@@ -8,22 +8,22 @@ import type { Property } from './lib/properties'
 
 const TESTIMONIALS = [
   {
-    name: 'Karim Benali',
-    role: 'Entrepreneur, Casablanca',
+    name: 'Marc Dupont',
+    role: 'Entrepreneur, Genève',
     text: "Grâce à Prestige Immobilier, j'ai trouvé ma villa de rêve en moins de 3 semaines. Service exceptionnel, équipe à l'écoute.",
-    avatar: 'KB',
+    avatar: 'MD',
   },
   {
-    name: 'Nadia El Fassi',
-    role: 'Directrice, Rabat',
-    text: "Professionnalisme et réactivité au rendez-vous. Mon penthouse à Aïn Diab est exactement ce que je cherchais. Merci !",
-    avatar: 'NF',
+    name: 'Sophie Rochat',
+    role: 'Directrice financière, Lausanne',
+    text: "Professionnalisme et réactivité au rendez-vous. Mon appartement aux Eaux-Vives est exactement ce que je cherchais. Merci !",
+    avatar: 'SR',
   },
   {
-    name: 'Youssef Amrani',
-    role: 'Investisseur, Marrakech',
+    name: 'Jean-Pierre Favre',
+    role: 'Investisseur, Nyon',
     text: "Accompagnement parfait du début à la fin. Je recommande Prestige Immobilier à tous mes associés sans hésitation.",
-    avatar: 'YA',
+    avatar: 'JF',
   },
 ]
 
@@ -54,10 +54,10 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
 
           <div className="flex items-center gap-3">
             <a
-              href="tel:+212600000000"
+              href="tel:+41227000000"
               className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:border-amber-500 hover:text-amber-600 transition-colors"
             >
-              📞 +212 6 00 00 00 00
+              📞 +41 22 700 00 00
             </a>
             <Link
               href="/dashboard"
@@ -89,8 +89,8 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
             <button onClick={() => { scrollTo('temoignages'); setMenuOpen(false) }} className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors text-left">
               ⭐ Avis clients
             </button>
-            <a href="tel:+212600000000" className="text-sm font-semibold text-amber-600 border border-amber-200 rounded-lg px-4 py-2.5 text-center hover:bg-amber-50 transition-colors">
-              📞 +212 6 00 00 00 00
+            <a href="tel:+41227000000" className="text-sm font-semibold text-amber-600 border border-amber-200 rounded-lg px-4 py-2.5 text-center hover:bg-amber-50 transition-colors">
+              📞 +41 22 700 00 00
             </a>
           </div>
         )}
@@ -100,7 +100,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
       <section className="relative overflow-hidden" style={{ height: '92vh', minHeight: 600 }}>
         <Image
           src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=80"
-          alt="Villa de luxe au Maroc"
+          alt="Villa de prestige en Suisse romande"
           fill
           className="object-cover"
           priority
@@ -109,14 +109,14 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <div className="mb-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur text-white text-xs font-medium px-4 py-2 rounded-full border border-white/20">
             <span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />
-            Agence agréée • 15 ans d&apos;expertise au Maroc
+            Agence agréée • 15 ans d&apos;expertise en Suisse romande
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight max-w-3xl">
             Trouvez votre bien<br />
-            <span className="text-amber-400">d&apos;exception</span> au Maroc
+            <span className="text-amber-400">d&apos;exception</span> en Suisse romande
           </h1>
           <p className="text-lg text-white/85 mb-8 max-w-xl leading-relaxed">
-            Villas premium, appartements de standing et opportunités d&apos;investissement à Casablanca, Marrakech et Rabat.
+            Villas premium, appartements de standing et opportunités d&apos;investissement à Genève, Lausanne et Nyon.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/biens" className="px-7 py-3.5 rounded-xl font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors">
@@ -139,7 +139,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
             { value: '500+', label: 'Biens vendus' },
             { value: '15 ans', label: "D'expérience" },
             { value: '98%', label: 'Clients satisfaits' },
-            { value: '3 villes', label: 'Présence nationale' },
+            { value: '4 villes', label: 'Présence régionale' },
           ].map(s => (
             <div key={s.label}>
               <p className="text-3xl font-bold text-amber-400">{s.value}</p>
@@ -187,7 +187,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
                   <span>📐 {p.area}</span>
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-amber-600 font-bold text-lg">{p.price} <span className="text-sm font-normal text-slate-500">MAD</span></p>
+                  <p className="text-amber-600 font-bold text-lg">{p.price} <span className="text-sm font-normal text-slate-500">CHF</span></p>
                   <Link href={`/biens/${p.id}`} className="text-xs font-semibold text-slate-900 hover:text-amber-600 transition-colors">
                     Détails →
                   </Link>
@@ -217,13 +217,13 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
               L&apos;excellence immobilière<br />depuis 2009
             </h2>
             <p className="text-slate-600 leading-relaxed mb-4">
-              Prestige Immobilier est la référence de l&apos;immobilier de luxe au Maroc. Fondée en 2009 à Casablanca, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
+              Prestige Immobilier est la référence de l&apos;immobilier de luxe en Suisse romande. Fondée en 2009 à Genève, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
             </p>
             <p className="text-slate-600 leading-relaxed mb-8">
               Notre équipe de consultants expérimentés vous guide à chaque étape : de la recherche jusqu&apos;à la signature, avec un service personnalisé et discret.
             </p>
             <div className="flex flex-wrap gap-3">
-              {['Agence agréée FNAIM Maroc', 'Service 7j/7', 'Évaluation gratuite', 'Réseau international'].map(tag => (
+              {['Agence agréée USPI', 'Service 7j/7', 'Évaluation gratuite', 'Réseau international'].map(tag => (
                 <span key={tag} className="text-xs font-medium px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                   ✓ {tag}
                 </span>
@@ -235,7 +235,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
               { icon: '🏠', title: 'Résidentiel', desc: 'Villas, appartements, penthouses' },
               { icon: '🏢', title: 'Commercial', desc: 'Bureaux, locaux, entrepôts' },
               { icon: '📈', title: 'Investissement', desc: 'Rentabilité et valorisation' },
-              { icon: '🌍', title: 'International', desc: 'Acheteurs MRE bienvenus' },
+              { icon: '🌍', title: 'International', desc: 'Clients internationaux bienvenus' },
             ].map(s => (
               <div key={s.title} className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
                 <span className="text-3xl">{s.icon}</span>
@@ -300,7 +300,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
                 <span className="text-xl">🏛</span>
                 <span className="font-bold text-white text-lg">Prestige <span className="text-amber-500">Immobilier</span></span>
               </div>
-              <p className="text-sm max-w-xs leading-relaxed">L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc depuis 2009.</p>
+              <p className="text-sm max-w-xs leading-relaxed">L&apos;agence de référence pour l&apos;immobilier de prestige en Suisse romande depuis 2009.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
               <div>
@@ -313,26 +313,26 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
               </div>
               <div>
                 <p className="text-white font-semibold mb-3">Villes</p>
-                {['Casablanca', 'Marrakech', 'Rabat', 'Tanger'].map(l => (
+                {['Genève', 'Lausanne', 'Nyon', 'Verbier'].map(l => (
                   <p key={l} className="mb-2 hover:text-amber-400 cursor-pointer transition-colors">{l}</p>
                 ))}
               </div>
               <div>
                 <p className="text-white font-semibold mb-3">Contact</p>
-                <p className="mb-2">📞 +212 6 00 00 00 00</p>
-                <p className="mb-2">✉ contact@prestige-immo.ma</p>
-                <p>📍 Boulevard Anfa, Casablanca</p>
+                <p className="mb-2">📞 +41 22 700 00 00</p>
+                <p className="mb-2">✉ contact@prestige-immo.ch</p>
+                <p>📍 Avenue de la Paix 12, Genève</p>
               </div>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-6 text-xs text-center text-slate-600">
-            © 2025 Prestige Immobilier. Tous droits réservés. •{' '}
+            © 2026 Prestige Immobilier. Tous droits réservés. •{' '}
             Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span>
           </div>
         </div>
       </footer>
 
-      <LeadWidget agencyName="Prestige Immobilier" />
+      <LeadWidget agencyName="Prestige Genève" />
     </main>
   )
 }
