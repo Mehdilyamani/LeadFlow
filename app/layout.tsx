@@ -3,7 +3,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './global.css'
 
 export const metadata: Metadata = {
-  title: 'Prestige Immobilier — Biens d\'Exception au Maroc',
+  title: 'Démo LeadFlow — Biens d\'Exception',
   description: 'Votre agence immobilière premium à Casablanca, Marrakech et Rabat. Villas, appartements de standing et opportunités d\'investissement.',
 }
 

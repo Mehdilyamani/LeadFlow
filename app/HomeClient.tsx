@@ -10,7 +10,7 @@ const TESTIMONIALS = [
   {
     name: 'Marc Dupont',
     role: 'Entrepreneur, Genève',
-    text: "Grâce à Prestige Immobilier, j'ai trouvé ma villa de rêve en moins de 3 semaines. Service exceptionnel, équipe à l'écoute.",
+    text: "Grâce à Démo LeadFlow, j'ai trouvé ma villa de rêve en moins de 3 semaines. Service exceptionnel, équipe à l'écoute.",
     avatar: 'MD',
   },
   {
@@ -22,7 +22,7 @@ const TESTIMONIALS = [
   {
     name: 'Jean-Pierre Favre',
     role: 'Investisseur, Nyon',
-    text: "Accompagnement parfait du début à la fin. Je recommande Prestige Immobilier à tous mes associés sans hésitation.",
+    text: "Accompagnement parfait du début à la fin. Je recommande Démo LeadFlow à tous mes associés sans hésitation.",
     avatar: 'JF',
   },
 ]
@@ -42,7 +42,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
           <div className="flex items-center gap-2">
             <span className="text-xl">🏛</span>
             <span className="font-bold text-slate-900 text-lg tracking-tight">
-              Prestige <span className="text-amber-600">Immobilier</span>
+              Démo <span className="text-amber-600">LeadFlow</span>
             </span>
           </div>
 
@@ -217,7 +217,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
               L&apos;excellence immobilière<br />depuis 2009
             </h2>
             <p className="text-slate-600 leading-relaxed mb-4">
-              Prestige Immobilier est la référence de l&apos;immobilier de luxe en Suisse romande. Fondée en 2009 à Genève, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
+              Démo LeadFlow est la référence de l&apos;immobilier de luxe en Suisse romande. Fondée en 2009 à Genève, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
             </p>
             <p className="text-slate-600 leading-relaxed mb-8">
               Notre équipe de consultants expérimentés vous guide à chaque étape : de la recherche jusqu&apos;à la signature, avec un service personnalisé et discret.
@@ -298,7 +298,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-xl">🏛</span>
-                <span className="font-bold text-white text-lg">Prestige <span className="text-amber-500">Immobilier</span></span>
+                <span className="font-bold text-white text-lg">Démo <span className="text-amber-500">LeadFlow</span></span>
               </div>
               <p className="text-sm max-w-xs leading-relaxed">L&apos;agence de référence pour l&apos;immobilier de prestige en Suisse romande depuis 2009.</p>
             </div>
@@ -326,13 +326,13 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
             </div>
           </div>
           <div className="border-t border-slate-800 pt-6 text-xs text-center text-slate-600">
-            © 2026 Prestige Immobilier. Tous droits réservés. •{' '}
+            © 2026 Démo LeadFlow. Tous droits réservés. •{' '}
             Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span>
           </div>
         </div>
       </footer>
 
-      <LeadWidget agencyName="Prestige Genève" />
+      <LeadWidget agencyName="Démo LeadFlow" />
     </main>
   )
 }

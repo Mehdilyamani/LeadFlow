@@ -115,10 +115,10 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       {/* FOOTER */}
       <footer className="bg-slate-950 text-slate-400 py-8 px-6 text-center text-xs">
         <p>
-          <Link href="/" className="text-white font-semibold hover:text-amber-400 transition-colors">🏛 Prestige Immobilier</Link>
+          <Link href="/" className="text-white font-semibold hover:text-amber-400 transition-colors">🏛 Démo LeadFlow</Link>
           {' '}— L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc
         </p>
-        <p className="mt-2">© 2025 Prestige Immobilier • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
+        <p className="mt-2">© 2026 Démo LeadFlow • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
       </footer>
 
       {/* PROPERTY MODAL */}
@@ -252,5 +252,5 @@ function PropertyModal({ property: p, onClose, onContact }: { property: Property
 // ── Widget trigger wrapper ─────────────────────────────────────────────────────
 function WidgetWithTrigger({ open, onManualClose }: { open: boolean; onManualClose: () => void }) {
   void open; void onManualClose
-  return <LeadWidget agencyName="Prestige Immobilier" />
+  return <LeadWidget agencyName="Démo LeadFlow" />
 }

@@ -181,7 +181,7 @@ export default function PropertyDetail({
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}>🏛</div>
                   <div>
-                    <p className="font-semibold text-sm text-slate-900">Prestige Immobilier</p>
+                    <p className="font-semibold text-sm text-slate-900">Démo LeadFlow</p>
                     <p className="text-xs text-slate-500">Agence agréée • 15 ans d&apos;expertise</p>
                   </div>
                 </div>
@@ -222,14 +222,14 @@ export default function PropertyDetail({
       {/* FOOTER */}
       <footer className="bg-slate-950 text-slate-400 py-8 px-6 text-center text-xs mt-14">
         <p>
-          <Link href="/" className="text-white font-semibold hover:text-amber-400 transition-colors">🏛 Prestige Immobilier</Link>
+          <Link href="/" className="text-white font-semibold hover:text-amber-400 transition-colors">🏛 Démo LeadFlow</Link>
           {' '}— L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc
         </p>
-        <p className="mt-2">© 2025 Prestige Immobilier • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
+        <p className="mt-2">© 2026 Démo LeadFlow • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
       </footer>
 
       <LeadWidget
-        agencyName="Prestige Immobilier"
+        agencyName="Démo LeadFlow"
         propertyContext={{
           id:          property.id,
           title:       property.title,

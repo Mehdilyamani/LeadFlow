@@ -6,7 +6,7 @@ export default async function WidgetPage({
   searchParams: Promise<{ agency?: string; client?: string; pid?: string; ptitle?: string }>
 }) {
   const { agency, client, pid, ptitle } = await searchParams
-  const agencyName = agency ? decodeURIComponent(agency) : 'Prestige Immobilier'
+  const agencyName = agency ? decodeURIComponent(agency) : 'Démo LeadFlow'
   const clientId = client ? decodeURIComponent(client) : undefined
   const propertyContext =
     pid && ptitle

@@ -374,7 +374,7 @@ function PitchContent() {
         </p>
         <p className="mt-2">
           © 2025 Leadflow •{' '}
-          <a href="/" className="hover:text-slate-300 transition-colors">Voir la démo Prestige Immobilier</a>
+          <a href="/" className="hover:text-slate-300 transition-colors">Voir la démo LeadFlow</a>
         </p>
       </footer>
 

@@ -10,7 +10,7 @@
  *     async></script>
  *
  * Optional attributes:
- *   data-agency        Display name shown in the widget header (default: "Prestige Immobilier")
+ *   data-agency        Display name shown in the widget header (default: "Démo LeadFlow")
  *   data-client-id     Stable id used to attribute leads to this client (recommended)
  *   data-base-url      Override the LeadFlow origin (auto-detected from this script's src otherwise)
  *   data-position      "right" (default) or "left"
@@ -31,7 +31,7 @@
     return v != null && v !== '' ? v : fallback;
   }
 
-  var agency        = attr('data-agency', 'Prestige Immobilier');
+  var agency        = attr('data-agency', 'Démo LeadFlow');
   var clientId      = attr('data-client-id', '');
   var position      = attr('data-position', 'right') === 'left' ? 'left' : 'right';
   var propertyId    = attr('data-property-id', '');

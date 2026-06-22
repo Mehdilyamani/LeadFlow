@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
   const body            = await req.json()
   const messages: Message[] = Array.isArray(body.messages) ? body.messages : []
   const sessionData: SessionData = body.sessionData ?? {}
-  const agencyName      = sessionData.agencyName ?? 'Prestige Immobilier'
+  const agencyName      = sessionData.agencyName ?? 'Démo LeadFlow'
   const propertyContext = sessionData.propertyContext ?? null
   const clientId        = typeof sessionData.clientId === 'string' ? sessionData.clientId : null
 

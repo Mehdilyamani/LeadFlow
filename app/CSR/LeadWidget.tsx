@@ -32,7 +32,7 @@ function renderMessage(text: string | undefined | null) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 export default function LeadWidget({
-  agencyName = 'Prestige Immobilier',
+  agencyName = 'Démo LeadFlow',
   isEmbedded = false,
   propertyContext = null,
   externalOpen = false,
