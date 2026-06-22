@@ -26,6 +26,7 @@ interface SessionData {
   agencyName?: string
   propertyContext?: PropertyContext | null
   clientId?: string
+  agencyContext?: string
   [key: string]: unknown
 }
 
@@ -97,7 +98,7 @@ Réponds à toutes les questions du visiteur sur ce bien avec précision et enth
 Puis qualifie-le dans cet ordre, UN champ à la fois.
 Accuse chaque réponse chaleureusement (1-2 phrases naturelles, pas robotiques) avant la prochaine question :
 1. Prénom
-2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
+2. Budget (moins de 500k / 500k-1M / plus d'1M)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
 4. Contact EN DERNIER — pose exactement :
    "Pour qu'un conseiller vous recontacte avec une sélection adaptée, quel est le meilleur moyen de vous joindre ? (numéro WhatsApp ou email)"
@@ -105,7 +106,7 @@ Accuse chaque réponse chaleureusement (1-2 phrases naturelles, pas robotiques) 
    → contact = numéro de téléphone ou adresse email uniquement.
 
 NE pose PAS de question sur le type de bien ni la localisation — déjà connus.
-Une question à la fois. Langue : français. Darija si utilisée.
+Une question à la fois. Langue : français.
 
 Quand tu as les 4 réponses, réponds UNIQUEMENT avec ce JSON :
 {"done":true,"message":"Parfait [prénom], merci ! Un conseiller va vous recontacter très vite concernant ${propertyContext.title}. En attendant, je reste à votre disposition si vous avez d'autres questions — n'hésitez pas.","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"${knownType}","location":"${knownLoc}"}}`
@@ -123,7 +124,7 @@ ${agencyDescription
 Puis qualifie-le naturellement, UN champ à la fois.
 Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochaine question :
 1. Prénom
-2. Budget (moins de 500k / 500k-1M / plus d'1M MAD)
+2. Budget (moins de 500k / 500k-1M / plus d'1M)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
 4. Type de bien (appartement / villa / terrain / autre)
 5. Ville ou quartier
@@ -132,7 +133,7 @@ Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochai
    → Si le visiteur donne seulement son prénom sans contact réel, redemande-lui.
    → contact = numéro de téléphone ou adresse email uniquement.
 
-Une question à la fois. Langue : français. Darija si utilisée.
+Une question à la fois. Langue : français.
 
 Quand tu as les 6 réponses, réponds UNIQUEMENT avec ce JSON :
 {"done":true,"message":"Parfait [prénom], merci ! Un conseiller va vous recontacter très vite pour avancer ensemble. En attendant, je reste à votre disposition si vous avez d'autres questions ou un autre projet en tête — n'hésitez pas.","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"...","location":"..."}}`
@@ -206,6 +207,7 @@ export async function POST(req: NextRequest) {
   const agencyName      = sessionData.agencyName ?? 'Démo LeadFlow'
   const propertyContext = sessionData.propertyContext ?? null
   const clientId        = typeof sessionData.clientId === 'string' ? sessionData.clientId : null
+  const agencyContext   = typeof sessionData.agencyContext === 'string' ? sessionData.agencyContext : null
 
   const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
   if (!apiKey) return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
@@ -216,7 +218,8 @@ export async function POST(req: NextRequest) {
     : null
 
   // Per-client context for Entry 1 — skipped when Entry 2 applies (propertyContext present)
-  let agencyDescription: string | null = null
+  // Priority: DB description > direct agencyContext prop > null (generic fallback)
+  let agencyDescription: string | null = agencyContext
   if (clientId && !propertyContext) {
     try {
       const { data } = await supabaseServer
@@ -226,7 +229,7 @@ export async function POST(req: NextRequest) {
         .maybeSingle()
       if (data?.description) agencyDescription = data.description
     } catch {
-      // non-fatal: fall back to generic no-hallucination instruction
+      // non-fatal: agencyContext (if any) still used
     }
   }
 

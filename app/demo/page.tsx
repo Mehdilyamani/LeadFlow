@@ -73,6 +73,13 @@ const SWISS_PROPERTIES: Property[] = [
   },
 ]
 
+const AGENCY_CONTEXT =
+  "Agence immobilière de prestige en Suisse romande. " +
+  "Spécialisée dans les villes de Genève (Cologny), Lausanne (Ouchy), Nyon et Verbier (Valais). " +
+  "Types de biens : villas avec vue sur le lac Léman, appartements de standing, chalets alpins de luxe. " +
+  "Prix en CHF. Clientèle locale et internationale. " +
+  "Pour le budget, utilise CHF (pas MAD ni EUR)."
+
 export default function DemoPage() {
-  return <HomeClient properties={SWISS_PROPERTIES} />
+  return <HomeClient properties={SWISS_PROPERTIES} agencyContext={AGENCY_CONTEXT} />
 }

@@ -31,7 +31,7 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
-export default function HomeClient({ properties }: { properties: Property[] }) {
+export default function HomeClient({ properties, agencyContext }: { properties: Property[]; agencyContext?: string }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
@@ -332,7 +332,7 @@ export default function HomeClient({ properties }: { properties: Property[] }) {
         </div>
       </footer>
 
-      <LeadWidget agencyName="Démo LeadFlow" />
+      <LeadWidget agencyName="Démo LeadFlow" agencyContext={agencyContext} />
     </main>
   )
 }
