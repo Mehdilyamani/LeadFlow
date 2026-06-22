@@ -10,10 +10,16 @@ interface LeadData {
   timeline: string; property_type: string; numericScore: number; label: 'Hot' | 'Warm' | 'Cold'
 }
 
-const GREETING = (agencyName: string, propertyContext?: { id: string; title: string } | null) =>
+interface PropertyCtx {
+  id: string; title: string; price?: string; location?: string; city?: string
+  area?: string; beds?: number; baths?: number; type?: string
+  description?: string; features?: string[]
+}
+
+const GREETING = (agencyName: string, propertyContext?: PropertyCtx | null) =>
   propertyContext
-    ? `Vous êtes intéressé par **${propertyContext.title}** ? Je vais vous poser quelques questions rapides pour vous mettre en relation avec un conseiller.`
-    : `Bienvenue chez ${agencyName}. Je vais vous poser quelques questions rapides pour mieux vous orienter.`
+    ? `Excellent choix ! **${propertyContext.title}** est un très beau bien. Avez-vous des questions à son sujet avant que je vous mette en relation avec un conseiller ?`
+    : `Bienvenue chez **${agencyName}**. Je suis là pour vous aider — n'hésitez pas à me poser vos questions.`
 
 function renderMessage(text: string | undefined | null) {
   if (!text) return null
@@ -34,7 +40,7 @@ export default function LeadWidget({
 }: {
   agencyName?: string
   isEmbedded?: boolean
-  propertyContext?: { id: string; title: string } | null
+  propertyContext?: PropertyCtx | null
   externalOpen?: boolean
   clientId?: string
 }) {
@@ -50,8 +56,18 @@ export default function LeadWidget({
 
   useEffect(() => { setMounted(true) }, [])
 
+  function notifyParent(open: boolean) {
+    if (typeof window !== 'undefined' && window.parent !== window)
+      window.parent.postMessage(open ? 'leadflow:open' : 'leadflow:close', '*')
+  }
+
+  function toggleOpen(next: boolean) {
+    setIsOpen(next)
+    notifyParent(next)
+  }
+
   useEffect(() => {
-    if (externalOpen) setIsOpen(true)
+    if (externalOpen) toggleOpen(true)
   }, [externalOpen])
 
   useEffect(() => {
@@ -86,10 +102,10 @@ export default function LeadWidget({
 
       if (data.isComplete && data.lead) {
         const name = (data.lead as LeadData).name ?? ''
-        const thanks = name
+        const fallback = name
           ? `Merci ${name} ! Un conseiller vous recontacte très vite.`
           : 'Merci ! Un conseiller vous recontacte très vite.'
-        setMessages([...newMsgs, { role: 'assistant', content: thanks }])
+        setMessages([...newMsgs, { role: 'assistant', content: data.reply || fallback }])
         setLeadName(name)
         setStage('done')
       } else {
@@ -120,12 +136,7 @@ export default function LeadWidget({
     <>
       {mounted && (
         <button
-          onClick={() => {
-            const next = !isOpen
-            setIsOpen(next)
-            if (window.parent !== window)
-              window.parent.postMessage(next ? 'leadflow:enable-pointer' : 'leadflow:disable-pointer', '*')
-          }}
+          onClick={() => toggleOpen(!isOpen)}
           className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95"
           style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}
           aria-label="Ouvrir l'assistant"
@@ -155,7 +166,7 @@ export default function LeadWidget({
             className="fixed bottom-24 right-6 z-50 w-93.75 rounded-2xl shadow-2xl overflow-hidden border border-slate-200/80 flex flex-col"
             style={{ height: 530 }}
           >
-            <WidgetHeader agencyName={agencyName} onClose={() => setIsOpen(false)} />
+            <WidgetHeader agencyName={agencyName} onClose={() => toggleOpen(false)} />
             <WidgetBody {...{ messages, loading, stage, leadName, input, setInput, send, handleKey, bottomRef, inputRef }} />
           </motion.div>
         )}
@@ -257,30 +268,28 @@ function WidgetBody({
         <div ref={bottomRef} />
       </div>
 
-      {/* Input bar — hidden once done */}
-      {stage === 'chat' && (
-        <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 shrink-0">
-          <div className="flex gap-2 items-center">
-            <input
-              ref={inputRef}
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={handleKey}
-              placeholder="Votre réponse…"
-              disabled={loading}
-              className="flex-1 text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-slate-400 focus:bg-white transition-colors placeholder:text-slate-400"
-            />
-            <button
-              onClick={send}
-              disabled={loading || !input.trim()}
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-white disabled:opacity-30 transition-opacity hover:opacity-90 shrink-0"
-              style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </div>
+      {/* Input bar — always visible so visitor can keep chatting after lead is captured */}
+      <div className="px-3 pb-3 pt-2 bg-white border-t border-slate-100 shrink-0">
+        <div className="flex gap-2 items-center">
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKey}
+            placeholder="Votre réponse…"
+            disabled={loading}
+            className="flex-1 text-sm px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none focus:border-slate-400 focus:bg-white transition-colors placeholder:text-slate-400"
+          />
+          <button
+            onClick={send}
+            disabled={loading || !input.trim()}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-white disabled:opacity-30 transition-opacity hover:opacity-90 shrink-0"
+            style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
+          >
+            <Send className="w-4 h-4" />
+          </button>
         </div>
-      )}
+      </div>
     </div>
   )
 }

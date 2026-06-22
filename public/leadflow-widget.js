@@ -58,28 +58,42 @@
   iframe.setAttribute('aria-label', 'Assistant ' + agency);
 
   var isMobile = window.matchMedia('(max-width: 480px)').matches;
-  var width    = isMobile ? '100%' : '410px';
-  var height   = '580px';
+
+  // The iframe is kept exactly as large as its *visible* content so the rest of
+  // the host page stays fully clickable — small when collapsed (just the floating
+  // bubble), large when the chat panel is open. The widget tells us which state
+  // it's in via postMessage.
+  var COLLAPSED = { w: '110px', h: '110px' };
+  var OPEN      = { w: isMobile ? '100%' : '420px', h: isMobile ? '100%' : '660px' };
+
+  function applySize(state) {
+    var s = state === 'open' ? OPEN : COLLAPSED;
+    iframe.style.width  = s.w;
+    iframe.style.height = s.h;
+  }
 
   iframe.style.cssText = [
     'position:fixed',
     'bottom:0',
     position + ':0',
-    'width:' + width,
-    'height:' + height,
-    'max-width:100vw',
     'border:none',
-    'z-index:2147483000',          // sit above almost any site chrome
+    'z-index:2147483000',
     'background:transparent',
     'overflow:hidden',
-    'pointer-events:none',         // empty area stays click-through…
+    'max-width:100vw',
+    'max-height:100vh',
+    'pointer-events:auto',         // safe: iframe is only as big as its visible content
   ].join(';');
+  applySize('collapsed');
 
-  // …only the widget content re-enables pointer events, via postMessage.
   window.addEventListener('message', function (e) {
-    if (e.origin !== baseUrl) return;          // only trust our own iframe
-    if (e.data === 'leadflow:enable-pointer')  iframe.style.pointerEvents = 'auto';
-    if (e.data === 'leadflow:disable-pointer') iframe.style.pointerEvents = 'none';
+    // Verify the message is from our iframe (works cross-domain, unlike origin string matching).
+    if (e.source !== iframe.contentWindow) return;
+    if (e.data === 'leadflow:open')  applySize('open');
+    if (e.data === 'leadflow:close') applySize('collapsed');
+    // Back-compat with the previous message names:
+    if (e.data === 'leadflow:enable-pointer')  applySize('open');
+    if (e.data === 'leadflow:disable-pointer') applySize('collapsed');
   });
 
   function mount() { document.body.appendChild(iframe); }

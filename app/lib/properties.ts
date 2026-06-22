@@ -1,5 +1,5 @@
-export type PropertyType = 'Villa' | 'Appartement' | 'Penthouse' | 'Riad'
-export type City = 'Casablanca' | 'Marrakech' | 'Rabat' | 'Tanger'
+export type PropertyType = 'Villa' | 'Appartement' | 'Penthouse' | 'Riad' | 'Chalet'
+export type City = 'Casablanca' | 'Marrakech' | 'Rabat' | 'Tanger' | 'Genève' | 'Lausanne' | 'Nyon' | 'Verbier'
 // badge_color values — listed here so Tailwind includes them in the CSS bundle
 export type BadgeColor = 'bg-amber-500' | 'bg-emerald-500' | 'bg-rose-500'
 

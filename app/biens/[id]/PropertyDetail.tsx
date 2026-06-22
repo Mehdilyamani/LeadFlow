@@ -230,7 +230,19 @@ export default function PropertyDetail({
 
       <LeadWidget
         agencyName="Prestige Immobilier"
-        propertyContext={{ id: property.id, title: property.title }}
+        propertyContext={{
+          id:          property.id,
+          title:       property.title,
+          price:       property.price,
+          location:    property.location,
+          city:        property.city,
+          area:        property.area,
+          beds:        property.beds,
+          baths:       property.baths,
+          type:        property.type,
+          description: property.description,
+          features:    property.features,
+        }}
         externalOpen={widgetOpen}
       />
     </main>
