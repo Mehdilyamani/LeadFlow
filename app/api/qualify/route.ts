@@ -199,6 +199,36 @@ function retryDelay(err: unknown, attempt: number): number {
   return is429 ? [15000, 30000][attempt - 1] ?? 30000 : [2000, 4000][attempt - 1] ?? 4000
 }
 
+// ── Groq fallback ──────────────────────────────────────────────────────────────
+// Used when Gemini is rate-limited. Same prompt, same JSON contract — the model
+// swap is invisible downstream (parsing/scoring/saving code is unchanged).
+const GROQ_MODEL = 'llama-3.3-70b-versatile'
+
+async function callGroq(prompt: string): Promise<string> {
+  const groqKey = process.env.GROQ_API_KEY
+  if (!groqKey) throw new Error('No Groq API key configured')
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${groqKey}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.4,
+      max_tokens: 1024,
+    }),
+  })
+  if (!res.ok) {
+    const errText = await res.text().catch(() => '')
+    throw new Error(`Groq error ${res.status}: ${errText}`)
+  }
+  const data = await res.json()
+  return (data?.choices?.[0]?.message?.content ?? '').trim()
+}
+
 // ── Handler ────────────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   const body            = await req.json()
@@ -256,7 +286,22 @@ export async function POST(req: NextRequest) {
         break
       } catch (err) {
         lastErr = err
-        if (!isRetryable(err) || attempt === 2) break
+        if (!isRetryable(err)) break
+
+        // Gemini is rate-limited — skip its own backoff and fail over to Groq
+        // right away. Waiting out a quota window would make the widget look broken.
+        if (process.env.GROQ_API_KEY) {
+          try {
+            text = await callGroq(prompt)
+            lastErr = undefined
+            console.log('[qualify] served by Groq fallback (Gemini rate-limited)')
+          } catch (groqErr) {
+            console.error('[qualify] Groq fallback failed:', groqErr)
+          }
+          break
+        }
+
+        if (attempt === 2) break
         await sleep(retryDelay(err, attempt + 1))
       }
     }
