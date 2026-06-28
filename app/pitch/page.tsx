@@ -2,6 +2,7 @@
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
 import LeadWidget from '../CSR/LeadWidget'
+import Logo from '../CSR/Logo'
 
 const FAQ = [
   { q: 'Est-ce que ça marche sur mon site existant ?', a: "Oui. Leadflow s'installe sur n'importe quel site web : WordPress, Squarespace, site custom, etc. Un simple copier-coller de code suffit." },
@@ -83,12 +84,7 @@ function PitchContent() {
       {/* NAV */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-base">⚡</span>
-            <span className="font-bold text-slate-900 tracking-tight">
-              Lead<span className="text-blue-600">flow</span>
-            </span>
-          </div>
+          <Logo />
           <button
             onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             className="text-xs font-semibold px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"

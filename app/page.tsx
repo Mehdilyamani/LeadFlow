@@ -7,6 +7,7 @@ import {
   MessageSquare, BarChart3, Zap, Clock,
   CheckCircle, ArrowRight, Mail,
 } from 'lucide-react'
+import Logo from './CSR/Logo'
 
 const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '800'] })
 
@@ -36,6 +37,12 @@ function FadeUp({
 }
 
 // ── Navbar ─────────────────────────────────────────────────────────────────────
+const NAV_LINKS = [
+  { label: 'Fonctionnalités', href: '#fonctionnalites' },
+  { label: 'Tarifs', href: '#tarifs' },
+  { label: 'Connexion', href: '/login' },
+]
+
 function Navbar() {
   return (
     <header
@@ -43,23 +50,27 @@ function Navbar() {
       style={{ background: '#0f172a', borderBottom: '1px solid rgba(255,255,255,0.07)' }}
     >
       <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 flex items-center justify-center shrink-0"
-            style={{ background: '#c9a84c', borderRadius: 8 }}
-          >
-            <MessageSquare className="w-4 h-4 text-white" />
-          </div>
-          <span style={{ color: '#fff', fontWeight: 800, fontSize: 17, letterSpacing: '-0.3px' }}>
-            LeadFlow <span style={{ color: '#c9a84c' }}>Immo</span>
-          </span>
-        </div>
+        <Link href="/" className="no-underline">
+          <Logo variant="dark" />
+        </Link>
+        <nav className="hidden md:flex items-center gap-7" style={{ fontSize: 14 }}>
+          {NAV_LINKS.map(l => (
+            <Link
+              key={l.label}
+              href={l.href}
+              className="transition-colors hover:text-white"
+              style={{ color: 'rgba(255,255,255,0.7)' }}
+            >
+              {l.label}
+            </Link>
+          ))}
+        </nav>
         <a
-          href={CONTACT}
+          href="/demo"
           className="transition-opacity hover:opacity-85"
           style={{ background: '#c9a84c', color: '#fff', borderRadius: 8, fontWeight: 700, fontSize: 14, padding: '8px 18px' }}
         >
-          Essayer gratuitement
+          Démo gratuite
         </a>
       </div>
     </header>
@@ -237,7 +248,7 @@ const FEATURES = [
 
 function Features() {
   return (
-    <section style={{ background: '#f9fafb' }}>
+    <section id="fonctionnalites" style={{ background: '#f9fafb' }}>
       <div className="max-w-5xl mx-auto px-6 py-20">
         <FadeUp>
           <h2
@@ -286,7 +297,7 @@ const INCLUS = [
 
 function Pricing() {
   return (
-    <section style={{ background: '#ffffff' }}>
+    <section id="tarifs" style={{ background: '#ffffff' }}>
       <div className="max-w-5xl mx-auto px-6 py-20 text-center">
         <FadeUp>
           <h2
@@ -379,17 +390,7 @@ function Footer() {
   return (
     <footer style={{ background: '#0f172a', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 flex items-center justify-center shrink-0"
-            style={{ background: '#c9a84c', borderRadius: 7 }}
-          >
-            <MessageSquare className="w-3.5 h-3.5 text-white" />
-          </div>
-          <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>
-            LeadFlow <span style={{ color: '#c9a84c' }}>Immo</span>
-          </span>
-        </div>
+        <Logo variant="dark" size={24} />
         <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13, textAlign: 'center' }}>
           Assistant IA pour régies immobilières · Suisse romande
         </p>
