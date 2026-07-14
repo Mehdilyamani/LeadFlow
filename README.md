@@ -1,36 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LeadFlow Immo
 
-## Getting Started
+Un chatbot IA pour agences immobilières qui qualifie les visiteurs 24/7 et transmet les leads chauds en temps réel — au lieu de laisser vos prospects partir sans réponse en dehors des heures d'ouverture.
 
-First, run the development server:
+**Démo en ligne :** [leadflowimmo.com/demo](https://leadflowimmo.com/demo)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Ce que ça fait
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Widget de chat embarquable sur n'importe quel site d'agence immobilière (script tag, intégration en 5 minutes)
+- Qualification automatique des visiteurs par IA — questions adaptées au secteur immobilier
+- Scoring des leads par priorité (chaud / tiède / froid)
+- Dashboard dédié par client pour suivre les leads qualifiés en temps réel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Stack technique
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend :** TypeScript, React
+- **Backend / Data :** Supabase (isolation des données par client via RLS)
+- **IA :** intégration LLM pour la qualification conversationnelle
+- **Déploiement :** production active sur leadflowimmo.com
 
-## Learn More
+## Statut
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Produit en production, déployé et testé en conditions réelles auprès d'agences immobilières en France et en Suisse.
