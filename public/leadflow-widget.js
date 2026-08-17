@@ -12,6 +12,7 @@
  * Optional attributes:
  *   data-agency        Display name shown in the widget header (default: "Démo LeadFlow")
  *   data-client-id     Stable id used to attribute leads to this client (recommended)
+ *   data-agency-context Agency description & context for AI system prompt (optional)
  *   data-base-url      Override the LeadFlow origin (auto-detected from this script's src otherwise)
  *   data-position      "right" (default) or "left"
  *   data-property-id   Current property id, if embedded on a single-listing page
@@ -31,11 +32,12 @@
     return v != null && v !== '' ? v : fallback;
   }
 
-  var agency        = attr('data-agency', 'Démo LeadFlow');
-  var clientId      = attr('data-client-id', '');
-  var position      = attr('data-position', 'right') === 'left' ? 'left' : 'right';
-  var propertyId    = attr('data-property-id', '');
-  var propertyTitle = attr('data-property-title', '');
+  var agency         = attr('data-agency', 'Démo LeadFlow');
+  var clientId       = attr('data-client-id', 'leadflow');
+  var agencyContext  = attr('data-agency-context', '');
+  var position       = attr('data-position', 'right') === 'left' ? 'left' : 'right';
+  var propertyId     = attr('data-property-id', '');
+  var propertyTitle  = attr('data-property-title', '');
 
   // Derive the LeadFlow origin from this script's own src so it works on any domain.
   var src     = (el && el.getAttribute('src')) || '';
@@ -46,6 +48,7 @@
   // Build the iframe URL with everything the widget needs.
   var params = ['agency=' + encodeURIComponent(agency)];
   if (clientId)      params.push('client=' + encodeURIComponent(clientId));
+  if (agencyContext) params.push('context=' + encodeURIComponent(agencyContext));
   if (propertyId)    params.push('pid=' + encodeURIComponent(propertyId));
   if (propertyTitle) params.push('ptitle=' + encodeURIComponent(propertyTitle));
 

@@ -1,18 +1,19 @@
 import type { Property } from '../lib/properties'
 import HomeClient from '../HomeClient'
+import Script from 'next/script'
 
 const SWISS_PROPERTIES: Property[] = [
   {
-    id: 'ch-1',
-    title: 'Villa Vue Lac',
-    location: 'Cologny, Genève',
-    city: 'Genève',
-    price: '4 800 000',
-    priceNum: 4800000,
+    id: 'ma-1',
+    title: 'Villa d\'Époque Anfa',
+    location: 'Anfa, Casablanca',
+    city: 'Casablanca',
+    price: '8 500 000',
+    priceNum: 8500000,
     type: 'Villa',
     beds: 5,
     baths: 4,
-    area: '380 m²',
+    area: '450 m²',
     image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=80',
@@ -22,20 +23,20 @@ const SWISS_PROPERTIES: Property[] = [
     ],
     badge: 'Exclusivité',
     badgeColor: 'bg-amber-500',
-    description: "Villa d'exception à Cologny avec vue imprenable sur le lac Léman. Architecture contemporaine aux lignes épurées, jardin paysagé et piscine chauffée. Finitions haut de gamme, domotique complète, accès direct au lac.",
-    features: ['Vue lac Léman', 'Piscine chauffée', 'Jardin paysagé 600 m²', 'Domotique complète', 'Garage triple', 'Cave à vin', 'Salle de sport'],
+    description: "Villa de prestige à Anfa avec vue dégagée sur l'océan. Architecture marocaine traditionnelle revisitée, patio avec fontaine, jardin climatisé et piscine. Finitions haut de gamme, domotique complète, accès direct aux commerces de prestige.",
+    features: ['Vue océan', 'Piscine chauffée', 'Patio traditionnel', 'Domotique complète', 'Garage double', 'Salon marocain', 'Hammam privatif'],
   },
   {
-    id: 'ch-2',
-    title: 'Appartement Standing',
-    location: 'Ouchy, Lausanne',
-    city: 'Lausanne',
-    price: '1 250 000',
-    priceNum: 1250000,
+    id: 'ma-2',
+    title: 'Penthouse Vue Mer',
+    location: 'Aïn Diab, Casablanca',
+    city: 'Casablanca',
+    price: '4 200 000',
+    priceNum: 4200000,
     type: 'Appartement',
     beds: 3,
     baths: 2,
-    area: '118 m²',
+    area: '220 m²',
     image: 'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=800&q=80',
     images: [
       'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=1200&q=80',
@@ -45,41 +46,53 @@ const SWISS_PROPERTIES: Property[] = [
     ],
     badge: 'Coup de cœur',
     badgeColor: 'bg-rose-500',
-    description: "Appartement de standing en bord de lac à Ouchy. Lumineux et bien agencé, avec terrasse et vue partielle sur le Léman. Résidence sécurisée, proche du métro et des commerces.",
-    features: ['Terrasse 20 m²', 'Vue lac partielle', 'Parking souterrain', 'Cave privative', 'Ascenseur', 'Proche métro m2'],
+    description: "Penthouse de standing en bord de mer à Aïn Diab. Lumineux et raffiné, avec terrasse panoramique et vue spectaculaire sur l'océan Atlantique. Résidence sécurisée 24h/24, proche des restaurants haut de gamme et clubs privés.",
+    features: ['Terrasse 40 m²', 'Vue océan', 'Parking couvert', 'Cave climatisée', 'Ascenseur privé', 'Accès plage'],
   },
   {
-    id: 'ch-3',
-    title: 'Chalet de Prestige',
-    location: 'Verbier, Valais',
-    city: 'Verbier',
-    price: '3 200 000',
-    priceNum: 3200000,
-    type: 'Chalet',
-    beds: 5,
-    baths: 3,
-    area: '240 m²',
-    image: 'https://images.unsplash.com/photo-1482192505345-5852cc5a7d08?w=800&q=80',
+    id: 'ma-3',
+    title: 'Riad de Luxe Medina',
+    location: 'Medina, Marrakech',
+    city: 'Marrakech',
+    price: '6 800 000',
+    priceNum: 6800000,
+    type: 'Riad',
+    beds: 6,
+    baths: 4,
+    area: '380 m²',
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80',
     images: [
-      'https://images.unsplash.com/photo-1482192505345-5852cc5a7d08?w=1200&q=80',
       'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80',
-      'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=1200&q=80',
-      'https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=1200&q=80',
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
+      'https://images.unsplash.com/photo-1494526585095-c41746248156?w=1200&q=80',
+      'https://images.unsplash.com/photo-1448630360428-65456885c650?w=1200&q=80',
     ],
     badge: 'Rare',
     badgeColor: 'bg-amber-500',
-    description: "Chalet de prestige au coeur du domaine skiable de Verbier. Vue panoramique sur les 4 000 m, spa privatif, finitions bois noble. Accès ski aux pieds. Idéal résidence principale ou investissement saisonnier.",
-    features: ['Ski aux pieds', 'Vue panoramique 4000 m', 'Spa & sauna privatifs', 'Cheminée pierre', 'Bois noble massif', 'Parking 3 voitures', 'Buanderie équipée'],
+    description: "Riad d'exception au cœur de la Médina de Marrakech. Authentique architecture marocaine avec patio central à ciel ouvert, fontaines et zellige. Entièrement rénové, équipements modernes, spa privatif. Idéal résidence principale ou investissement touristique.",
+    features: ['Patio traditionnel', 'Terrasse Kasbah', 'Spa et hammam', 'Fontaines', 'Zellige artisanal', 'Cuisine marocaine équipée', 'Bibliothèque orientale'],
   },
 ]
 
 const AGENCY_CONTEXT =
-  "Agence immobilière de prestige en Suisse romande. " +
-  "Spécialisée dans les villes de Genève (Cologny), Lausanne (Ouchy), Nyon et Verbier (Valais). " +
-  "Types de biens : villas avec vue sur le lac Léman, appartements de standing, chalets alpins de luxe. " +
-  "Prix en CHF. Clientèle locale et internationale. " +
-  "Pour le budget, utilise CHF (pas MAD ni EUR)."
+  "Agence immobilière de prestige au Maroc. " +
+  "Spécialisée dans les villes de Casablanca (Anfa, Aïn Diab), Marrakech (Medina, Palmeraie), Rabat et Tanger. " +
+  "Types de biens : villas de prestige, penthouses vue océan, riads de luxe, apartements de standing. " +
+  "Prix en MAD (dirhams marocains). Clientèle marocaine et internationale. " +
+  "Pour le budget, utilise MAD (pas CHF ni EUR). Contact via WhatsApp naturel pour les prospects marocains."
 
 export default function DemoPage() {
-  return <HomeClient properties={SWISS_PROPERTIES} agencyContext={AGENCY_CONTEXT} />
+  return (
+    <>
+      <HomeClient properties={SWISS_PROPERTIES} agencyContext={AGENCY_CONTEXT} />
+      <Script
+        src="/leadflow-widget.js"
+        strategy="lazyOnload"
+        data-agency="Agence de Prestige Maroc"
+        data-client-id="leadflow"
+        data-agency-context={AGENCY_CONTEXT}
+        async
+      />
+    </>
+  )
 }

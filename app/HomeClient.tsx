@@ -8,22 +8,22 @@ import type { Property } from './lib/properties'
 
 const TESTIMONIALS = [
   {
-    name: 'Marc Dupont',
-    role: 'Entrepreneur, Genève',
-    text: "Grâce à Démo LeadFlow, j'ai trouvé ma villa de rêve en moins de 3 semaines. Service exceptionnel, équipe à l'écoute.",
-    avatar: 'MD',
+    name: 'Karim El Mansouri',
+    role: 'Entrepreneur, Casablanca',
+    text: "Grâce à LeadFlow, j'ai trouvé ma villa d'exception à Anfa en moins de 3 semaines. Service impeccable, équipe vraiment à l'écoute.",
+    avatar: 'KM',
   },
   {
-    name: 'Sophie Rochat',
-    role: 'Directrice financière, Lausanne',
-    text: "Professionnalisme et réactivité au rendez-vous. Mon appartement aux Eaux-Vives est exactement ce que je cherchais. Merci !",
-    avatar: 'SR',
+    name: 'Amira Benkirane',
+    role: 'Directrice générale, Marrakech',
+    text: "Professionnalisme et réactivité au rendez-vous. Mon riad dans la médina est exactement ce que je cherchais. Je recommande vivement !",
+    avatar: 'AB',
   },
   {
-    name: 'Jean-Pierre Favre',
-    role: 'Investisseur, Nyon',
-    text: "Accompagnement parfait du début à la fin. Je recommande Démo LeadFlow à tous mes associés sans hésitation.",
-    avatar: 'JF',
+    name: 'Hassan Berrada',
+    role: 'Investisseur, Rabat',
+    text: "Accompagnement parfait du début à la fin. Les conseillers connaissent le marché marocain comme personne. Je recommande sans hésiter.",
+    avatar: 'HB',
   },
 ]
 
@@ -42,7 +42,7 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
           <div className="flex items-center gap-2">
             <span className="text-xl">🏛</span>
             <span className="font-bold text-slate-900 text-lg tracking-tight">
-              Démo <span className="text-amber-600">LeadFlow</span>
+              Agence de Prestige <span className="text-amber-600">Maroc</span>
             </span>
           </div>
 
@@ -54,10 +54,10 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
 
           <div className="flex items-center gap-3">
             <a
-              href="tel:+41227000000"
+              href="tel:+212522000000"
               className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:border-amber-500 hover:text-amber-600 transition-colors"
             >
-              📞 +41 22 700 00 00
+              📞 +212 5 22 00 00 00
             </a>
             <Link
               href="/dashboard"
@@ -89,8 +89,8 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
             <button onClick={() => { scrollTo('temoignages'); setMenuOpen(false) }} className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors text-left">
               ⭐ Avis clients
             </button>
-            <a href="tel:+41227000000" className="text-sm font-semibold text-amber-600 border border-amber-200 rounded-lg px-4 py-2.5 text-center hover:bg-amber-50 transition-colors">
-              📞 +41 22 700 00 00
+            <a href="tel:+212522000000" className="text-sm font-semibold text-amber-600 border border-amber-200 rounded-lg px-4 py-2.5 text-center hover:bg-amber-50 transition-colors">
+              📞 +212 5 22 00 00 00
             </a>
           </div>
         )}
@@ -100,7 +100,7 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
       <section className="relative overflow-hidden" style={{ height: '92vh', minHeight: 600 }}>
         <Image
           src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=80"
-          alt="Villa de prestige en Suisse romande"
+          alt="Villa de prestige au Maroc"
           fill
           className="object-cover"
           priority
@@ -109,14 +109,14 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <div className="mb-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur text-white text-xs font-medium px-4 py-2 rounded-full border border-white/20">
             <span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />
-            Agence agréée • 15 ans d&apos;expertise en Suisse romande
+            Agence certifiée • 12 ans d&apos;expertise au Maroc
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight max-w-3xl">
             Trouvez votre bien<br />
-            <span className="text-amber-400">d&apos;exception</span> en Suisse romande
+            <span className="text-amber-400">d&apos;exception</span> au Maroc
           </h1>
           <p className="text-lg text-white/85 mb-8 max-w-xl leading-relaxed">
-            Villas premium, appartements de standing et opportunités d&apos;investissement à Genève, Lausanne et Nyon.
+            Villas de prestige, penthouses vue océan et riads de luxe à Casablanca, Marrakech et Rabat.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link href="/biens" className="px-7 py-3.5 rounded-xl font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors">
@@ -136,10 +136,10 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
       <section className="bg-slate-900 text-white py-10">
         <div className="max-w-4xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { value: '500+', label: 'Biens vendus' },
-            { value: '15 ans', label: "D'expérience" },
+            { value: '350+', label: 'Biens vendus' },
+            { value: '12 ans', label: "D'expérience" },
             { value: '98%', label: 'Clients satisfaits' },
-            { value: '4 villes', label: 'Présence régionale' },
+            { value: '5 villes', label: 'Présence régionale' },
           ].map(s => (
             <div key={s.label}>
               <p className="text-3xl font-bold text-amber-400">{s.value}</p>
@@ -187,7 +187,7 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
                   <span>📐 {p.area}</span>
                 </div>
                 <div className="flex items-center justify-between mt-4">
-                  <p className="text-amber-600 font-bold text-lg">{p.price} <span className="text-sm font-normal text-slate-500">CHF</span></p>
+                  <p className="text-amber-600 font-bold text-lg">{p.price} <span className="text-sm font-normal text-slate-500">MAD</span></p>
                   <Link href={`/biens/${p.id}`} className="text-xs font-semibold text-slate-900 hover:text-amber-600 transition-colors">
                     Détails →
                   </Link>
@@ -214,16 +214,16 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
           <div className="flex-1">
             <p className="text-amber-600 text-sm font-semibold uppercase tracking-widest mb-3">À propos</p>
             <h2 className="text-3xl font-bold text-slate-900 mb-5">
-              L&apos;excellence immobilière<br />depuis 2009
+              L&apos;excellence immobilière<br />depuis 2012
             </h2>
             <p className="text-slate-600 leading-relaxed mb-4">
-              Démo LeadFlow est la référence de l&apos;immobilier de luxe en Suisse romande. Fondée en 2009 à Genève, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
+              Agence de Prestige Maroc est la référence de l&apos;immobilier de luxe au Maroc. Fondée en 2012 à Casablanca, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
             </p>
             <p className="text-slate-600 leading-relaxed mb-8">
-              Notre équipe de consultants expérimentés vous guide à chaque étape : de la recherche jusqu&apos;à la signature, avec un service personnalisé et discret.
+              Notre équipe de consultants expérimentés vous guide à chaque étape : de la recherche jusqu&apos;à la signature, avec un service personnalisé, discret et disponible via WhatsApp.
             </p>
             <div className="flex flex-wrap gap-3">
-              {['Agence agréée USPI', 'Service 7j/7', 'Évaluation gratuite', 'Réseau international'].map(tag => (
+              {['Agence certifiée', 'Service 24h/24', 'Expertise marocaine', 'WhatsApp disponible'].map(tag => (
                 <span key={tag} className="text-xs font-medium px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
                   ✓ {tag}
                 </span>
@@ -232,10 +232,10 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
           </div>
           <div className="flex-1 grid grid-cols-2 gap-4">
             {[
-              { icon: '🏠', title: 'Résidentiel', desc: 'Villas, appartements, penthouses' },
-              { icon: '🏢', title: 'Commercial', desc: 'Bureaux, locaux, entrepôts' },
-              { icon: '📈', title: 'Investissement', desc: 'Rentabilité et valorisation' },
-              { icon: '🌍', title: 'International', desc: 'Clients internationaux bienvenus' },
+              { icon: '🏠', title: 'Résidentiel', desc: 'Villas, riads, penthouses' },
+              { icon: '🏢', title: 'Commercial', desc: 'Locaux commerciaux haut standing' },
+              { icon: '📈', title: 'Investissement', desc: 'Rentabilité touristique & patrimoniale' },
+              { icon: '🌍', title: 'International', desc: 'Clients marocains et internationaux' },
             ].map(s => (
               <div key={s.title} className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
                 <span className="text-3xl">{s.icon}</span>
@@ -297,10 +297,10 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
           <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🏛</span>
-                <span className="font-bold text-white text-lg">Démo <span className="text-amber-500">LeadFlow</span></span>
+                <span className="text-xl">�</span>
+                <span className="font-bold text-white text-lg">Agence de Prestige <span className="text-amber-500">Maroc</span></span>
               </div>
-              <p className="text-sm max-w-xs leading-relaxed">L&apos;agence de référence pour l&apos;immobilier de prestige en Suisse romande depuis 2009.</p>
+              <p className="text-sm max-w-xs leading-relaxed">L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc depuis 2012.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
               <div>
@@ -313,26 +313,26 @@ export default function HomeClient({ properties, agencyContext }: { properties: 
               </div>
               <div>
                 <p className="text-white font-semibold mb-3">Villes</p>
-                {['Genève', 'Lausanne', 'Nyon', 'Verbier'].map(l => (
+                {['Casablanca', 'Marrakech', 'Rabat', 'Tanger'].map(l => (
                   <p key={l} className="mb-2 hover:text-amber-400 cursor-pointer transition-colors">{l}</p>
                 ))}
               </div>
               <div>
                 <p className="text-white font-semibold mb-3">Contact</p>
-                <p className="mb-2">📞 +41 22 700 00 00</p>
-                <p className="mb-2">✉ contact@prestige-immo.ch</p>
-                <p>📍 Avenue de la Paix 12, Genève</p>
+                <p className="mb-2">📞 +212 5 22 00 00 00</p>
+                <p className="mb-2">📱 WhatsApp: +212 6 XX XX XX XX</p>
+                <p>📍 Boulevard Anfa, Casablanca</p>
               </div>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-6 text-xs text-center text-slate-600">
-            © 2026 Démo LeadFlow. Tous droits réservés. •{' '}
-            Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span>
+            © 2026 Agence de Prestige Maroc. Tous droits réservés. •{' '}
+            Propulsé par <span className="text-amber-500 font-semibold">LeadFlow AI</span>
           </div>
         </div>
       </footer>
 
-      <LeadWidget agencyName="Démo LeadFlow" agencyContext={agencyContext} />
+      <LeadWidget agencyName="Agence de Prestige Maroc" agencyContext={agencyContext} />
     </main>
   )
 }

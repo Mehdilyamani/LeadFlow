@@ -286,6 +286,16 @@ export async function POST(req: NextRequest) {
         break
       } catch (err) {
         lastErr = err
+        const errName = err instanceof Error ? err.name : 'UnknownError'
+        const errMsg = err instanceof Error ? err.message : String(err)
+        const status = typeof err === 'object' && err && 'status' in err ? String((err as { status?: unknown }).status) : 'n/a'
+        console.log('[qualify] Gemini catch', {
+          status,
+          errorName: errName,
+          errorMessage: errMsg,
+          groqKeyPresent: Boolean(process.env.GROQ_API_KEY),
+          geminiKeyPresent: Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY),
+        })
         if (!isRetryable(err)) break
 
         // Gemini is rate-limited — skip its own backoff and fail over to Groq

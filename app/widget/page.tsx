@@ -3,11 +3,12 @@ import LeadWidget from '../CSR/LeadWidget'
 export default async function WidgetPage({
   searchParams,
 }: {
-  searchParams: Promise<{ agency?: string; client?: string; pid?: string; ptitle?: string }>
+  searchParams: Promise<{ agency?: string; client?: string; context?: string; pid?: string; ptitle?: string }>
 }) {
-  const { agency, client, pid, ptitle } = await searchParams
+  const { agency, client, context, pid, ptitle } = await searchParams
   const agencyName = agency ? decodeURIComponent(agency) : 'Démo LeadFlow'
   const clientId = client ? decodeURIComponent(client) : undefined
+  const agencyContext = context ? decodeURIComponent(context) : undefined
   const propertyContext =
     pid && ptitle
       ? { id: decodeURIComponent(pid), title: decodeURIComponent(ptitle) }
@@ -25,7 +26,7 @@ export default async function WidgetPage({
         /* always clickable — pointer-events on the iframe is managed by embed script */
         * { pointer-events: auto !important; }
       `}</style>
-      <LeadWidget agencyName={agencyName} clientId={clientId} propertyContext={propertyContext} />
+      <LeadWidget agencyName={agencyName} clientId={clientId} agencyContext={agencyContext} propertyContext={propertyContext} />
     </>
   )
 }

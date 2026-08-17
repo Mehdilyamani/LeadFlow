@@ -88,7 +88,7 @@ function Hero() {
           transition={{ duration: 0.5, delay: 0 }}
           style={{ color: '#c9a84c', fontSize: 13, letterSpacing: '0.12em', fontWeight: 600, textTransform: 'uppercase', marginBottom: 20 }}
         >
-          Assistant IA pour régies immobilières · Suisse romande
+          Assistant IA pour agences immobilières · Maroc
         </motion.p>
 
         <motion.h1
@@ -325,7 +325,7 @@ function Pricing() {
               </p>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 6 }}>
                 <span style={{ color: '#fff', fontSize: 52, fontWeight: 800, letterSpacing: '-1px', lineHeight: 1 }}>199</span>
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 600 }}>CHF / mois</span>
+                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: 18, fontWeight: 600 }}>MAD / mois</span>
               </div>
               <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 14, marginBottom: 32 }}>
                 Premier mois offert — sans carte bancaire requise
@@ -392,7 +392,7 @@ function Footer() {
       <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
         <Logo variant="dark" size={24} />
         <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13, textAlign: 'center' }}>
-          Assistant IA pour régies immobilières · Suisse romande
+          Assistant IA pour agences immobilières · Maroc
         </p>
         <a
           href={CONTACT}
