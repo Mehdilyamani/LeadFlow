@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import supabaseServer from '../../DB/supabaseServer'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -42,23 +43,47 @@ interface RawLead {
 
 type Score = 'HOT' | 'WARM' | 'COLD'
 
+// ── Morocco market context ─────────────────────────────────────────────────────
+
+const MARKET_CONTEXT = `
+CONTEXTE MARCHÉ :
+
+Tu travailles pour une agence immobilière opérant au Maroc.
+
+- Devise : MAD (dirham marocain)
+- Langue principale : français
+- Principales zones : Casablanca, Marrakech, Rabat et Tanger
+- Les prospects marocains utilisent naturellement WhatsApp comme moyen de contact.
+- Utilise toujours le contexte réel du bien et/ou de l'agence fourni dans le prompt.
+- N'invente jamais de prix, de biens, de quartiers ou d'informations qui ne sont pas fournis.
+- Ne fais aucune référence à la Suisse, au CHF, à l'EUR ou à des villes suisses.
+`.trim()
+
 // ── Scoring ────────────────────────────────────────────────────────────────────
+
 function calculateScore(lead: RawLead): Score {
-  const budget   = (lead.budget   || '').toLowerCase()
+  const budget = (lead.budget || '').toLowerCase()
   const timeline = (lead.timeline || '').toLowerCase()
 
   const highBudget =
-    budget.includes('1m') || budget.includes("plus d'1m") ||
-    budget.includes('1 000 000') || budget.includes('500k-1m') ||
+    budget.includes('1m') ||
+    budget.includes("plus d'1m") ||
+    budget.includes('1 000 000') ||
+    budget.includes('500k-1m') ||
     budget.includes('500k-1') ||
     /[5-9]\d{5,}/.test(budget.replace(/\s/g, '')) ||
     /[1-9]\d{6,}/.test(budget.replace(/\s/g, ''))
 
   const shortTimeline =
-    timeline.includes('ce mois') || timeline.includes('mois-ci') ||
-    timeline.includes('immédiat') || timeline.includes('urgent')
+    timeline.includes('ce mois') ||
+    timeline.includes('mois-ci') ||
+    timeline.includes('immédiat') ||
+    timeline.includes('urgent')
 
-  const mediumTimeline = shortTimeline || timeline.includes('3 mois') || timeline.includes('dans 3')
+  const mediumTimeline =
+    shortTimeline ||
+    timeline.includes('3 mois') ||
+    timeline.includes('dans 3')
 
   if (shortTimeline && highBudget) return 'HOT'
   if (mediumTimeline || highBudget) return 'WARM'
@@ -66,16 +91,28 @@ function calculateScore(lead: RawLead): Score {
 }
 
 // ── System prompts ─────────────────────────────────────────────────────────────
-function buildSystemPrompt(agencyName: string, propertyContext?: PropertyContext | null, agencyDescription?: string | null): string {
 
+function buildSystemPrompt(
+  agencyName: string,
+  propertyContext?: PropertyContext | null,
+  agencyDescription?: string | null,
+): string {
   if (propertyContext) {
     // ── ENTRY 2: visitor came from a property page ────────────────────────────
-    const loc          = [propertyContext.location, propertyContext.city].filter(Boolean).join(', ')
-    const featuresStr  = propertyContext.features?.join(', ') || 'Non précisé'
-    const knownType    = propertyContext.type   || '...'
-    const knownLoc     = loc || '...'
 
-    return `Tu es l'assistant de "${agencyName}".
+    const loc = [propertyContext.location, propertyContext.city]
+      .filter(Boolean)
+      .join(', ')
+
+    const featuresStr =
+      propertyContext.features?.join(', ') || 'Non précisé'
+
+    const knownType = propertyContext.type || '...'
+    const knownLoc = loc || '...'
+
+    return `${MARKET_CONTEXT}
+
+Tu es l'assistant de "${agencyName}".
 
 Le widget a déjà affiché ce message au visiteur :
 "Excellent choix ! ${propertyContext.title} est un très beau bien. Avez-vous des questions à son sujet avant que je vous mette en relation avec un conseiller ?"
@@ -83,46 +120,65 @@ Le widget a déjà affiché ce message au visiteur :
 Ne répète PAS de message d'accueil. Enchaîne directement depuis là.
 
 DONNÉES COMPLÈTES DU BIEN (utilise-les pour répondre aux questions du visiteur) :
-- Titre       : ${propertyContext.title}
-- Prix        : ${propertyContext.price ?? 'Non communiqué'} MAD
-- Type        : ${propertyContext.type ?? 'Non précisé'}
-- Surface     : ${propertyContext.area ?? 'Non précisé'}
-- Chambres    : ${propertyContext.beds ?? 'Non précisé'}
+- Titre : ${propertyContext.title}
+- Prix : ${propertyContext.price ?? 'Non communiqué'} MAD
+- Type : ${propertyContext.type ?? 'Non précisé'}
+- Surface : ${propertyContext.area ?? 'Non précisé'}
+- Chambres : ${propertyContext.beds ?? 'Non précisé'}
 - Salle de bain : ${propertyContext.baths ?? 'Non précisé'}
-- Localisation: ${loc || 'Non précisé'}
+- Localisation : ${loc || 'Non précisé'}
 - Description : ${propertyContext.description ?? 'Non précisé'}
 - Prestations : ${featuresStr}
 
 Réponds à toutes les questions du visiteur sur ce bien avec précision et enthousiasme.
 
 Puis qualifie-le dans cet ordre, UN champ à la fois.
+
 Accuse chaque réponse chaleureusement (1-2 phrases naturelles, pas robotiques) avant la prochaine question :
+
 1. Prénom
 2. Budget (moins de 500k / 500k-1M / plus d'1M)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
 4. Contact EN DERNIER — pose exactement :
    "Pour qu'un conseiller vous recontacte avec une sélection adaptée, quel est le meilleur moyen de vous joindre ? (numéro WhatsApp ou email)"
+
    → Si le visiteur donne seulement son prénom sans contact réel, redemande-lui.
    → contact = numéro de téléphone ou adresse email uniquement.
 
 NE pose PAS de question sur le type de bien ni la localisation — déjà connus.
-Une question à la fois. Langue : français.
+
+Une question à la fois.
+Langue : français.
 
 Quand tu as les 4 réponses, réponds UNIQUEMENT avec ce JSON :
+
 {"done":true,"message":"Parfait [prénom], merci ! Un conseiller va vous recontacter très vite concernant ${propertyContext.title}. En attendant, je reste à votre disposition si vous avez d'autres questions — n'hésitez pas.","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"${knownType}","location":"${knownLoc}"}}`
   }
 
   // ── ENTRY 1: floating widget, no property context ─────────────────────────
-  return `Tu es l'assistant de "${agencyName}".
+
+  return `${MARKET_CONTEXT}
+
+Tu es l'assistant de "${agencyName}".
 
 Le widget a déjà accueilli le visiteur. Ta PREMIÈRE réponse doit s'enchaîner naturellement — PAS de "Bonjour", PAS de message d'accueil séparé. Continue directement depuis là.
 
-${agencyDescription
-  ? `Ce visiteur explore le site. Voici le contexte de l'agence pour répondre à ses questions. Sois chaleureux et utile.\n\nCONTEXTE DE L'AGENCE :\n${agencyDescription}`
-  : `Ce visiteur explore le site. Réponds à ses questions sur l'agence si tu as l'information. Sois chaleureux et utile.\nN'invente jamais de biens ni de prix, même de façon générale. Ne dis pas que l'agence "a" des propriétés si tu ne les connais pas. Si le visiteur demande quelles propriétés sont disponibles, dis-lui simplement qu'un conseiller lui enverra une sélection personnalisée.`}
+${
+  agencyDescription
+    ? `Ce visiteur explore le site. Voici le contexte de l'agence pour répondre à ses questions. Sois chaleureux et utile.
+
+CONTEXTE DE L'AGENCE :
+${agencyDescription}`
+    : `Ce visiteur explore le site. Réponds à ses questions sur l'agence si tu as l'information. Sois chaleureux et utile.
+N'invente jamais de biens ni de prix, même de façon générale.
+Ne dis pas que l'agence "a" des propriétés si tu ne les connais pas.
+Si le visiteur demande quelles propriétés sont disponibles, dis-lui simplement qu'un conseiller lui enverra une sélection personnalisée.`
+}
 
 Puis qualifie-le naturellement, UN champ à la fois.
+
 Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochaine question :
+
 1. Prénom
 2. Budget (moins de 500k / 500k-1M / plus d'1M)
 3. Délai (ce mois-ci / dans 3 mois / dans 6 mois / je regarde)
@@ -130,37 +186,65 @@ Accuse chaque réponse chaleureusement (1-2 phrases naturelles) avant la prochai
 5. Ville ou quartier
 6. Contact EN DERNIER — pose exactement :
    "Pour qu'un conseiller vous recontacte avec une sélection adaptée, quel est le meilleur moyen de vous joindre ? (numéro WhatsApp ou email)"
+
    → Si le visiteur donne seulement son prénom sans contact réel, redemande-lui.
    → contact = numéro de téléphone ou adresse email uniquement.
 
-Une question à la fois. Langue : français.
+Une question à la fois.
+Langue : français.
 
 Quand tu as les 6 réponses, réponds UNIQUEMENT avec ce JSON :
+
 {"done":true,"message":"Parfait [prénom], merci ! Un conseiller va vous recontacter très vite pour avancer ensemble. En attendant, je reste à votre disposition si vous avez d'autres questions ou un autre projet en tête — n'hésitez pas.","lead":{"name":"[prénom]","contact":"[numéro ou email]","budget":"...","timeline":"...","property_type":"...","location":"..."}}`
 }
 
 // ── Score → widget payload ─────────────────────────────────────────────────────
-const SCORE_DISPLAY: Record<Score, { label: 'Hot' | 'Warm' | 'Cold'; numeric: number }> = {
-  HOT:  { label: 'Hot',  numeric: 9 },
-  WARM: { label: 'Warm', numeric: 6 },
-  COLD: { label: 'Cold', numeric: 2 },
+
+const SCORE_DISPLAY: Record<
+  Score,
+  { label: 'Hot' | 'Warm' | 'Cold'; numeric: number }
+> = {
+  HOT: {
+    label: 'Hot',
+    numeric: 9,
+  },
+  WARM: {
+    label: 'Warm',
+    numeric: 6,
+  },
+  COLD: {
+    label: 'Cold',
+    numeric: 2,
+  },
 }
 
-function buildLeadPayload(lead: RawLead, score: Score, knownLocation?: string | null) {
+function buildLeadPayload(
+  lead: RawLead,
+  score: Score,
+  knownLocation?: string | null,
+) {
   const { label, numeric } = SCORE_DISPLAY[score]
+
   return {
-    name:          lead.name          ?? 'Prospect',
-    contact:       lead.contact       ?? lead.name ?? 'Non fourni',
-    budget:        lead.budget        ?? 'Non précisé',
-    timeline:      lead.timeline      ?? 'Non précisé',
-    property_type: lead.property_type ?? lead.propertyType ?? 'Non précisé',
-    location:      knownLocation      ?? lead.location ?? 'Non précisé',
+    name: lead.name ?? 'Prospect',
+    contact: lead.contact ?? lead.name ?? 'Non fourni',
+    budget: lead.budget ?? 'Non précisé',
+    timeline: lead.timeline ?? 'Non précisé',
+    property_type:
+      lead.property_type ??
+      lead.propertyType ??
+      'Non précisé',
+    location:
+      knownLocation ??
+      lead.location ??
+      'Non précisé',
     label,
-    numericScore:  numeric,
+    numericScore: numeric,
   }
 }
 
 // ── Supabase insert ────────────────────────────────────────────────────────────
+
 async function saveLead(
   lead: RawLead,
   score: Score,
@@ -168,176 +252,435 @@ async function saveLead(
   knownLocation?: string | null,
   clientId?: string | null,
 ) {
-  const { error } = await supabaseServer.from('leads').insert({
-    name:              lead.name          ?? 'Prospect',
-    contact:           lead.contact       ?? lead.name ?? 'Non fourni',
-    budget:            lead.budget        ?? 'Non précisé',
-    timeline:          lead.timeline      ?? 'Non précisé',
-    property_type:     lead.property_type ?? lead.propertyType ?? 'Non précisé',
-    location:          knownLocation      ?? lead.location ?? 'Non précisé',
-    score,
-    property_interest: propertyInterest   ?? null,
-    client_id:         clientId           ?? null,
-  })
-  if (error) console.error('Supabase insert error:', error.message)
+  const { error } = await supabaseServer
+    .from('leads')
+    .insert({
+      name: lead.name ?? 'Prospect',
+      contact: lead.contact ?? lead.name ?? 'Non fourni',
+      budget: lead.budget ?? 'Non précisé',
+      timeline: lead.timeline ?? 'Non précisé',
+      property_type:
+        lead.property_type ??
+        lead.propertyType ??
+        'Non précisé',
+      location:
+        knownLocation ??
+        lead.location ??
+        'Non précisé',
+      score,
+      property_interest: propertyInterest ?? null,
+      client_id: clientId ?? null,
+    })
+
+  if (error) {
+    console.error(
+      'Supabase insert error:',
+      error.message,
+    )
+  }
 }
 
 // ── Retry helpers ─────────────────────────────────────────────────────────────
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+
+const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms))
 
 function isRetryable(err: unknown): boolean {
-  const msg = (err instanceof Error ? err.message : String(err)).toLowerCase()
-  return msg.includes('429') || msg.includes('quota') || msg.includes('resource_exhausted') ||
-         msg.includes('500') || msg.includes('503') || msg.includes('unavailable')
+  const msg = (
+    err instanceof Error
+      ? err.message
+      : String(err)
+  ).toLowerCase()
+
+  return (
+    msg.includes('429') ||
+    msg.includes('quota') ||
+    msg.includes('resource_exhausted') ||
+    msg.includes('500') ||
+    msg.includes('503') ||
+    msg.includes('unavailable')
+  )
 }
 
-function retryDelay(err: unknown, attempt: number): number {
-  const msg = err instanceof Error ? err.message : String(err)
-  const parsed = msg.match(/retry in ([\d.]+)s/i)
-  if (parsed) return Math.ceil(parseFloat(parsed[1]) * 1000) + 1000
-  const is429 = /429|quota|resource_exhausted/i.test(msg)
-  return is429 ? [15000, 30000][attempt - 1] ?? 30000 : [2000, 4000][attempt - 1] ?? 4000
+function retryDelay(
+  err: unknown,
+  attempt: number,
+): number {
+  const msg =
+    err instanceof Error
+      ? err.message
+      : String(err)
+
+  const parsed = msg.match(
+    /retry in ([\d.]+)s/i,
+  )
+
+  if (parsed) {
+    return (
+      Math.ceil(parseFloat(parsed[1]) * 1000) +
+      1000
+    )
+  }
+
+  const is429 =
+    /429|quota|resource_exhausted/i.test(
+      msg,
+    )
+
+  return is429
+    ? [15000, 30000][attempt - 1] ?? 30000
+    : [2000, 4000][attempt - 1] ?? 4000
 }
 
 // ── Groq fallback ──────────────────────────────────────────────────────────────
-// Used when Gemini is rate-limited. Same prompt, same JSON contract — the model
-// swap is invisible downstream (parsing/scoring/saving code is unchanged).
-const GROQ_MODEL = 'llama-3.3-70b-versatile'
 
-async function callGroq(prompt: string): Promise<string> {
-  const groqKey = process.env.GROQ_API_KEY
-  if (!groqKey) throw new Error('No Groq API key configured')
+const GROQ_MODEL =
+  'llama-3.3-70b-versatile'
 
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${groqKey}`,
-    },
-    body: JSON.stringify({
-      model: GROQ_MODEL,
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.4,
-      max_tokens: 1024,
-    }),
-  })
-  if (!res.ok) {
-    const errText = await res.text().catch(() => '')
-    throw new Error(`Groq error ${res.status}: ${errText}`)
+async function callGroq(
+  prompt: string,
+): Promise<string> {
+  const groqKey =
+    process.env.GROQ_API_KEY
+
+  if (!groqKey) {
+    throw new Error(
+      'No Groq API key configured',
+    )
   }
-  const data = await res.json()
-  return (data?.choices?.[0]?.message?.content ?? '').trim()
+
+  const res = await fetch(
+    'https://api.groq.com/openai/v1/chat/completions',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type':
+          'application/json',
+        Authorization:
+          `Bearer ${groqKey}`,
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.4,
+        max_tokens: 1024,
+      }),
+    },
+  )
+
+  if (!res.ok) {
+    const errText =
+      await res.text().catch(() => '')
+
+    throw new Error(
+      `Groq error ${res.status}: ${errText}`,
+    )
+  }
+
+  const data =
+    await res.json()
+
+  return (
+    data?.choices?.[0]?.message
+      ?.content ?? ''
+  ).trim()
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────────
-export async function POST(req: NextRequest) {
-  const body            = await req.json()
-  const messages: Message[] = Array.isArray(body.messages) ? body.messages : []
-  const sessionData: SessionData = body.sessionData ?? {}
-  const agencyName      = sessionData.agencyName ?? 'Démo LeadFlow'
-  const propertyContext = sessionData.propertyContext ?? null
-  const clientId        = typeof sessionData.clientId === 'string' ? sessionData.clientId : null
-  const agencyContext   = typeof sessionData.agencyContext === 'string' ? sessionData.agencyContext : null
 
-  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY
-  if (!apiKey) return NextResponse.json({ error: 'No API key configured' }, { status: 500 })
+export async function POST(
+  req: NextRequest,
+) {
+  const body =
+    await req.json()
 
-  // Derive known location from the property context directly (no DB round-trip)
-  const knownLocation = propertyContext
-    ? [propertyContext.location, propertyContext.city].filter(Boolean).join(', ') || null
-    : null
+  const messages: Message[] =
+    Array.isArray(body.messages)
+      ? body.messages
+      : []
 
-  // Per-client context for Entry 1 — skipped when Entry 2 applies (propertyContext present)
-  // Priority: DB description > direct agencyContext prop > null (generic fallback)
-  let agencyDescription: string | null = agencyContext
-  if (clientId && !propertyContext) {
+  const sessionData: SessionData =
+    body.sessionData ?? {}
+
+  const agencyName =
+    sessionData.agencyName ??
+    'Démo LeadFlow'
+
+  const propertyContext =
+    sessionData.propertyContext ??
+    null
+
+  const clientId =
+    typeof sessionData.clientId ===
+    'string'
+      ? sessionData.clientId
+      : null
+
+  const agencyContext =
+    typeof sessionData.agencyContext ===
+    'string'
+      ? sessionData.agencyContext
+      : null
+
+  const apiKey =
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY ||
+    process.env.GEMINI_API_KEY
+
+  if (!apiKey) {
+    return NextResponse.json(
+      {
+        error:
+          'No API key configured',
+      },
+      { status: 500 },
+    )
+  }
+
+  // Derive known location from property context directly
+  const knownLocation =
+    propertyContext
+      ? [
+          propertyContext.location,
+          propertyContext.city,
+        ]
+          .filter(Boolean)
+          .join(', ') || null
+      : null
+
+  // Per-client context for Entry 1
+  let agencyDescription:
+    | string
+    | null = agencyContext
+
+  if (
+    clientId &&
+    !propertyContext
+  ) {
     try {
-      const { data } = await supabaseServer
-        .from('clients')
-        .select('description')
-        .eq('client_id', clientId)
-        .maybeSingle()
-      if (data?.description) agencyDescription = data.description
+      const { data } =
+        await supabaseServer
+          .from('clients')
+          .select('description')
+          .eq(
+            'client_id',
+            clientId,
+          )
+          .maybeSingle()
+
+      if (data?.description) {
+        agencyDescription =
+          data.description
+      }
     } catch {
-      // non-fatal: agencyContext (if any) still used
+      // non-fatal:
+      // agencyContext is still used
     }
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey })
+    const ai =
+      new GoogleGenAI({
+        apiKey,
+      })
 
-    const systemPrompt = buildSystemPrompt(agencyName, propertyContext, agencyDescription)
-    const history = messages
-      .map(m => `${m.role === 'user' ? 'Visiteur' : 'Assistant'}: ${m.content}`)
-      .join('\n\n')
+    const systemPrompt =
+      buildSystemPrompt(
+        agencyName,
+        propertyContext,
+        agencyDescription,
+      )
 
-    const prompt = `${systemPrompt}\n\n---\nHistorique:\n${history}\n\nAssistant:`
+    const history =
+      messages
+        .map(
+          (m) =>
+            `${m.role === 'user' ? 'Visiteur' : 'Assistant'}: ${m.content}`,
+        )
+        .join('\n\n')
+
+    const prompt =
+      `${systemPrompt}\n\n---\nHistorique:\n${history}\n\nAssistant:`
 
     let text = ''
     let lastErr: unknown
-    for (let attempt = 0; attempt <= 2; attempt++) {
+
+    for (
+      let attempt = 0;
+      attempt <= 2;
+      attempt++
+    ) {
       try {
-        const result = await ai.models.generateContent({
-          model: 'gemini-2.5-flash',
-          contents: prompt,
-        })
-        text = (result.text ?? '').trim()
-        lastErr = undefined
+        const result =
+          await ai.models.generateContent(
+            {
+              model:
+                'gemini-2.5-flash',
+              contents: prompt,
+            },
+          )
+
+        text =
+          (
+            result.text ?? ''
+          ).trim()
+
+        lastErr =
+          undefined
+
         break
       } catch (err) {
         lastErr = err
-        if (!isRetryable(err)) break
 
-        // Gemini is rate-limited — skip its own backoff and fail over to Groq
-        // right away. Waiting out a quota window would make the widget look broken.
-        if (process.env.GROQ_API_KEY) {
-          try {
-            text = await callGroq(prompt)
-            lastErr = undefined
-            console.log('[qualify] served by Groq fallback (Gemini rate-limited)')
-          } catch (groqErr) {
-            console.error('[qualify] Groq fallback failed:', groqErr)
-          }
+        if (!isRetryable(err)) {
           break
         }
 
-        if (attempt === 2) break
-        await sleep(retryDelay(err, attempt + 1))
+        // Gemini is rate-limited:
+        // try Groq fallback
+        if (
+          process.env.GROQ_API_KEY
+        ) {
+          try {
+            text =
+              await callGroq(
+                prompt,
+              )
+
+            lastErr =
+              undefined
+
+            console.log(
+              '[qualify] served by Groq fallback (Gemini rate-limited)',
+            )
+          } catch (
+            groqErr
+          ) {
+            console.error(
+              '[qualify] Groq fallback failed:',
+              groqErr,
+            )
+          }
+
+          break
+        }
+
+        if (
+          attempt === 2
+        ) {
+          break
+        }
+
+        await sleep(
+          retryDelay(
+            err,
+            attempt + 1,
+          ),
+        )
       }
     }
+
     if (lastErr) {
-      if (isRetryable(lastErr))
-        return NextResponse.json({
-          reply: "Je rencontre un souci technique momentané, pouvez-vous reformuler votre message ?",
-          isComplete: false,
-        })
+      if (
+        isRetryable(
+          lastErr,
+        )
+      ) {
+        return NextResponse.json(
+          {
+            reply:
+              'Je rencontre un souci technique momentané, pouvez-vous reformuler votre message ?',
+            isComplete:
+              false,
+          },
+        )
+      }
+
       throw lastErr
     }
 
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    // Try to extract a completed lead JSON
+    const jsonMatch =
+      text.match(
+        /\{[\s\S]*\}/,
+      )
+
     if (jsonMatch) {
       try {
-        const parsed = JSON.parse(jsonMatch[0])
-        if (parsed.done && parsed.lead) {
-          const rawLead = parsed.lead as RawLead
-          const score   = calculateScore(rawLead)
-          await saveLead(rawLead, score, propertyContext?.title, knownLocation, clientId)
-          return NextResponse.json({
-            reply:      parsed.message ?? 'Merci pour ces informations !',
-            isComplete: true,
+        const parsed =
+          JSON.parse(
+            jsonMatch[0],
+          )
+
+        if (
+          parsed.done &&
+          parsed.lead
+        ) {
+          const rawLead =
+            parsed.lead as RawLead
+
+          const score =
+            calculateScore(
+              rawLead,
+            )
+
+          await saveLead(
+            rawLead,
             score,
-            lead:       buildLeadPayload(rawLead, score, knownLocation),
-          })
+            propertyContext?.title,
+            knownLocation,
+            clientId,
+          )
+
+          return NextResponse.json(
+            {
+              reply:
+                parsed.message ??
+                'Merci pour ces informations !',
+              isComplete:
+                true,
+              score,
+              lead:
+                buildLeadPayload(
+                  rawLead,
+                  score,
+                  knownLocation,
+                ),
+            },
+          )
         }
       } catch {
-        // not valid JSON — fall through to plain reply
+        // Not valid JSON:
+        // fall through to plain reply
       }
     }
 
-    return NextResponse.json({ reply: text, isComplete: false })
+    return NextResponse.json(
+      {
+        reply: text,
+        isComplete: false,
+      },
+    )
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error('[qualify] error:', msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+    const msg =
+      err instanceof Error
+        ? err.message
+        : String(err)
+
+    console.error(
+      '[qualify] error:',
+      msg,
+    )
+
+    return NextResponse.json(
+      {
+        error: msg,
+      },
+      { status: 500 },
+    )
   }
 }
