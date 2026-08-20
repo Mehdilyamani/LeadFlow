@@ -1,0 +1,103 @@
+import type { Property } from './properties'
+
+export const DEMO_PROPERTIES: Property[] = [
+  {
+    id: 'ma-1',
+    title: 'Villa Contemporaine',
+    location: 'Anfa, Casablanca',
+    city: 'Casablanca',
+    price: '8 500 000',
+    priceNum: 8500000,
+    type: 'Villa',
+    beds: 5,
+    baths: 4,
+    area: '450 m²',
+    image:
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&q=80',
+      'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1200&q=80',
+      'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=1200&q=80',
+    ],
+    badge: 'Exclusivité',
+    badgeColor: 'bg-amber-500',
+    description:
+      "Villa contemporaine d'exception nichée dans le quartier prisé d'Anfa. Architecture moderne aux lignes épurées, baignée de lumière naturelle. Espaces de vie généreux ouverts sur un jardin paysagé avec piscine à débordement. Finitions haut de gamme.",
+    features: [
+      'Piscine à débordement',
+      'Jardin paysagé',
+      'Cuisine haut de gamme équipée',
+      'Garage double',
+      'Domotique complète',
+      'Cave à vin',
+      'Salle de sport',
+    ],
+  },
+  {
+    id: 'ma-2',
+    title: 'Penthouse Vue Océan',
+    location: 'Aïn Diab, Casablanca',
+    city: 'Casablanca',
+    price: '4 200 000',
+    priceNum: 4200000,
+    type: 'Penthouse',
+    beds: 3,
+    baths: 2,
+    area: '220 m²',
+    image:
+      'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=1200&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1200&q=80',
+      'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=1200&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
+    ],
+    badge: 'Coup de cœur',
+    badgeColor: 'bg-rose-500',
+    description:
+      "Penthouse d'exception à Aïn Diab avec vue panoramique sur l'océan Atlantique. Grande terrasse aménagée, intérieur contemporain et résidence sécurisée. Un bien rare à quelques minutes des commerces et restaurants de la côte.",
+    features: [
+      'Terrasse 80 m²',
+      'Vue mer panoramique',
+      'Parking 2 places',
+      'Gardien 24h/24',
+      'Ascenseur privatif',
+      'Climatisation centralisée',
+      'Finitions haut de gamme',
+    ],
+  },
+  {
+    id: 'ma-3',
+    title: 'Riad de Prestige',
+    location: 'Médina, Marrakech',
+    city: 'Marrakech',
+    price: '3 500 000',
+    priceNum: 3500000,
+    type: 'Riad',
+    beds: 4,
+    baths: 3,
+    area: '320 m²',
+    image:
+      'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=1200&q=80',
+      'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1200&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1200&q=80',
+      'https://images.unsplash.com/photo-1416331108676-a22ccb276e35?w=1200&q=80',
+    ],
+    badge: 'Rare',
+    badgeColor: 'bg-amber-500',
+    description:
+      "Riad d'exception entièrement rénové au cœur de la Médina de Marrakech. Zellige artisanal, stucs sculptés et patio central avec fontaine traditionnelle. Terrasse offrant une vue sur les toits de la Médina. Idéal comme résidence ou maison d'hôtes.",
+    features: [
+      'Patio avec fontaine',
+      'Terrasse panoramique',
+      'Zellige & stucs artisanaux',
+      'Hammam privatif',
+      'Entièrement rénové',
+      'Titre foncier propre',
+      'Potentiel maison d’hôtes',
+    ],
+  },
+]

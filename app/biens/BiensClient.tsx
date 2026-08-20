@@ -1,256 +1,624 @@
 'use client'
+
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Property, PropertyType } from '../lib/properties'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Bath,
+  BedDouble,
+  Building2,
+  Check,
+  ChevronRight,
+  MapPin,
+  Maximize2,
+  Menu,
+  MessageCircle,
+  Phone,
+  Search,
+  ShieldCheck,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react'
+import type { Property, PropertyType } from '../lib/properties'
 import LeadWidget from '../CSR/LeadWidget'
 
 const FILTERS: { label: string; value: 'Tous' | PropertyType }[] = [
-  { label: 'Tous', value: 'Tous' },
-  { label: 'Villa', value: 'Villa' },
-  { label: 'Appartement', value: 'Appartement' },
-  { label: 'Penthouse', value: 'Penthouse' },
-  { label: 'Riad', value: 'Riad' },
+  { label: 'Tous les biens', value: 'Tous' },
+  { label: 'Villas', value: 'Villa' },
+  { label: 'Appartements', value: 'Appartement' },
+  { label: 'Penthouses', value: 'Penthouse' },
+  { label: 'Riads', value: 'Riad' },
 ]
+
+function AgencyLogo({ light = false }: { light?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <span
+        className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
+          light
+            ? 'border-white/20 bg-white/10 text-white'
+            : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
+        }`}
+      >
+        MA
+      </span>
+      <span className="leading-none">
+        <span
+          className={`block text-[13px] font-semibold tracking-[0.17em] ${
+            light ? 'text-white' : 'text-[#17221f]'
+          }`}
+        >
+          MAISON ATLAS
+        </span>
+        <span
+          className={`mt-1 block text-[8px] font-medium uppercase tracking-[0.31em] ${
+            light ? 'text-white/45' : 'text-[#8a7660]'
+          }`}
+        >
+          Immobilier
+        </span>
+      </span>
+    </span>
+  )
+}
+
+function Reveal({
+  children,
+  delay = 0,
+  className = '',
+}: {
+  children: React.ReactNode
+  delay?: number
+  className?: string
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 22 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 export default function BiensClient({ properties }: { properties: Property[] }) {
   const [activeFilter, setActiveFilter] = useState<'Tous' | PropertyType>('Tous')
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [widgetOpen, setWidgetOpen] = useState(false)
 
-  const filtered = activeFilter === 'Tous'
-    ? properties
-    : properties.filter(p => p.type === activeFilter)
+  const filtered =
+    activeFilter === 'Tous'
+      ? properties
+      : properties.filter((property) => property.type === activeFilter)
+
+  const openWidget = () => {
+    // Toggle first so the same CTA can trigger the widget again after it has been closed.
+    setWidgetOpen(false)
+    window.setTimeout(() => setWidgetOpen(true), 0)
+  }
 
   return (
-    <main className="bg-white text-slate-900 min-h-screen">
-      {/* NAV */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl">🏛</span>
-            <span className="font-bold text-slate-900 text-lg tracking-tight">
-              Prestige <span className="text-amber-600">Immobilier</span>
-            </span>
+    <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
+      {/* NAVIGATION */}
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#101916]/90 text-white backdrop-blur-xl">
+        <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
+          <Link href="/demo" aria-label="Accueil Maison Atlas">
+            <AgencyLogo light />
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link href="/" className="hover:text-amber-600 transition-colors">Accueil</Link>
-            <Link href="/biens" className="text-amber-600 font-semibold">Nos biens</Link>
-            <Link href="/#apropos" className="hover:text-amber-600 transition-colors">À propos</Link>
+
+          <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-wide text-white/65 md:flex">
+            <Link href="/demo" className="transition-colors hover:text-white">
+              Accueil
+            </Link>
+            <Link href="/biens" className="text-[#d7b57c]">
+              Nos biens
+            </Link>
+            <Link href="/demo#expertise" className="transition-colors hover:text-white">
+              Expertise
+            </Link>
+            <Link href="/demo#villes" className="transition-colors hover:text-white">
+              Villes
+            </Link>
+            <Link href="/demo#contact" className="transition-colors hover:text-white">
+              Contact
+            </Link>
           </nav>
-          <a
-            href="tel:+212600000000"
-            className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:border-amber-500 hover:text-amber-600 transition-colors"
-          >
-            📞 +212 6 00 00 00 00
-          </a>
+
+          <div className="flex items-center gap-2">
+            <a
+              href="tel:+212600000000"
+              className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
+            >
+              <Phone className="h-3.5 w-3.5" /> +212 6 00 00 00 00
+            </a>
+            <button
+              onClick={() => setMenuOpen((value) => !value)}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/8 md:hidden"
+              aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
+
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+              className="border-t border-white/10 bg-[#101916] px-5 py-5 md:hidden"
+            >
+              <div className="mx-auto flex max-w-[1380px] flex-col gap-1 text-sm text-white/85">
+                <Link href="/demo" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                  Accueil
+                </Link>
+                <Link href="/biens" onClick={() => setMenuOpen(false)} className="rounded-xl bg-white/5 px-3 py-3 text-[#d7b57c]">
+                  Nos biens
+                </Link>
+                <Link href="/demo#expertise" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                  Expertise
+                </Link>
+                <Link href="/demo#villes" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                  Villes
+                </Link>
+                <a href="tel:+212600000000" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
+                  <Phone className="h-4 w-4" /> +212 6 00 00 00 00
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* HERO */}
-      <section className="py-14 px-6 bg-slate-50 border-b border-slate-100">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-amber-600 text-sm font-semibold uppercase tracking-widest mb-2">Sélection exclusive</p>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Nos biens du moment</h1>
-          <p className="text-slate-500 max-w-xl leading-relaxed">
-            Découvrez notre portefeuille de propriétés d&apos;exception à Casablanca, Marrakech, Rabat et Tanger.
-            Chaque bien est soigneusement sélectionné pour son emplacement, sa qualité et son potentiel.
-          </p>
-        </div>
-      </section>
+      <section className="relative overflow-hidden bg-[#101916] pt-[76px] text-white">
+        <motion.div
+          initial={{ scale: 1.05, opacity: 0.72 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.25, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0"
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1800&q=88"
+            alt="Architecture résidentielle contemporaine"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </motion.div>
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,20,17,.94)_0%,rgba(12,20,17,.76)_48%,rgba(12,20,17,.30)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#101916]/80 via-transparent to-[#101916]/25" />
 
-      {/* FILTER BAR */}
-      <section className="sticky top-16 z-30 bg-white border-b border-slate-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex items-center gap-2 overflow-x-auto">
-          <span className="text-xs text-slate-400 font-medium mr-1 flex-shrink-0">Filtrer :</span>
-          {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setActiveFilter(f.value)}
-              className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                activeFilter === f.value
-                  ? 'bg-amber-500 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
+        <div className="relative mx-auto flex min-h-[520px] max-w-[1380px] items-end px-5 pb-16 pt-24 sm:px-8 sm:pb-20 lg:px-10">
+          <div className="max-w-3xl">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.1 }}
+              className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#d7b57c]"
             >
-              {f.label}
-              <span className="ml-1.5 text-xs opacity-70">
-                ({f.value === 'Tous' ? properties.length : properties.filter(p => p.type === f.value).length})
-              </span>
-            </button>
-          ))}
-          <span className="ml-auto text-xs text-slate-400 flex-shrink-0">{filtered.length} bien{filtered.length > 1 ? 's' : ''}</span>
+              <span className="h-px w-9 bg-[#d7b57c]/70" /> Notre collection
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+              className="text-[43px] font-medium leading-[1] tracking-[-0.05em] sm:text-6xl lg:text-[72px]"
+            >
+              Des propriétés choisies,
+              <br />
+              <span className="font-serif font-normal italic text-[#d7b57c]">pas simplement listées.</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.26 }}
+              className="mt-6 max-w-2xl text-[15px] leading-7 text-white/62 sm:text-base sm:leading-8"
+            >
+              Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca,
+              Marrakech, Rabat et Tanger pour leur emplacement, leur architecture et leur potentiel.
+            </motion.p>
+          </div>
         </div>
       </section>
 
-      {/* GRID */}
-      <section className="py-12 px-6 max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filtered.map(p => (
-            <PropertyCard key={p.id} property={p} onOpen={() => setSelectedProperty(p)} />
-          ))}
+      {/* FILTERS */}
+      <section className="sticky top-[76px] z-30 border-b border-[#17221f]/8 bg-[#f7f5f0]/94 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-[1380px] items-center gap-3 overflow-x-auto px-5 py-4 sm:px-8 lg:px-10">
+          <span className="mr-1 inline-flex shrink-0 items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#857763]">
+            <SlidersHorizontal className="h-3.5 w-3.5" /> Filtrer
+          </span>
+
+          {FILTERS.map((filter) => {
+            const count =
+              filter.value === 'Tous'
+                ? properties.length
+                : properties.filter((property) => property.type === filter.value).length
+
+            return (
+              <button
+                key={filter.value}
+                onClick={() => setActiveFilter(filter.value)}
+                className={`shrink-0 rounded-full border px-4 py-2 text-[11px] font-semibold transition-all duration-300 ${
+                  activeFilter === filter.value
+                    ? 'border-[#17221f] bg-[#17221f] text-white shadow-lg shadow-[#17221f]/10'
+                    : 'border-[#17221f]/10 bg-white/65 text-[#5f685f] hover:border-[#b9945f]/50 hover:bg-white hover:text-[#17221f]'
+                }`}
+              >
+                {filter.label}
+                <span className={`ml-1.5 ${activeFilter === filter.value ? 'text-white/45' : 'text-[#a39a8d]'}`}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
+
+          <span className="ml-auto hidden shrink-0 text-[11px] font-medium text-[#8a8175] sm:block">
+            {filtered.length} propriété{filtered.length > 1 ? 's' : ''}
+          </span>
         </div>
+      </section>
+
+      {/* PROPERTY GRID */}
+      <section className="mx-auto max-w-[1380px] px-5 py-16 sm:px-8 md:py-24 lg:px-10">
+        <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+          <Reveal>
+            <div>
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">
+                Sélection actuelle
+              </p>
+              <h2 className="text-3xl font-medium tracking-[-0.04em] text-[#17221f] sm:text-[40px]">
+                {activeFilter === 'Tous' ? 'Tous nos biens' : FILTERS.find((filter) => filter.value === activeFilter)?.label}
+              </h2>
+            </div>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <p className="max-w-md text-sm leading-6 text-[#6f756f]">
+              Chaque propriété est présentée avec les informations essentielles pour vous permettre de décider rapidement si elle mérite une visite.
+            </p>
+          </Reveal>
+        </div>
+
+        <motion.div layout className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+          <AnimatePresence mode="popLayout">
+            {filtered.map((property, index) => (
+              <PropertyCard
+                key={property.id}
+                property={property}
+                index={index}
+                onOpen={() => setSelectedProperty(property)}
+              />
+            ))}
+          </AnimatePresence>
+        </motion.div>
+
         {filtered.length === 0 && (
-          <div className="text-center py-20 text-slate-400">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="font-medium">Aucun bien pour ce filtre</p>
-          </div>
+          <Reveal>
+            <div className="my-10 rounded-[28px] border border-[#17221f]/8 bg-white px-6 py-20 text-center">
+              <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#f1eadf] text-[#8f6d3b]">
+                <Search className="h-5 w-5" />
+              </span>
+              <h3 className="mt-5 text-lg font-semibold text-[#17221f]">Aucun bien dans cette catégorie</h3>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#747b75]">
+                Certaines opportunités sont commercialisées confidentiellement. Parlez-nous de votre recherche pour accéder à une sélection plus large.
+              </p>
+              <button
+                onClick={openWidget}
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#17221f] px-5 py-3 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
+              >
+                Nous confier votre recherche <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </Reveal>
         )}
       </section>
 
-      {/* CTA BAND */}
-      <section className="py-14 px-6" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}>
-        <div className="max-w-3xl mx-auto text-center text-white">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">Vous ne trouvez pas votre bien idéal ?</h2>
-          <p className="text-white/70 mb-6">Notre assistant IA vous qualifie en 2 minutes et vous met en relation avec le bon conseiller.</p>
-          <button
-            onClick={() => setWidgetOpen(true)}
-            className="px-7 py-3.5 rounded-xl font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors"
-          >
-            Parler à notre assistant ✨
-          </button>
-        </div>
+      {/* PRIVATE SEARCH CTA */}
+      <section className="px-5 pb-20 sm:px-8 md:pb-28 lg:px-10">
+        <Reveal>
+          <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-[30px] bg-[#101916] text-white md:rounded-[38px]">
+            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#c9a56d]/10 blur-3xl" />
+            <div className="absolute -bottom-32 left-1/4 h-72 w-72 rounded-full bg-white/5 blur-3xl" />
+
+            <div className="relative grid gap-10 px-6 py-12 sm:px-10 md:px-14 md:py-16 lg:grid-cols-[1fr_auto] lg:items-end lg:px-16">
+              <div className="max-w-3xl">
+                <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.25em] text-[#d7b57c]">
+                  Recherche confidentielle
+                </p>
+                <h2 className="text-3xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-4xl md:text-[48px]">
+                  Votre bien idéal n&apos;est peut-être
+                  <br className="hidden sm:block" /> pas encore publié.
+                </h2>
+                <p className="mt-5 max-w-2xl text-sm leading-7 text-white/58 sm:text-[15px]">
+                  Décrivez-nous votre projet. Un conseiller peut vous orienter vers des biens disponibles, des opportunités discrètes ou une recherche sur mesure.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-[11px] text-white/48">
+                  <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-[#d7b57c]" /> Échange confidentiel</span>
+                  <span className="inline-flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-[#d7b57c]" /> Accompagnement personnalisé</span>
+                </div>
+              </div>
+
+              <button
+                onClick={openWidget}
+                className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-sm font-semibold text-[#101916] transition-all hover:-translate-y-0.5 hover:bg-[#e4c58f]"
+              >
+                Parler à un conseiller <MessageCircle className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </Reveal>
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-slate-950 text-slate-400 py-8 px-6 text-center text-xs">
-        <p>
-          <Link href="/" className="text-white font-semibold hover:text-amber-400 transition-colors">🏛 Prestige Immobilier</Link>
-          {' '}— L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc
-        </p>
-        <p className="mt-2">© 2025 Prestige Immobilier • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
+      <footer className="bg-[#0b1210] px-5 py-12 text-white/45 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[1380px]">
+          <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-[1.25fr_.75fr_.75fr]">
+            <div>
+              <AgencyLogo light />
+              <p className="mt-5 max-w-sm text-sm leading-6 text-white/45">
+                Conseil et transaction immobilière pour une clientèle exigeante à Casablanca, Marrakech, Rabat et Tanger.
+              </p>
+            </div>
+
+            <div>
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Navigation</p>
+              <div className="space-y-3 text-sm">
+                <Link href="/demo" className="block transition-colors hover:text-white">Accueil</Link>
+                <Link href="/biens" className="block text-[#d7b57c]">Nos biens</Link>
+                <Link href="/demo#expertise" className="block transition-colors hover:text-white">Expertise</Link>
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Contact</p>
+              <div className="space-y-3 text-sm">
+                <a href="tel:+212600000000" className="block transition-colors hover:text-white">+212 6 00 00 00 00</a>
+                <a href="mailto:contact@maisonatlas.ma" className="block transition-colors hover:text-white">contact@maisonatlas.ma</a>
+                <p>Casablanca, Maroc</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 pt-7 text-[10px] tracking-wide text-white/28 sm:flex-row sm:items-center sm:justify-between">
+            <p>© 2026 Maison Atlas Immobilier. Tous droits réservés.</p>
+            <p>Immobilier résidentiel · Maroc</p>
+          </div>
+        </div>
       </footer>
 
       {/* PROPERTY MODAL */}
-      {selectedProperty && (
-        <PropertyModal
-          property={selectedProperty}
-          onClose={() => setSelectedProperty(null)}
-          onContact={() => { setSelectedProperty(null); setWidgetOpen(true) }}
-        />
-      )}
+      <AnimatePresence>
+        {selectedProperty && (
+          <PropertyModal
+            property={selectedProperty}
+            onClose={() => setSelectedProperty(null)}
+            onContact={() => {
+              setSelectedProperty(null)
+              openWidget()
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      <WidgetWithTrigger open={widgetOpen} onManualClose={() => setWidgetOpen(false)} />
+      <LeadWidget agencyName="Maison Atlas Immobilier" externalOpen={widgetOpen} />
     </main>
   )
 }
 
-// ── Property Card ──────────────────────────────────────────────────────────────
-function PropertyCard({ property: p, onOpen }: { property: Property; onOpen: () => void }) {
+function PropertyCard({
+  property: p,
+  index,
+  onOpen,
+}: {
+  property: Property
+  index: number
+  onOpen: () => void
+}) {
   return (
-    <div className="group rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl transition-all duration-300 bg-white flex flex-col">
-      <div className="relative overflow-hidden" style={{ height: 224 }}>
-        <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-        <span className={`absolute top-3 left-3 text-xs font-bold text-white px-3 py-1 rounded-full ${p.badgeColor}`}>
-          {p.badge}
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      transition={{ duration: 0.55, delay: Math.min(index * 0.06, 0.24), ease: [0.22, 1, 0.36, 1] }}
+      className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_50px_rgba(23,34,31,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(23,34,31,0.10)]"
+    >
+      <button onClick={onOpen} className="relative block h-[300px] w-full overflow-hidden text-left sm:h-[330px]">
+        <Image
+          src={p.image}
+          alt={p.title}
+          fill
+          className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/58 via-black/4 to-black/8" />
+
+        {p.badge && (
+          <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-[#101916]/78 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md">
+            {p.badge}
+          </span>
+        )}
+
+        <span className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full bg-white/92 text-[#17221f] shadow-lg transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#d7b57c]">
+          <ArrowUpRight className="h-4 w-4" />
         </span>
-        <span className="absolute top-3 right-3 text-xs font-medium text-white bg-black/40 backdrop-blur px-2.5 py-1 rounded-full">
-          {p.type}
-        </span>
-        <span className="absolute bottom-3 right-3 text-xs font-medium text-white bg-black/50 backdrop-blur px-2.5 py-1 rounded-full">
-          📍 {p.city}
-        </span>
-      </div>
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="font-bold text-slate-900 text-lg">{p.title}</h3>
-        <p className="text-slate-500 text-sm flex items-center gap-1 mt-1"><span>📍</span> {p.location}</p>
-        <div className="flex gap-4 text-xs text-slate-500 mt-3 pt-3 border-t border-slate-50">
-          <span>🛏 {p.beds} ch.</span>
-          <span>🚿 {p.baths} sdb</span>
-          <span>📐 {p.area}</span>
+
+        <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 text-white">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/85">
+            <MapPin className="h-3.5 w-3.5 text-[#e0bd82]" /> {p.location}
+          </span>
+          <span className="rounded-full border border-white/18 bg-black/22 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.13em] backdrop-blur-md">
+            {p.type}
+          </span>
         </div>
-        <div className="flex items-center justify-between mt-auto pt-3">
-          <p className="text-amber-600 font-bold text-lg">{p.price} <span className="text-sm font-normal text-slate-500">MAD</span></p>
-          <div className="flex gap-2">
-            <Link
-              href={`/biens/${p.id}`}
-              className="text-xs font-semibold px-3 py-2 rounded-lg border border-slate-200 text-slate-700 hover:border-amber-500 hover:text-amber-600 transition-colors"
-            >
-              Détails
-            </Link>
-            <button
-              onClick={onOpen}
-              className="text-xs font-semibold px-3 py-2 rounded-lg text-white transition-colors hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-            >
-              Voir le bien →
-            </button>
+      </button>
+
+      <div className="flex flex-1 flex-col p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-5">
+          <div>
+            <h3 className="text-xl font-medium tracking-[-0.025em] text-[#17221f]">{p.title}</h3>
+            <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#9b7949]">{p.city}</p>
           </div>
+          <p className="shrink-0 text-right text-[15px] font-semibold text-[#17221f]">
+            {p.price}
+            <span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[0.15em] text-[#989084]">MAD</span>
+          </p>
+        </div>
+
+        <div className="mt-5 flex items-center gap-5 border-y border-[#17221f]/7 py-4 text-[11px] text-[#6f756f]">
+          <span className="inline-flex items-center gap-1.5"><BedDouble className="h-4 w-4 text-[#9b7949]" /> {p.beds} ch.</span>
+          <span className="inline-flex items-center gap-1.5"><Bath className="h-4 w-4 text-[#9b7949]" /> {p.baths} sdb</span>
+          <span className="inline-flex items-center gap-1.5"><Maximize2 className="h-4 w-4 text-[#9b7949]" /> {p.area}</span>
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+          <button
+            onClick={onOpen}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-[#17221f] transition-colors hover:text-[#9b7949]"
+          >
+            Aperçu <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+          <Link
+            href={`/biens/${p.id}`}
+            className="inline-flex items-center gap-2 rounded-full bg-[#17221f] px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
+          >
+            Voir la fiche <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
-    </div>
+    </motion.article>
   )
 }
 
-// ── Property Modal ─────────────────────────────────────────────────────────────
-function PropertyModal({ property: p, onClose, onContact }: { property: Property; onClose: () => void; onContact: () => void }) {
+function PropertyModal({
+  property: p,
+  onClose,
+  onContact,
+}: {
+  property: Property
+  onClose: () => void
+  onContact: () => void
+}) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 py-8" onClick={onClose}>
-      <div
-        className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
-        onClick={e => e.stopPropagation()}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.22 }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#07100d]/78 px-3 py-4 backdrop-blur-sm sm:px-5 sm:py-8"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 24, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 16, scale: 0.985 }}
+        transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+        className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-[24px] bg-[#f8f6f1] shadow-2xl sm:rounded-[30px]"
+        onClick={(event) => event.stopPropagation()}
       >
-        <div className="relative flex-shrink-0" style={{ height: 260 }}>
-          <Image src={p.image} alt={p.title} fill className="object-cover" />
-          <button onClick={onClose} className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 transition-colors text-lg">✕</button>
-          <span className={`absolute top-4 left-4 text-xs font-bold text-white px-3 py-1 rounded-full ${p.badgeColor}`}>{p.badge}</span>
+        <div className="relative h-[280px] shrink-0 overflow-hidden sm:h-[370px]">
+          <Image
+            src={p.image}
+            alt={p.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 900px) 100vw, 900px"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/12" />
+
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 grid h-10 w-10 place-items-center rounded-full border border-white/20 bg-black/30 text-white backdrop-blur-md transition-colors hover:bg-black/55"
+            aria-label="Fermer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+
+          {p.badge && (
+            <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-[#101916]/75 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-md sm:left-6 sm:top-6">
+              {p.badge}
+            </span>
+          )}
+
+          <div className="absolute bottom-5 left-5 right-5 text-white sm:bottom-7 sm:left-7 sm:right-7">
+            <p className="mb-2 inline-flex items-center gap-1.5 text-[11px] text-white/75">
+              <MapPin className="h-3.5 w-3.5 text-[#e0bd82]" /> {p.location}
+            </p>
+            <h2 className="text-3xl font-medium tracking-[-0.04em] sm:text-4xl">{p.title}</h2>
+          </div>
         </div>
-        <div className="overflow-y-auto flex-1 p-6">
-          <div className="flex items-start justify-between mb-4">
+
+        <div className="overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
+          <div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-start">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900">{p.title}</h2>
-              <p className="text-slate-500 text-sm mt-1">📍 {p.location}</p>
+              <p className="text-sm leading-7 text-[#626a64]">{p.description}</p>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-amber-600">{p.price}</p>
-              <p className="text-sm text-slate-500">MAD</p>
+            <div className="lg:min-w-[185px] lg:text-right">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9b7949]">Prix</p>
+              <p className="mt-1 text-2xl font-semibold tracking-[-0.025em] text-[#17221f]">{p.price}</p>
+              <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-[#989084]">MAD</p>
             </div>
           </div>
-          <div className="grid grid-cols-3 gap-3 mb-5">
+
+          <div className="mt-7 grid grid-cols-3 divide-x divide-[#17221f]/8 rounded-2xl border border-[#17221f]/8 bg-white">
             {[
-              { icon: '🛏', label: 'Chambres', value: `${p.beds}` },
-              { icon: '🚿', label: 'Salles de bain', value: `${p.baths}` },
-              { icon: '📐', label: 'Surface', value: p.area },
-            ].map(s => (
-              <div key={s.label} className="bg-slate-50 rounded-xl p-3 text-center border border-slate-100">
-                <span className="text-xl">{s.icon}</span>
-                <p className="text-xs text-slate-500 mt-1">{s.label}</p>
-                <p className="font-bold text-slate-900 text-sm">{s.value}</p>
+              { icon: BedDouble, label: 'Chambres', value: `${p.beds}` },
+              { icon: Bath, label: 'Salles de bain', value: `${p.baths}` },
+              { icon: Maximize2, label: 'Surface', value: p.area },
+            ].map((item) => (
+              <div key={item.label} className="px-3 py-4 text-center sm:px-5 sm:py-5">
+                <item.icon className="mx-auto h-4 w-4 text-[#9b7949]" />
+                <p className="mt-2 text-[9px] font-medium uppercase tracking-[0.13em] text-[#999084]">{item.label}</p>
+                <p className="mt-1 text-sm font-semibold text-[#17221f]">{item.value}</p>
               </div>
             ))}
           </div>
-          <p className="text-slate-600 text-sm leading-relaxed mb-5">{p.description}</p>
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-3">Prestations</p>
-            <div className="flex flex-wrap gap-2">
-              {p.features.map(f => (
-                <span key={f} className="text-xs font-medium px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-100">✓ {f}</span>
-              ))}
+
+          {p.features.length > 0 && (
+            <div className="mt-8">
+              <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9b7949]">Prestations</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {p.features.map((feature) => (
+                  <div key={feature} className="flex items-center gap-2.5 rounded-xl border border-[#17221f]/7 bg-white px-3.5 py-3 text-xs font-medium text-[#56605a]">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#efe5d5] text-[#8b6938]">
+                      <Check className="h-3 w-3" />
+                    </span>
+                    {feature}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="flex gap-3">
+          )}
+
+          <div className="mt-8 flex flex-col gap-3 border-t border-[#17221f]/8 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={onContact}
-              className="flex-1 py-3.5 rounded-xl font-semibold text-white text-sm transition-opacity hover:opacity-90"
-              style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-5 py-3 text-xs font-semibold text-[#101916] transition-all hover:bg-[#e3c58f]"
             >
-              💬 Parler à un conseiller
+              <MessageCircle className="h-4 w-4" /> Parler à un conseiller
             </button>
             <Link
               href={`/biens/${p.id}`}
-              className="flex-1 py-3.5 rounded-xl font-semibold text-slate-900 text-sm border-2 border-slate-200 hover:border-amber-500 transition-colors text-center"
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#17221f] px-5 py-3 text-xs font-semibold text-white transition-all hover:bg-[#263a34]"
             >
-              Voir la fiche complète →
+              Consulter la fiche complète <ArrowUpRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
-}
-
-// ── Widget trigger wrapper ─────────────────────────────────────────────────────
-function WidgetWithTrigger({ open, onManualClose }: { open: boolean; onManualClose: () => void }) {
-  void open; void onManualClose
-  return <LeadWidget agencyName="Prestige Immobilier" />
 }

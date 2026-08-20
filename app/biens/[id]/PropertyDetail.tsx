@@ -1,9 +1,85 @@
 'use client'
-import { useState } from 'react'
+
+import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  ArrowLeft,
+  ArrowRight,
+  ArrowUpRight,
+  Bath,
+  BedDouble,
+  Building2,
+  Camera,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Compass,
+  MapPin,
+  Maximize2,
+  Menu,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  X,
+} from 'lucide-react'
 import type { Property } from '../../lib/properties'
 import LeadWidget from '../../CSR/LeadWidget'
+
+function AgencyLogo({ light = false }: { light?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <span
+        className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
+          light
+            ? 'border-white/20 bg-white/10 text-white'
+            : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
+        }`}
+      >
+        MA
+      </span>
+      <span className="leading-none">
+        <span
+          className={`block text-[13px] font-semibold tracking-[0.17em] ${
+            light ? 'text-white' : 'text-[#17221f]'
+          }`}
+        >
+          MAISON ATLAS
+        </span>
+        <span
+          className={`mt-1 block text-[8px] font-medium uppercase tracking-[0.31em] ${
+            light ? 'text-white/45' : 'text-[#8a7660]'
+          }`}
+        >
+          Immobilier
+        </span>
+      </span>
+    </span>
+  )
+}
+
+function Reveal({
+  children,
+  delay = 0,
+  className = '',
+}: {
+  children: React.ReactNode
+  delay?: number
+  className?: string
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 22 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 export default function PropertyDetail({
   property,
@@ -12,237 +88,585 @@ export default function PropertyDetail({
   property: Property
   similar: Property[]
 }) {
+  const gallery = useMemo(
+    () => (property.images?.length ? property.images : [property.image]),
+    [property.image, property.images]
+  )
+
   const [activeImage, setActiveImage] = useState(0)
-  const [widgetOpen, setWidgetOpen]   = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [widgetOpen, setWidgetOpen] = useState(false)
+
+  const openWidget = () => {
+    setWidgetOpen(false)
+    window.setTimeout(() => setWidgetOpen(true), 0)
+  }
+
+  const previousImage = () => {
+    setActiveImage((current) => (current - 1 + gallery.length) % gallery.length)
+  }
+
+  const nextImage = () => {
+    setActiveImage((current) => (current + 1) % gallery.length)
+  }
+
+  const propertyContext = {
+    id: property.id,
+    title: property.title,
+    price: property.price,
+    location: property.location,
+    city: property.city,
+    area: property.area,
+    beds: property.beds,
+    baths: property.baths,
+    type: property.type,
+    description: property.description,
+    features: property.features,
+  }
 
   return (
-    <main className="bg-white text-slate-900 min-h-screen">
-      {/* NAV */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl">🏛</span>
-            <span className="font-bold text-slate-900 text-lg tracking-tight">
-              Prestige <span className="text-amber-600">Immobilier</span>
-            </span>
+    <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
+      {/* NAVIGATION */}
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/92 text-white backdrop-blur-xl">
+        <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
+          <Link href="/demo" aria-label="Accueil Maison Atlas">
+            <AgencyLogo light />
           </Link>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <Link href="/" className="hover:text-amber-600 transition-colors">Accueil</Link>
-            <Link href="/biens" className="hover:text-amber-600 transition-colors">Nos biens</Link>
+
+          <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-wide text-white/65 md:flex">
+            <Link href="/demo" className="transition-colors hover:text-white">
+              Accueil
+            </Link>
+            <Link href="/biens" className="text-[#d7b57c]">
+              Nos biens
+            </Link>
+            <Link href="/demo#expertise" className="transition-colors hover:text-white">
+              Expertise
+            </Link>
+            <Link href="/demo#villes" className="transition-colors hover:text-white">
+              Villes
+            </Link>
+            <Link href="/demo#contact" className="transition-colors hover:text-white">
+              Contact
+            </Link>
           </nav>
-          <Link href="/biens" className="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors flex items-center gap-1">
-            ← Tous les biens
-          </Link>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/biens"
+              className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Tous les biens
+            </Link>
+            <button
+              onClick={() => setMenuOpen((value) => !value)}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/8 md:hidden"
+              aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={menuOpen}
+            >
+              {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
+
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.22 }}
+              className="border-t border-white/10 bg-[#101916] px-5 py-5 md:hidden"
+            >
+              <div className="mx-auto flex max-w-[1380px] flex-col gap-1 text-sm text-white/85">
+                <Link href="/demo" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                  Accueil
+                </Link>
+                <Link href="/biens" onClick={() => setMenuOpen(false)} className="rounded-xl bg-white/5 px-3 py-3 text-[#d7b57c]">
+                  Nos biens
+                </Link>
+                <Link href="/demo#expertise" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                  Expertise
+                </Link>
+                <Link href="/demo#contact" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                  Contact
+                </Link>
+                <a href="tel:+212600000000" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
+                  <Phone className="h-4 w-4" /> +212 6 00 00 00 00
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="flex flex-col lg:flex-row gap-10">
-          {/* ── LEFT COLUMN ── */}
-          <div className="flex-1 min-w-0">
-            {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-xs text-slate-400 mb-5">
-              <Link href="/" className="hover:text-slate-600 transition-colors">Accueil</Link>
-              <span>›</span>
-              <Link href="/biens" className="hover:text-slate-600 transition-colors">Nos biens</Link>
-              <span>›</span>
-              <span className="text-slate-600 font-medium">{property.title}</span>
+      {/* PROPERTY INTRO */}
+      <section className="bg-[#101916] pb-24 pt-[76px] text-white sm:pb-28">
+        <div className="mx-auto max-w-[1380px] px-5 pt-10 sm:px-8 sm:pt-14 lg:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-white/38"
+          >
+            <Link href="/demo" className="transition-colors hover:text-white/75">Accueil</Link>
+            <span>/</span>
+            <Link href="/biens" className="transition-colors hover:text-white/75">Nos biens</Link>
+            <span>/</span>
+            <span className="text-[#d7b57c]">{property.city}</span>
+          </motion.div>
+
+          <div className="mt-9 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="max-w-4xl">
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.55, delay: 0.05 }}
+                className="mb-5 flex flex-wrap items-center gap-2.5"
+              >
+                <span className="rounded-full border border-[#d7b57c]/25 bg-[#d7b57c]/10 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#e3c799]">
+                  {property.badge}
+                </span>
+                <span className="rounded-full border border-white/12 bg-white/6 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white/60">
+                  {property.type}
+                </span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="text-[42px] font-medium leading-[1.02] tracking-[-0.05em] sm:text-6xl lg:text-[72px]"
+              >
+                {property.title}
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.2 }}
+                className="mt-5 inline-flex items-center gap-2 text-sm text-white/55 sm:text-base"
+              >
+                <MapPin className="h-4 w-4 text-[#d7b57c]" /> {property.location}
+              </motion.p>
             </div>
 
-            {/* Main image */}
-            <div className="relative rounded-2xl overflow-hidden mb-3" style={{ height: 420 }}>
-              <Image
-                src={property.images[activeImage] ?? property.image}
-                alt={property.title}
-                fill
-                className="object-cover transition-opacity duration-300"
-                priority
-              />
-              <span className={`absolute top-4 left-4 text-xs font-bold text-white px-3 py-1.5 rounded-full ${property.badgeColor}`}>
-                {property.badge}
-              </span>
-              <span className="absolute top-4 right-4 text-xs font-medium text-white bg-black/40 backdrop-blur px-3 py-1.5 rounded-full">
-                {property.type}
-              </span>
-            </div>
-
-            {/* Thumbnail gallery */}
-            {property.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2 mb-8">
-                {property.images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveImage(i)}
-                    className={`relative rounded-xl overflow-hidden transition-all ${
-                      activeImage === i ? 'ring-2 ring-amber-500 ring-offset-2' : 'opacity-60 hover:opacity-90'
-                    }`}
-                    style={{ height: 72 }}
-                  >
-                    <Image src={img} alt={`Photo ${i + 1}`} fill className="object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Description */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold text-slate-900 mb-3">Description</h2>
-              <p className="text-slate-600 leading-relaxed">{property.description}</p>
-            </div>
-
-            {/* Features */}
-            <div className="mb-8">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Prestations incluses</h2>
-              <div className="grid grid-cols-2 gap-2">
-                {property.features.map(f => (
-                  <div key={f} className="flex items-center gap-2.5 p-3 rounded-xl bg-amber-50 border border-amber-100">
-                    <span className="w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0">✓</span>
-                    <span className="text-sm text-slate-700 font-medium">{f}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="mb-10">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Caractéristiques</h2>
-              <div className="grid grid-cols-3 gap-4">
-                {[
-                  { icon: '🛏', label: 'Chambres', value: `${property.beds}` },
-                  { icon: '🚿', label: 'Salles de bain', value: `${property.baths}` },
-                  { icon: '📐', label: 'Surface habitable', value: property.area },
-                  { icon: '🏙', label: 'Ville', value: property.city },
-                  { icon: '📍', label: 'Quartier', value: property.location },
-                  { icon: '🏠', label: 'Type', value: property.type },
-                ].map(s => (
-                  <div key={s.label} className="bg-slate-50 rounded-xl p-4 border border-slate-100">
-                    <span className="text-2xl">{s.icon}</span>
-                    <p className="text-xs text-slate-500 mt-1">{s.label}</p>
-                    <p className="font-bold text-slate-900 text-sm mt-0.5">{s.value}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Map placeholder */}
-            <div className="mb-10">
-              <h2 className="text-lg font-bold text-slate-900 mb-4">Localisation</h2>
-              <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center" style={{ height: 200 }}>
-                <div className="text-center text-slate-400">
-                  <p className="text-3xl mb-2">📍</p>
-                  <p className="font-medium text-slate-600">{property.location}</p>
-                  <p className="text-sm">{property.city}, Maroc</p>
-                  <p className="text-xs mt-2">Coordonnées exactes communiquées sur rendez-vous</p>
-                </div>
-              </div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, delay: 0.22 }}
+              className="lg:text-right"
+            >
+              <p className="text-[9px] font-semibold uppercase tracking-[0.25em] text-white/35">Prix de vente</p>
+              <p className="mt-2 text-3xl font-medium tracking-[-0.035em] text-[#e0c08b] sm:text-4xl">
+                {property.price}
+              </p>
+              <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/38">MAD</p>
+            </motion.div>
           </div>
+        </div>
+      </section>
 
-          {/* ── RIGHT COLUMN (Sticky Sidebar) ── */}
-          <div className="lg:w-80 shrink-0">
-            <div className="sticky top-24">
-              {/* Price card */}
-              <div className="bg-white rounded-2xl border-2 border-amber-200 shadow-lg p-6 mb-4">
-                <div className="mb-4">
-                  <p className="text-xs text-slate-500 uppercase tracking-widest font-medium mb-1">Prix de vente</p>
-                  <p className="text-3xl font-bold text-amber-600">{property.price}</p>
-                  <p className="text-slate-500 font-medium">MAD</p>
+      {/* GALLERY */}
+      <section className="relative z-10 -mt-14 sm:-mt-16">
+        <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden rounded-[28px] bg-[#d9d7cf] shadow-[0_24px_80px_rgba(20,31,27,.14)] sm:rounded-[34px]"
+          >
+            <div className="relative h-[430px] overflow-hidden sm:h-[560px] lg:h-[660px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`${property.id}-${activeImage}`}
+                  initial={{ opacity: 0.45, scale: 1.018 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0.25 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute inset-0"
+                >
+                  <Image
+                    src={gallery[activeImage] ?? property.image}
+                    alt={`${property.title} — photo ${activeImage + 1}`}
+                    fill
+                    priority={activeImage === 0}
+                    className="object-cover"
+                    sizes="100vw"
+                  />
+                </motion.div>
+              </AnimatePresence>
+
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/8" />
+
+              <div className="absolute bottom-5 left-5 flex items-center gap-2 sm:bottom-7 sm:left-7">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#101916]/72 px-3.5 py-2 text-[10px] font-semibold text-white backdrop-blur-xl">
+                  <Camera className="h-3.5 w-3.5 text-[#e0c08b]" /> {activeImage + 1} / {gallery.length}
+                </span>
+              </div>
+
+              {gallery.length > 1 && (
+                <div className="absolute bottom-5 right-5 flex gap-2 sm:bottom-7 sm:right-7">
+                  <button
+                    onClick={previousImage}
+                    className="grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-[#101916]/72 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-[#17221f]"
+                    aria-label="Photo précédente"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={nextImage}
+                    className="grid h-11 w-11 place-items-center rounded-full border border-white/20 bg-[#101916]/72 text-white backdrop-blur-xl transition-all hover:bg-white hover:text-[#17221f]"
+                    aria-label="Photo suivante"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
                 </div>
-                <div className="space-y-2 mb-5 pt-4 border-t border-slate-100">
+              )}
+            </div>
+          </motion.div>
+
+          {gallery.length > 1 && (
+            <div className="mt-3 grid grid-cols-4 gap-2.5 sm:mt-4 sm:gap-4">
+              {gallery.slice(0, 4).map((image, index) => (
+                <motion.button
+                  key={`${image}-${index}`}
+                  type="button"
+                  whileHover={{ y: -2 }}
+                  onClick={() => setActiveImage(index)}
+                  className={`relative h-[74px] overflow-hidden rounded-[14px] border transition-all sm:h-[108px] sm:rounded-[18px] ${
+                    activeImage === index
+                      ? 'border-[#9b7949] shadow-lg shadow-[#17221f]/8'
+                      : 'border-transparent opacity-62 hover:opacity-100'
+                  }`}
+                  aria-label={`Afficher la photo ${index + 1}`}
+                >
+                  <Image src={image} alt={`Miniature ${index + 1}`} fill className="object-cover" sizes="25vw" />
+                  {activeImage === index && <span className="absolute inset-x-0 bottom-0 h-1 bg-[#b9945f]" />}
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CONTENT */}
+      <section className="mx-auto grid max-w-[1380px] gap-12 px-5 py-16 sm:px-8 md:py-24 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-10 xl:gap-16">
+        <div className="min-w-0">
+          {/* QUICK FACTS */}
+          <Reveal>
+            <div className="grid grid-cols-2 overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white sm:grid-cols-4">
+              {[
+                { icon: BedDouble, label: 'Chambres', value: `${property.beds}` },
+                { icon: Bath, label: 'Salles de bain', value: `${property.baths}` },
+                { icon: Maximize2, label: 'Surface', value: property.area },
+                { icon: Building2, label: 'Type', value: property.type },
+              ].map((item, index) => (
+                <div
+                  key={item.label}
+                  className={`px-5 py-6 ${
+                    index % 2 === 0 ? 'border-r border-[#17221f]/8' : ''
+                  } ${index < 2 ? 'border-b border-[#17221f]/8 sm:border-b-0' : ''} ${
+                    index === 1 ? 'sm:border-r' : ''
+                  }`}
+                >
+                  <item.icon className="h-4 w-4 text-[#9b7949]" strokeWidth={1.7} />
+                  <p className="mt-4 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#9b9387]">{item.label}</p>
+                  <p className="mt-1.5 text-sm font-semibold text-[#17221f]">{item.value}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          {/* DESCRIPTION */}
+          <Reveal className="mt-14">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">La propriété</p>
+            <h2 className="mt-3 text-3xl font-medium tracking-[-0.04em] text-[#17221f] sm:text-[42px]">
+              Une adresse pensée dans les moindres détails.
+            </h2>
+            <p className="mt-6 max-w-3xl text-[15px] leading-8 text-[#687069] sm:text-base">
+              {property.description}
+            </p>
+          </Reveal>
+
+          {/* FEATURES */}
+          <Reveal className="mt-14" delay={0.05}>
+            <div className="border-t border-[#17221f]/10 pt-10">
+              <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">Prestations</p>
+                  <h2 className="mt-3 text-2xl font-medium tracking-[-0.035em] text-[#17221f] sm:text-3xl">
+                    Ce qui distingue ce bien
+                  </h2>
+                </div>
+                <p className="max-w-sm text-sm leading-6 text-[#7a807a]">
+                  Les informations ci-dessous reprennent les principaux équipements et atouts communiqués pour cette propriété.
+                </p>
+              </div>
+
+              <div className="mt-8 grid gap-x-8 gap-y-3 sm:grid-cols-2">
+                {property.features.map((feature, index) => (
+                  <motion.div
+                    key={feature}
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.035 }}
+                    className="flex items-center gap-3 border-b border-[#17221f]/7 py-3.5 text-sm font-medium text-[#4f5a53]"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#eee5d7] text-[#8e6b39]">
+                      <Check className="h-3.5 w-3.5" strokeWidth={2} />
+                    </span>
+                    {feature}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+
+          {/* LOCATION */}
+          <Reveal className="mt-14" delay={0.08}>
+            <div className="overflow-hidden rounded-[28px] bg-[#17221f] text-white">
+              <div className="grid md:grid-cols-[0.8fr_1.2fr]">
+                <div className="flex flex-col justify-center p-7 sm:p-9">
+                  <span className="grid h-11 w-11 place-items-center rounded-full border border-white/10 bg-white/7 text-[#d7b57c]">
+                    <Compass className="h-4.5 w-4.5" />
+                  </span>
+                  <p className="mt-7 text-[9px] font-semibold uppercase tracking-[0.22em] text-[#d7b57c]">Localisation</p>
+                  <h3 className="mt-2 text-2xl font-medium tracking-[-0.03em]">{property.location}</h3>
+                  <p className="mt-2 text-sm text-white/45">{property.city}, Maroc</p>
+                  <p className="mt-6 max-w-sm text-sm leading-6 text-white/55">
+                    L&apos;adresse exacte et les informations d&apos;accès sont communiquées lors de l&apos;organisation d&apos;une visite.
+                  </p>
+                </div>
+                <div className="relative min-h-[280px] overflow-hidden border-t border-white/8 bg-[#1d2d28] md:border-l md:border-t-0">
+                  <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:36px_36px]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(215,181,124,.15),transparent_35%)]" />
+                  <div className="absolute inset-0 grid place-items-center">
+                    <div className="text-center">
+                      <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#d7b57c] text-[#17221f] shadow-2xl shadow-black/20">
+                        <MapPin className="h-5 w-5" />
+                      </span>
+                      <p className="mt-4 text-xs font-semibold text-white/80">{property.city}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* STICKY CONTACT PANEL */}
+        <aside className="lg:relative">
+          <div className="lg:sticky lg:top-[104px]">
+            <Reveal>
+              <div className="overflow-hidden rounded-[28px] border border-[#17221f]/8 bg-white shadow-[0_20px_60px_rgba(23,34,31,.08)]">
+                <div className="border-b border-[#17221f]/8 px-6 py-6 sm:px-7">
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.22em] text-[#9b9387]">Prix de vente</p>
+                  <div className="mt-2 flex items-end gap-2">
+                    <p className="text-3xl font-medium tracking-[-0.035em] text-[#17221f]">{property.price}</p>
+                    <span className="pb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#a59276]">MAD</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 px-6 py-6 text-sm sm:px-7">
                   {[
                     ['Type', property.type],
                     ['Surface', property.area],
                     ['Chambres', `${property.beds}`],
+                    ['Salles de bain', `${property.baths}`],
                     ['Localisation', property.location],
-                  ].map(([k, v]) => (
-                    <div key={k} className="flex justify-between text-sm">
-                      <span className="text-slate-500">{k}</span>
-                      <span className="font-semibold text-slate-900 text-right">{v}</span>
+                  ].map(([label, value]) => (
+                    <div key={label} className="flex items-start justify-between gap-5 border-b border-[#17221f]/7 pb-3 last:border-b-0 last:pb-0">
+                      <span className="text-[#8a918a]">{label}</span>
+                      <span className="max-w-[190px] text-right font-semibold text-[#25312d]">{value}</span>
                     </div>
                   ))}
                 </div>
-                <button
-                  onClick={() => setWidgetOpen(true)}
-                  className="w-full py-3.5 rounded-xl font-bold text-white text-sm mb-3 transition-opacity hover:opacity-90"
-                  style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-                >
-                  Parler à un conseiller
-                </button>
-                <a
-                  href="tel:+212600000000"
-                  className="w-full py-3 rounded-xl font-semibold text-slate-900 text-sm border-2 border-slate-200 hover:border-amber-500 transition-colors flex items-center justify-center gap-2"
-                >
-                  📞 +212 6 00 00 00 00
-                </a>
-              </div>
 
-              {/* Agency card */}
-              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}>🏛</div>
-                  <div>
-                    <p className="font-semibold text-sm text-slate-900">Prestige Immobilier</p>
-                    <p className="text-xs text-slate-500">Agence agréée • 15 ans d&apos;expertise</p>
+                <div className="px-6 pb-6 sm:px-7 sm:pb-7">
+                  <button
+                    onClick={openWidget}
+                    className="group flex w-full items-center justify-center gap-2 rounded-full bg-[#17221f] px-5 py-3.5 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
+                  >
+                    Organiser une visite
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  </button>
+                  <a
+                    href="tel:+212600000000"
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-[#17221f]/12 bg-[#f8f6f1] px-5 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:border-[#b9945f]/40 hover:bg-white"
+                  >
+                    <Phone className="h-3.5 w-3.5 text-[#9b7949]" /> +212 6 00 00 00 00
+                  </a>
+
+                  <div className="mt-5 flex items-start gap-3 rounded-2xl bg-[#f3eee5] p-4">
+                    <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#8f6d3b]" />
+                    <p className="text-[11px] leading-5 text-[#6e695f]">
+                      Votre demande est traitée de manière confidentielle par un conseiller Maison Atlas.
+                    </p>
                   </div>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Notre équipe est disponible 7j/7 pour répondre à vos questions et organiser une visite.
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.08} className="mt-4">
+              <div className="rounded-[24px] border border-[#17221f]/8 bg-[#eee9df] p-5">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-[#17221f] text-[10px] font-semibold tracking-[0.14em] text-[#d7b57c]">MA</span>
+                  <div>
+                    <p className="text-sm font-semibold text-[#17221f]">Maison Atlas Immobilier</p>
+                    <p className="mt-0.5 text-[10px] text-[#898276]">Casablanca · Marrakech · Rabat · Tanger</p>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs leading-5 text-[#77746c]">
+                  Une question sur ce bien, son emplacement ou les modalités de visite ? Notre équipe vous répond directement.
                 </p>
+                <button
+                  onClick={openWidget}
+                  className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#76572e] transition-colors hover:text-[#17221f]"
+                >
+                  Poser une question <MessageCircle className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </Reveal>
+          </div>
+        </aside>
+      </section>
+
+      {/* SIMILAR PROPERTIES */}
+      {similar.length > 0 && (
+        <section className="border-t border-[#17221f]/8 bg-[#eee9df] py-16 sm:py-20">
+          <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+            <Reveal>
+              <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">À découvrir aussi</p>
+                  <h2 className="mt-3 text-3xl font-medium tracking-[-0.04em] text-[#17221f] sm:text-[42px]">Biens similaires</h2>
+                </div>
+                <Link href="/biens" className="inline-flex w-fit items-center gap-2 text-xs font-semibold text-[#76572e] transition-colors hover:text-[#17221f]">
+                  Voir toute la collection <ArrowUpRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </Reveal>
+
+            <div className="mt-9 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {similar.slice(0, 3).map((item, index) => (
+                <Reveal key={item.id} delay={index * 0.07}>
+                  <Link
+                    href={`/biens/${item.id}`}
+                    className="group block overflow-hidden rounded-[24px] bg-[#f8f6f1] shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#17221f]/8"
+                  >
+                    <div className="relative h-[250px] overflow-hidden">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/48 via-transparent to-transparent" />
+                      <span className="absolute left-4 top-4 rounded-full border border-white/18 bg-[#101916]/74 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur-md">
+                        {item.badge}
+                      </span>
+                      <span className="absolute bottom-4 left-4 inline-flex items-center gap-1.5 text-[11px] font-medium text-white">
+                        <MapPin className="h-3.5 w-3.5 text-[#e0c08b]" /> {item.location}
+                      </span>
+                    </div>
+                    <div className="p-5 sm:p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[#9b7949]">{item.type}</p>
+                          <h3 className="mt-1.5 text-lg font-semibold tracking-[-0.02em] text-[#17221f]">{item.title}</h3>
+                        </div>
+                        <p className="whitespace-nowrap text-right text-sm font-semibold text-[#17221f]">
+                          {item.price}
+                          <span className="block text-[9px] font-medium text-[#999184]">MAD</span>
+                        </p>
+                      </div>
+                      <div className="mt-5 flex items-center gap-4 border-t border-[#17221f]/8 pt-4 text-[11px] text-[#777f78]">
+                        <span className="inline-flex items-center gap-1.5"><BedDouble className="h-3.5 w-3.5 text-[#9b7949]" /> {item.beds} ch.</span>
+                        <span className="inline-flex items-center gap-1.5"><Bath className="h-3.5 w-3.5 text-[#9b7949]" /> {item.baths} sdb</span>
+                        <span className="inline-flex items-center gap-1.5"><Maximize2 className="h-3.5 w-3.5 text-[#9b7949]" /> {item.area}</span>
+                      </div>
+                    </div>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* CONTACT CTA */}
+      <section className="bg-[#101916] px-5 py-16 text-white sm:px-8 sm:py-20">
+        <div className="mx-auto flex max-w-[1100px] flex-col items-center text-center">
+          <Reveal>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#d7b57c]">Une visite ? Une question ?</p>
+            <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-5xl">
+              Parlons de cette propriété
+              <span className="font-serif font-normal italic text-[#d7b57c]"> en toute simplicité.</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/52">
+              Décrivez votre projet ou demandez une visite. Un conseiller Maison Atlas pourra reprendre votre demande avec le contexte de ce bien.
+            </p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <button
+                onClick={openWidget}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e1c493]"
+              >
+                Organiser une visite <ArrowRight className="h-4 w-4" />
+              </button>
+              <a
+                href="tel:+212600000000"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 text-xs font-semibold text-white transition-all hover:bg-white hover:text-[#17221f]"
+              >
+                <Phone className="h-3.5 w-3.5" /> Nous appeler
+              </a>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-[#0b1210] px-5 py-12 text-white/42 sm:px-8">
+        <div className="mx-auto max-w-[1380px]">
+          <div className="flex flex-col justify-between gap-10 border-b border-white/8 pb-10 md:flex-row">
+            <div>
+              <AgencyLogo light />
+              <p className="mt-5 max-w-sm text-xs leading-6 text-white/38">
+                Immobilier résidentiel et de prestige au Maroc. Sélection, conseil et accompagnement confidentiel.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-10 text-xs sm:grid-cols-3">
+              <div>
+                <p className="mb-4 font-semibold text-white">Navigation</p>
+                <Link href="/demo" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">Accueil</Link>
+                <Link href="/biens" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">Nos biens</Link>
+                <Link href="/demo#expertise" className="block transition-colors hover:text-[#d7b57c]">Expertise</Link>
+              </div>
+              <div>
+                <p className="mb-4 font-semibold text-white">Villes</p>
+                {['Casablanca', 'Marrakech', 'Rabat', 'Tanger'].map((city) => (
+                  <p key={city} className="mb-2.5">{city}</p>
+                ))}
+              </div>
+              <div>
+                <p className="mb-4 font-semibold text-white">Contact</p>
+                <a href="tel:+212600000000" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">+212 6 00 00 00 00</a>
+                <p>Maroc</p>
               </div>
             </div>
           </div>
+          <div className="flex flex-col justify-between gap-3 pt-6 text-[10px] text-white/25 sm:flex-row">
+            <p>© 2026 Maison Atlas Immobilier.</p>
+            <p>Casablanca · Marrakech · Rabat · Tanger</p>
+          </div>
         </div>
-
-        {/* ── SIMILAR PROPERTIES ── */}
-        {similar.length > 0 && (
-          <section className="mt-14 pt-10 border-t border-slate-100">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Biens similaires</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {similar.map(p => (
-                <Link key={p.id} href={`/biens/${p.id}`} className="group rounded-2xl overflow-hidden border border-slate-100 hover:shadow-lg transition-shadow bg-white block">
-                  <div className="relative overflow-hidden" style={{ height: 180 }}>
-                    <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <span className={`absolute top-3 left-3 text-xs font-bold text-white px-2.5 py-1 rounded-full ${p.badgeColor}`}>{p.badge}</span>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-slate-900">{p.title}</h3>
-                    <p className="text-slate-500 text-xs mt-1">📍 {p.location}</p>
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="text-amber-600 font-bold">{p.price} <span className="text-xs text-slate-500 font-normal">MAD</span></p>
-                      <span className="text-xs text-slate-400">{p.area}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
-
-      {/* FOOTER */}
-      <footer className="bg-slate-950 text-slate-400 py-8 px-6 text-center text-xs mt-14">
-        <p>
-          <Link href="/" className="text-white font-semibold hover:text-amber-400 transition-colors">🏛 Prestige Immobilier</Link>
-          {' '}— L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc
-        </p>
-        <p className="mt-2">© 2025 Prestige Immobilier • Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span></p>
       </footer>
 
       <LeadWidget
-        agencyName="Prestige Immobilier"
-        propertyContext={{
-          id:          property.id,
-          title:       property.title,
-          price:       property.price,
-          location:    property.location,
-          city:        property.city,
-          area:        property.area,
-          beds:        property.beds,
-          baths:       property.baths,
-          type:        property.type,
-          description: property.description,
-          features:    property.features,
-        }}
+        agencyName="Maison Atlas Immobilier"
+        propertyContext={propertyContext}
         externalOpen={widgetOpen}
       />
     </main>

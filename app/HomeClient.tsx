@@ -1,29 +1,77 @@
 'use client'
+
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { LayoutDashboard } from 'lucide-react'
+import { motion } from 'framer-motion'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Bath,
+  BedDouble,
+  Building2,
+  Check,
+  ChevronDown,
+  Compass,
+  KeyRound,
+  MapPin,
+  Maximize2,
+  Menu,
+  MessageCircle,
+  Phone,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  TrendingUp,
+  X,
+} from 'lucide-react'
 import LeadWidget from './CSR/LeadWidget'
 import type { Property } from './lib/properties'
 
-const TESTIMONIALS = [
+const CITIES = [
   {
-    name: 'Karim Benali',
-    role: 'Entrepreneur, Casablanca',
-    text: "Grâce à Prestige Immobilier, j'ai trouvé ma villa de rêve en moins de 3 semaines. Service exceptionnel, équipe à l'écoute.",
-    avatar: 'KB',
+    name: 'Casablanca',
+    subtitle: 'Anfa · Aïn Diab · CFC',
+    image: 'https://images.unsplash.com/photo-1577147443647-81856d5151af?w=1200&q=85',
   },
   {
-    name: 'Nadia El Fassi',
-    role: 'Directrice, Rabat',
-    text: "Professionnalisme et réactivité au rendez-vous. Mon penthouse à Aïn Diab est exactement ce que je cherchais. Merci !",
-    avatar: 'NF',
+    name: 'Marrakech',
+    subtitle: 'Médina · Palmeraie · Hivernage',
+    image: 'https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=1200&q=85',
   },
   {
-    name: 'Youssef Amrani',
-    role: 'Investisseur, Marrakech',
-    text: "Accompagnement parfait du début à la fin. Je recommande Prestige Immobilier à tous mes associés sans hésitation.",
-    avatar: 'YA',
+    name: 'Rabat',
+    subtitle: 'Souissi · Hay Riad · Agdal',
+    image: 'https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?w=1200&q=85',
+  },
+  {
+    name: 'Tanger',
+    subtitle: 'Malabata · Iberia · Centre',
+    image: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Tangier%20-%2044699733295.jpg?width=1400',
+  },
+]
+
+const SERVICES = [
+  {
+    icon: KeyRound,
+    eyebrow: 'Acquisition',
+    title: 'Trouver le bon bien',
+    description:
+      'Une sélection ciblée selon votre style de vie, votre budget et vos priorités, avec un accompagnement jusqu’à la signature.',
+  },
+  {
+    icon: Building2,
+    eyebrow: 'Commercialisation',
+    title: 'Valoriser votre propriété',
+    description:
+      'Positionnement, présentation et diffusion de votre bien auprès d’acquéreurs qualifiés au Maroc et à l’international.',
+  },
+  {
+    icon: TrendingUp,
+    eyebrow: 'Investissement',
+    title: 'Décider avec clarté',
+    description:
+      'Lecture du marché, potentiel de valorisation et sélection d’opportunités cohérentes avec vos objectifs patrimoniaux.',
   },
 ]
 
@@ -31,308 +79,526 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
-export default function HomeClient({ properties }: { properties: Property[] }) {
+function Reveal({
+  children,
+  delay = 0,
+  className = '',
+}: {
+  children: React.ReactNode
+  delay?: number
+  className?: string
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.18 }}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+function AgencyLogo({ light = false }: { light?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <span
+        className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
+          light
+            ? 'border-white/20 bg-white/10 text-white'
+            : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
+        }`}
+      >
+        MA
+      </span>
+      <span className="leading-none">
+        <span
+          className={`block text-[13px] font-semibold tracking-[0.17em] ${
+            light ? 'text-white' : 'text-[#17221f]'
+          }`}
+        >
+          MAISON ATLAS
+        </span>
+        <span
+          className={`mt-1 block text-[8px] font-medium uppercase tracking-[0.31em] ${
+            light ? 'text-white/45' : 'text-[#8a7660]'
+          }`}
+        >
+          Immobilier
+        </span>
+      </span>
+    </span>
+  )
+}
+
+export default function HomeClient({
+  properties,
+}: {
+  properties: Property[]
+  agencyContext?: string
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <main className="bg-white text-slate-900">
-      {/* NAV */}
-      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🏛</span>
-            <span className="font-bold text-slate-900 text-lg tracking-tight">
-              Prestige <span className="text-amber-600">Immobilier</span>
-            </span>
-          </div>
+    <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/85 text-white backdrop-blur-xl">
+        <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
+          <Link href="/demo" aria-label="Accueil Maison Atlas">
+            <AgencyLogo light />
+          </Link>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-            <Link href="/biens" className="hover:text-amber-600 transition-colors">Nos biens</Link>
-            <button onClick={() => scrollTo('apropos')} className="hover:text-amber-600 transition-colors">À propos</button>
-            <button onClick={() => scrollTo('temoignages')} className="hover:text-amber-600 transition-colors">Avis clients</button>
+          <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-wide text-white/70 md:flex">
+            <Link href="/biens" className="transition-colors hover:text-white">
+              Nos biens
+            </Link>
+            <button onClick={() => scrollTo('expertise')} className="transition-colors hover:text-white">
+              Expertise
+            </button>
+            <button onClick={() => scrollTo('villes')} className="transition-colors hover:text-white">
+              Villes
+            </button>
+            <button onClick={() => scrollTo('contact')} className="transition-colors hover:text-white">
+              Contact
+            </button>
           </nav>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <a
               href="tel:+212600000000"
-              className="hidden md:flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-lg border border-slate-200 hover:border-amber-500 hover:text-amber-600 transition-colors"
+              className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
             >
-              📞 +212 6 00 00 00 00
+              <Phone className="h-3.5 w-3.5" /> +212 6 00 00 00 00
             </a>
-            <Link
-              href="/dashboard"
-              className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-slate-700 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              Dashboard
-            </Link>
             <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden flex flex-col gap-1.5 p-2 rounded-lg hover:bg-slate-100 transition-colors"
-              aria-label="Menu"
+              onClick={() => setMenuOpen((value) => !value)}
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/15 bg-white/8 md:hidden"
+              aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={menuOpen}
             >
-              <span className={`block w-5 h-0.5 bg-slate-900 transition-all duration-200 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-              <span className={`block w-5 h-0.5 bg-slate-900 transition-all duration-200 ${menuOpen ? 'opacity-0' : ''}`} />
-              <span className={`block w-5 h-0.5 bg-slate-900 transition-all duration-200 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+              {menuOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
             </button>
           </div>
         </div>
 
         {menuOpen && (
-          <div className="md:hidden border-t border-slate-100 bg-white px-6 py-4 flex flex-col gap-4">
-            <Link href="/biens" onClick={() => setMenuOpen(false)} className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors">
-              🏠 Nos biens
-            </Link>
-            <button onClick={() => { scrollTo('apropos'); setMenuOpen(false) }} className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors text-left">
-              ℹ️ À propos
-            </button>
-            <button onClick={() => { scrollTo('temoignages'); setMenuOpen(false) }} className="text-sm font-medium text-slate-700 hover:text-amber-600 transition-colors text-left">
-              ⭐ Avis clients
-            </button>
-            <a href="tel:+212600000000" className="text-sm font-semibold text-amber-600 border border-amber-200 rounded-lg px-4 py-2.5 text-center hover:bg-amber-50 transition-colors">
-              📞 +212 6 00 00 00 00
-            </a>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border-t border-white/10 bg-[#101916] px-5 py-5 md:hidden"
+          >
+            <div className="mx-auto flex max-w-[1380px] flex-col gap-1 text-sm text-white/85">
+              <Link href="/biens" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                Nos biens
+              </Link>
+              <button onClick={() => { scrollTo('expertise'); setMenuOpen(false) }} className="rounded-xl px-3 py-3 text-left hover:bg-white/5">
+                Expertise
+              </button>
+              <button onClick={() => { scrollTo('villes'); setMenuOpen(false) }} className="rounded-xl px-3 py-3 text-left hover:bg-white/5">
+                Villes
+              </button>
+              <button onClick={() => { scrollTo('contact'); setMenuOpen(false) }} className="rounded-xl px-3 py-3 text-left hover:bg-white/5">
+                Contact
+              </button>
+            </div>
+          </motion.div>
         )}
       </header>
 
-      {/* HERO */}
-      <section className="relative overflow-hidden" style={{ height: '92vh', minHeight: 600 }}>
-        <Image
-          src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1600&q=80"
-          alt="Villa de luxe au Maroc"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.6) 100%)' }} />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <div className="mb-4 inline-flex items-center gap-2 bg-white/10 backdrop-blur text-white text-xs font-medium px-4 py-2 rounded-full border border-white/20">
-            <span className="w-2 h-2 bg-amber-400 rounded-full inline-block" />
-            Agence agréée • 15 ans d&apos;expertise au Maroc
-          </div>
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight max-w-3xl">
-            Trouvez votre bien<br />
-            <span className="text-amber-400">d&apos;exception</span> au Maroc
-          </h1>
-          <p className="text-lg text-white/85 mb-8 max-w-xl leading-relaxed">
-            Villas premium, appartements de standing et opportunités d&apos;investissement à Casablanca, Marrakech et Rabat.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/biens" className="px-7 py-3.5 rounded-xl font-semibold text-slate-900 bg-amber-400 hover:bg-amber-500 transition-colors">
-              Voir nos biens
-            </Link>
-            <button
-              onClick={() => scrollTo('widget-cta')}
-              className="px-7 py-3.5 rounded-xl font-semibold text-white bg-white/20 backdrop-blur hover:bg-white/30 border border-white/30 transition-colors"
+      <section className="relative min-h-[92vh] overflow-hidden bg-[#101916] text-white">
+        <motion.div
+          initial={{ scale: 1.06, opacity: 0.75 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0"
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=88"
+            alt="Villa contemporaine au Maroc"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </motion.div>
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,20,17,.88)_0%,rgba(12,20,17,.63)_43%,rgba(12,20,17,.17)_72%,rgba(12,20,17,.28)_100%)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#101916]/80 via-transparent to-[#101916]/30" />
+
+        <div className="relative mx-auto flex min-h-[92vh] max-w-[1380px] items-end px-5 pb-16 pt-32 sm:px-8 sm:pb-20 lg:px-10 lg:pb-24">
+          <div className="grid w-full gap-12 lg:grid-cols-[1.12fr_.88fr] lg:items-end">
+            <div className="max-w-3xl">
+              <motion.div
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.12 }}
+                className="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#d7b57c]"
+              >
+                <span className="h-px w-9 bg-[#d7b57c]/70" /> Immobilier résidentiel au Maroc
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.85, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                className="max-w-3xl text-[46px] font-medium leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[78px]"
+              >
+                Des lieux rares.
+                <br />
+                <span className="font-serif font-normal italic text-[#d7b57c]">Des décisions justes.</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.75, delay: 0.3 }}
+                className="mt-7 max-w-xl text-[15px] leading-7 text-white/65 sm:text-base sm:leading-8"
+              >
+                Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca,
+                Marrakech, Rabat et Tanger.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.42 }}
+                className="mt-9 flex flex-col gap-3 sm:flex-row"
+              >
+                <Link
+                  href="/biens"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-[12px] font-bold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c691]"
+                >
+                  Découvrir les propriétés
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <button
+                  onClick={() => scrollTo('contact')}
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/8 px-6 py-3.5 text-[12px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/14"
+                >
+                  <MessageCircle className="h-4 w-4" /> Parler de votre projet
+                </button>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 26 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+              className="hidden justify-self-end rounded-[24px] border border-white/14 bg-[#101916]/48 p-5 backdrop-blur-xl lg:block lg:w-[390px]"
             >
-              Parler à notre assistant ✨
-            </button>
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div>
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b57c]">Votre recherche</p>
+                  <p className="mt-1 text-sm font-medium text-white">Un bien qui vous ressemble</p>
+                </div>
+                <Search className="h-4.5 w-4.5 text-white/45" />
+              </div>
+              <div className="grid grid-cols-2 gap-3 py-4">
+                {[
+                  ['Ville', 'Casablanca'],
+                  ['Type', 'Villa'],
+                  ['Budget', 'Sur mesure'],
+                  ['Projet', 'Achat'],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-2xl bg-white/8 px-4 py-3">
+                    <p className="text-[9px] uppercase tracking-[0.16em] text-white/35">{label}</p>
+                    <p className="mt-1.5 flex items-center justify-between text-xs font-semibold text-white">
+                      {value} <ChevronDown className="h-3 w-3 text-white/35" />
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => scrollTo('contact')}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-xs font-bold text-[#17221f] transition-transform hover:-translate-y-0.5"
+              >
+                Confier ma recherche <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* STATS */}
-      <section className="bg-slate-900 text-white py-10">
-        <div className="max-w-4xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <section className="border-b border-[#17221f]/8 bg-white">
+        <div className="mx-auto grid max-w-[1380px] grid-cols-1 divide-y divide-[#17221f]/8 px-5 sm:px-8 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-10">
           {[
-            { value: '500+', label: 'Biens vendus' },
-            { value: '15 ans', label: "D'expérience" },
-            { value: '98%', label: 'Clients satisfaits' },
-            { value: '3 villes', label: 'Présence nationale' },
-          ].map(s => (
-            <div key={s.label}>
-              <p className="text-3xl font-bold text-amber-400">{s.value}</p>
-              <p className="text-sm text-slate-400 mt-1">{s.label}</p>
+            ['Casablanca · Marrakech', 'Une sélection dans les marchés les plus recherchés'],
+            ['Rabat · Tanger', 'Une présence pensée pour vos projets au Maroc'],
+            ['Vente · Location · Conseil', 'Un accompagnement clair du premier échange à la signature'],
+          ].map(([title, text]) => (
+            <div key={title} className="px-0 py-6 md:px-7 lg:px-9">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b6b3f]">{title}</p>
+              <p className="mt-2 max-w-sm text-[13px] leading-5 text-[#58615d]">{text}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* FEATURED PROPERTIES */}
-      <section id="biens" className="py-20 px-6 max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-amber-600 text-sm font-semibold uppercase tracking-widest mb-2">Sélection exclusive</p>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900">Nos biens du moment</h2>
-          <p className="text-slate-500 mt-3 max-w-xl mx-auto">
-            Découvrez notre sélection de propriétés d&apos;exception, soigneusement choisies pour leur emplacement et leur qualité.
-          </p>
-        </div>
+      <section className="mx-auto max-w-[1380px] px-5 py-20 sm:px-8 md:py-28 lg:px-10">
+        <Reveal>
+          <div className="flex flex-col justify-between gap-7 md:flex-row md:items-end">
+            <div className="max-w-2xl">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#9a743f]">Sélection actuelle</p>
+              <h2 className="text-3xl font-medium leading-[1.08] tracking-[-0.04em] text-[#17221f] sm:text-4xl md:text-[52px]">
+                Des propriétés choisies pour leur caractère.
+              </h2>
+            </div>
+            <Link href="/biens" className="group inline-flex w-fit items-center gap-2 text-[12px] font-bold text-[#76562c]">
+              Voir tous les biens
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          </div>
+        </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {properties.map(p => (
-            <div key={p.id} className="group rounded-2xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl transition-shadow duration-300 bg-white">
-              <div className="relative overflow-hidden" style={{ height: 224 }}>
-                <Image
-                  src={p.image}
-                  alt={p.title}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className={`absolute top-3 left-3 text-xs font-bold text-white px-3 py-1 rounded-full ${p.badgeColor}`}>
-                  {p.badge}
-                </span>
-                <span className="absolute top-3 right-3 text-xs font-medium text-white bg-black/40 backdrop-blur px-2.5 py-1 rounded-full">
-                  {p.type}
-                </span>
-              </div>
-              <div className="p-5">
-                <h3 className="font-bold text-slate-900 text-lg">{p.title}</h3>
-                <p className="text-slate-500 text-sm flex items-center gap-1 mt-1">
-                  <span>📍</span> {p.location}
+        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+          {properties.map((property, index) => (
+            <Reveal key={property.id} delay={index * 0.08}>
+              <Link
+                href={`/biens/${property.id}`}
+                className="group block overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_55px_rgba(23,34,31,0.06)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_26px_70px_rgba(23,34,31,0.11)]"
+              >
+                <div className="relative h-[330px] overflow-hidden">
+                  <Image
+                    src={property.image}
+                    alt={property.title}
+                    fill
+                    className="object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.045]"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+                  {property.badge && (
+                    <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-md">
+                      {property.badge}
+                    </span>
+                  )}
+                  <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-4 text-white">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/90">
+                      <MapPin className="h-3.5 w-3.5 text-[#e3c58f]" /> {property.location}
+                    </span>
+                    <span className="grid h-10 w-10 place-items-center rounded-full bg-white text-[#17221f] transition-transform duration-300 group-hover:rotate-45">
+                      <ArrowUpRight className="h-4 w-4" />
+                    </span>
+                  </div>
+                </div>
+                <div className="p-5 sm:p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#9a743f]">{property.type}</p>
+                      <h3 className="mt-2 text-xl font-semibold tracking-[-0.025em] text-[#17221f]">{property.title}</h3>
+                    </div>
+                    <p className="whitespace-nowrap text-right text-sm font-bold text-[#17221f]">
+                      {property.price}
+                      <span className="mt-0.5 block text-[9px] font-medium tracking-[0.12em] text-[#8b918e]">MAD</span>
+                    </p>
+                  </div>
+                  <div className="mt-5 flex items-center gap-5 border-t border-[#17221f]/8 pt-4 text-[11px] text-[#68716d]">
+                    <span className="inline-flex items-center gap-1.5"><BedDouble className="h-3.5 w-3.5 text-[#9a743f]" /> {property.beds} ch.</span>
+                    <span className="inline-flex items-center gap-1.5"><Bath className="h-3.5 w-3.5 text-[#9a743f]" /> {property.baths} sdb</span>
+                    <span className="inline-flex items-center gap-1.5"><Maximize2 className="h-3.5 w-3.5 text-[#9a743f]" /> {property.area}</span>
+                  </div>
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section id="villes" className="bg-[#111a17] py-20 text-white md:py-28">
+        <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+          <Reveal>
+            <div className="max-w-2xl">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#d7b57c]">Nos territoires</p>
+              <h2 className="text-3xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-4xl md:text-[52px]">
+                Quatre villes, quatre façons d’habiter le Maroc.
+              </h2>
+            </div>
+          </Reveal>
+
+          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {CITIES.map((city, index) => (
+              <Reveal key={city.name} delay={index * 0.06}>
+                <button
+                  onClick={() => scrollTo('contact')}
+                  className="group relative block h-[420px] w-full overflow-hidden rounded-[24px] text-left"
+                >
+                  <img
+                    src={city.image}
+                    alt={`Vue de ${city.name}`}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/10" />
+                  <div className="absolute inset-x-0 bottom-0 p-5">
+                    <p className="text-2xl font-medium tracking-[-0.03em]">{city.name}</p>
+                    <p className="mt-1.5 text-[11px] text-white/60">{city.subtitle}</p>
+                    <span className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#e1c795]">
+                      Explorer <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </button>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="expertise" className="bg-white py-20 md:py-28">
+        <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+          <div className="grid gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+            <Reveal>
+              <div className="lg:sticky lg:top-28">
+                <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#9a743f]">Notre approche</p>
+                <h2 className="max-w-lg text-3xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-4xl md:text-[52px]">
+                  L’immobilier, avec plus de précision et moins de bruit.
+                </h2>
+                <p className="mt-6 max-w-md text-[14px] leading-7 text-[#68716d]">
+                  Nous privilégions la qualité de la sélection, la connaissance du marché et une relation directe. Chaque projet commence par une vraie compréhension de vos critères.
                 </p>
-                <div className="flex gap-4 text-xs text-slate-500 mt-3 pt-3 border-t border-slate-50">
-                  <span>🛏 {p.beds} ch.</span>
-                  <span>🚿 {p.baths} sdb</span>
-                  <span>📐 {p.area}</span>
-                </div>
-                <div className="flex items-center justify-between mt-4">
-                  <p className="text-amber-600 font-bold text-lg">{p.price} <span className="text-sm font-normal text-slate-500">MAD</span></p>
-                  <Link href={`/biens/${p.id}`} className="text-xs font-semibold text-slate-900 hover:text-amber-600 transition-colors">
-                    Détails →
-                  </Link>
-                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            </Reveal>
 
-        <div className="text-center mt-10">
-          <Link
-            href="/biens"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white transition-opacity hover:opacity-90"
-            style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}
-          >
-            Voir tous nos biens →
-          </Link>
-        </div>
-      </section>
-
-      {/* ABOUT */}
-      <section id="apropos" className="py-20 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1">
-            <p className="text-amber-600 text-sm font-semibold uppercase tracking-widest mb-3">À propos</p>
-            <h2 className="text-3xl font-bold text-slate-900 mb-5">
-              L&apos;excellence immobilière<br />depuis 2009
-            </h2>
-            <p className="text-slate-600 leading-relaxed mb-4">
-              Prestige Immobilier est la référence de l&apos;immobilier de luxe au Maroc. Fondée en 2009 à Casablanca, notre agence accompagne investisseurs et particuliers dans leurs projets les plus ambitieux.
-            </p>
-            <p className="text-slate-600 leading-relaxed mb-8">
-              Notre équipe de consultants expérimentés vous guide à chaque étape : de la recherche jusqu&apos;à la signature, avec un service personnalisé et discret.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {['Agence agréée FNAIM Maroc', 'Service 7j/7', 'Évaluation gratuite', 'Réseau international'].map(tag => (
-                <span key={tag} className="text-xs font-medium px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
-                  ✓ {tag}
-                </span>
+            <div className="space-y-4">
+              {SERVICES.map((service, index) => (
+                <Reveal key={service.title} delay={index * 0.06}>
+                  <div className="group grid gap-6 rounded-[24px] border border-[#17221f]/8 bg-[#f7f5f0] p-6 transition-all duration-500 hover:border-[#b9945f]/40 hover:bg-white hover:shadow-[0_22px_60px_rgba(23,34,31,0.07)] sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-8">
+                    <span className="grid h-12 w-12 place-items-center rounded-full bg-[#17221f] text-[#e0c28c]">
+                      <service.icon className="h-4.5 w-4.5" />
+                    </span>
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9a743f]">{service.eyebrow}</p>
+                      <h3 className="mt-2 text-xl font-semibold tracking-[-0.025em]">{service.title}</h3>
+                      <p className="mt-2 max-w-2xl text-[13px] leading-6 text-[#68716d]">{service.description}</p>
+                    </div>
+                    <ArrowUpRight className="hidden h-5 w-5 text-[#8b6b3f] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:block" />
+                  </div>
+                </Reveal>
               ))}
             </div>
           </div>
-          <div className="flex-1 grid grid-cols-2 gap-4">
-            {[
-              { icon: '🏠', title: 'Résidentiel', desc: 'Villas, appartements, penthouses' },
-              { icon: '🏢', title: 'Commercial', desc: 'Bureaux, locaux, entrepôts' },
-              { icon: '📈', title: 'Investissement', desc: 'Rentabilité et valorisation' },
-              { icon: '🌍', title: 'International', desc: 'Acheteurs MRE bienvenus' },
-            ].map(s => (
-              <div key={s.title} className="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
-                <span className="text-3xl">{s.icon}</span>
-                <h4 className="font-semibold text-slate-900 mt-2 text-sm">{s.title}</h4>
-                <p className="text-slate-500 text-xs mt-1">{s.desc}</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-[1380px] px-5 py-20 sm:px-8 md:py-28 lg:px-10">
+        <div className="grid overflow-hidden rounded-[30px] bg-[#e9e2d6] lg:grid-cols-2">
+          <div className="relative min-h-[420px] lg:min-h-[560px]">
+            <Image
+              src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1400&q=85"
+              alt="Intérieur résidentiel haut de gamme"
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+            />
+          </div>
+          <div className="flex items-center px-6 py-12 sm:px-10 md:p-14 lg:p-16">
+            <Reveal>
+              <div className="max-w-xl">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#17221f] text-[#e1c795]">
+                  <Compass className="h-4.5 w-4.5" />
+                </span>
+                <p className="mt-8 text-[10px] font-bold uppercase tracking-[0.25em] text-[#8b6b3f]">Une relation sur mesure</p>
+                <h2 className="mt-3 text-3xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-4xl md:text-[48px]">
+                  Votre projet ne devrait jamais ressembler à un formulaire.
+                </h2>
+                <p className="mt-6 text-[14px] leading-7 text-[#5f6965]">
+                  Expliquez-nous ce que vous recherchez. Nous vous aidons à préciser vos critères et à identifier les biens qui méritent réellement votre attention.
+                </p>
+                <button
+                  onClick={() => scrollTo('contact')}
+                  className="group mt-8 inline-flex items-center gap-2 rounded-full bg-[#17221f] px-6 py-3.5 text-[12px] font-bold text-white transition-all hover:-translate-y-0.5"
+                >
+                  Échanger avec un conseiller
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </button>
               </div>
-            ))}
+            </Reveal>
           </div>
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
-      <section id="temoignages" className="py-20 px-6 max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-amber-600 text-sm font-semibold uppercase tracking-widest mb-2">Témoignages</p>
-          <h2 className="text-3xl font-bold text-slate-900">Ce que disent nos clients</h2>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          {TESTIMONIALS.map(t => (
-            <div key={t.name} className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-              <div className="flex gap-1 mb-4">
-                {[...Array(5)].map((_, i) => <span key={i} className="text-amber-400">★</span>)}
+      <section id="contact" className="bg-[#111a17] px-5 py-20 text-white sm:px-8 md:py-28 lg:px-10">
+        <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-[1fr_.85fr] lg:items-center">
+          <Reveal>
+            <div className="max-w-2xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#d7b57c]">Parlons de votre projet</p>
+              <h2 className="mt-4 text-4xl font-medium leading-[1.04] tracking-[-0.045em] sm:text-5xl md:text-[64px]">
+                Une recherche, un bien à vendre, une question ?
+              </h2>
+              <p className="mt-6 max-w-xl text-[14px] leading-7 text-white/55">
+                Notre conseiller immobilier est disponible pour comprendre votre besoin et vous orienter vers la bonne prochaine étape.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4 text-[11px] text-white/55">
+                <span className="inline-flex items-center gap-2"><Check className="h-3.5 w-3.5 text-[#d7b57c]" /> Réponse personnalisée</span>
+                <span className="inline-flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-[#d7b57c]" /> Échange confidentiel</span>
+                <span className="inline-flex items-center gap-2"><Sparkles className="h-3.5 w-3.5 text-[#d7b57c]" /> Disponible en ligne</span>
               </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-5">&ldquo;{t.text}&rdquo;</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #0f172a, #1e3a5f)' }}>
-                  {t.avatar}
-                </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <div className="rounded-[26px] border border-white/12 bg-white/6 p-5 backdrop-blur-sm sm:p-7">
+              <div className="flex items-center gap-4 border-b border-white/10 pb-5">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-[#d7b57c] text-[#17221f]">
+                  <MessageCircle className="h-5 w-5" />
+                </span>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{t.name}</p>
-                  <p className="text-xs text-slate-500">{t.role}</p>
+                  <p className="text-sm font-semibold">Conseiller Maison Atlas</p>
+                  <p className="mt-1 text-[11px] text-white/40">Disponible pour votre recherche immobilière</p>
                 </div>
               </div>
+              <div className="mt-5 rounded-2xl rounded-bl-sm bg-white px-4 py-3.5 text-[13px] leading-6 text-[#4e5a55] shadow-xl">
+                Bonjour, dites-moi simplement ce que vous recherchez : ville, type de bien, budget et délai.
+              </div>
+              <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-[11px] text-white/45">
+                <span>Ouvrez le conseiller en bas à droite</span>
+                <ArrowRight className="h-4 w-4 text-[#d7b57c]" />
+              </div>
+              <a
+                href="https://wa.me/212600000000"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/8 px-4 py-3.5 text-[11px] font-semibold text-white transition-colors hover:bg-white/12"
+              >
+                <MessageCircle className="h-4 w-4" /> Continuer sur WhatsApp
+              </a>
             </div>
-          ))}
+          </Reveal>
         </div>
       </section>
 
-      {/* WIDGET CTA */}
-      <section id="widget-cta" className="py-20 px-6" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%)' }}>
-        <div className="max-w-3xl mx-auto text-center text-white">
-          <p className="text-amber-400 text-sm font-semibold uppercase tracking-widest mb-3">Assistant IA disponible 24h/24</p>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Qualifiez votre projet en 2 minutes</h2>
-          <p className="text-white/70 mb-8 max-w-lg mx-auto">
-            Notre assistant IA vous pose quelques questions et met votre profil en relation avec le bon consultant immédiatement.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center text-sm">
-            {['⚡ Réponse en moins de 30 min', '🔒 Données confidentielles', '📱 Notification WhatsApp agent'].map(item => (
-              <div key={item} className="bg-white/10 backdrop-blur px-4 py-2 rounded-full">{item}</div>
-            ))}
-          </div>
-          <p className="mt-8 text-white/50 text-sm">👉 Cliquez sur le bouton chat en bas à droite pour commencer</p>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="bg-slate-950 text-slate-400 py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between gap-8 mb-8">
+      <footer className="border-t border-white/8 bg-[#0c1311] px-5 py-12 text-white/45 sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[1380px]">
+          <div className="grid gap-10 md:grid-cols-[1fr_auto_auto]">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🏛</span>
-                <span className="font-bold text-white text-lg">Prestige <span className="text-amber-500">Immobilier</span></span>
-              </div>
-              <p className="text-sm max-w-xs leading-relaxed">L&apos;agence de référence pour l&apos;immobilier de prestige au Maroc depuis 2009.</p>
+              <AgencyLogo light />
+              <p className="mt-5 max-w-sm text-[12px] leading-6 text-white/40">
+                Immobilier résidentiel au Maroc. Sélection de propriétés, conseil et accompagnement personnalisé.
+              </p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-sm">
-              <div>
-                <p className="text-white font-semibold mb-3">Navigation</p>
-                <Link href="/" className="block mb-2 hover:text-amber-400 transition-colors">Accueil</Link>
-                <Link href="/biens" className="block mb-2 hover:text-amber-400 transition-colors">Nos biens</Link>
-                <button onClick={() => scrollTo('apropos')} className="block mb-2 hover:text-amber-400 transition-colors">À propos</button>
-                <button onClick={() => scrollTo('temoignages')} className="block mb-2 hover:text-amber-400 transition-colors">Avis clients</button>
-                <Link href="/dashboard" className="block hover:text-amber-400 transition-colors text-slate-500">Dashboard agent</Link>
-              </div>
-              <div>
-                <p className="text-white font-semibold mb-3">Villes</p>
-                {['Casablanca', 'Marrakech', 'Rabat', 'Tanger'].map(l => (
-                  <p key={l} className="mb-2 hover:text-amber-400 cursor-pointer transition-colors">{l}</p>
-                ))}
-              </div>
-              <div>
-                <p className="text-white font-semibold mb-3">Contact</p>
-                <p className="mb-2">📞 +212 6 00 00 00 00</p>
-                <p className="mb-2">✉ contact@prestige-immo.ma</p>
-                <p>📍 Boulevard Anfa, Casablanca</p>
-              </div>
+
+            <div className="text-[12px]">
+              <p className="mb-4 font-semibold text-white">Navigation</p>
+              <Link href="/biens" className="mb-2.5 block transition-colors hover:text-white">Nos biens</Link>
+              <button onClick={() => scrollTo('expertise')} className="mb-2.5 block transition-colors hover:text-white">Expertise</button>
+              <button onClick={() => scrollTo('villes')} className="mb-2.5 block transition-colors hover:text-white">Villes</button>
+            </div>
+
+            <div className="text-[12px]">
+              <p className="mb-4 font-semibold text-white">Contact</p>
+              <a href="tel:+212600000000" className="mb-2.5 block transition-colors hover:text-white">+212 6 00 00 00 00</a>
+              <a href="mailto:contact@maisonatlas.ma" className="mb-2.5 block transition-colors hover:text-white">contact@maisonatlas.ma</a>
+              <p>Casablanca, Maroc</p>
             </div>
           </div>
-          <div className="border-t border-slate-800 pt-6 text-xs text-center text-slate-600">
-            © 2025 Prestige Immobilier. Tous droits réservés. •{' '}
-            Propulsé par <span className="text-amber-500 font-semibold">Leadflow AI</span>
+
+          <div className="mt-10 flex flex-col justify-between gap-3 border-t border-white/8 pt-6 text-[10px] text-white/25 sm:flex-row">
+            <p>© 2026 Maison Atlas Immobilier. Tous droits réservés.</p>
+            <p>Casablanca · Marrakech · Rabat · Tanger</p>
           </div>
         </div>
       </footer>
 
-      <LeadWidget agencyName="Prestige Immobilier" />
+      <LeadWidget agencyName="Maison Atlas Immobilier" />
     </main>
   )
 }
