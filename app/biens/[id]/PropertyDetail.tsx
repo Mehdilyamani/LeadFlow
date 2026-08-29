@@ -25,7 +25,8 @@ import {
   X,
 } from 'lucide-react'
 import type { Property } from '../../lib/properties'
-import LeadWidget from '../../CSR/LeadWidget'
+
+const WHATSAPP_URL = 'https://wa.me/212723037305'
 
 function AgencyLogo({ light = false }: { light?: boolean }) {
   return (
@@ -95,11 +96,9 @@ export default function PropertyDetail({
 
   const [activeImage, setActiveImage] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [widgetOpen, setWidgetOpen] = useState(false)
 
-  const openWidget = () => {
-    setWidgetOpen(false)
-    window.setTimeout(() => setWidgetOpen(true), 0)
+  const openWhatsApp = () => {
+    window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer')
   }
 
   const previousImage = () => {
@@ -110,25 +109,11 @@ export default function PropertyDetail({
     setActiveImage((current) => (current + 1) % gallery.length)
   }
 
-  const propertyContext = {
-    id: property.id,
-    title: property.title,
-    price: property.price,
-    location: property.location,
-    city: property.city,
-    area: property.area,
-    beds: property.beds,
-    baths: property.baths,
-    type: property.type,
-    description: property.description,
-    features: property.features,
-  }
-
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
       {/* NAVIGATION */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/92 text-white backdrop-blur-xl">
-        <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
           <Link href="/demo" aria-label="Accueil Maison Atlas">
             <AgencyLogo light />
           </Link>
@@ -191,8 +176,8 @@ export default function PropertyDetail({
                 <Link href="/demo#contact" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Contact
                 </Link>
-                <a href="tel:+212600000000" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
-                  <Phone className="h-4 w-4" /> +212 6 00 00 00 00
+                <a href="tel:+212723037305" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
+                  <Phone className="h-4 w-4" /> +212 723-037305
                 </a>
               </div>
             </motion.div>
@@ -201,8 +186,8 @@ export default function PropertyDetail({
       </header>
 
       {/* PROPERTY INTRO */}
-      <section className="bg-[#101916] pb-24 pt-[76px] text-white sm:pb-28">
-        <div className="mx-auto max-w-[1380px] px-5 pt-10 sm:px-8 sm:pt-14 lg:px-10">
+      <section className="bg-[#101916] pb-20 pt-[68px] text-white sm:pb-28 sm:pt-[76px]">
+        <div className="mx-auto max-w-[1380px] px-4 pt-8 sm:px-8 sm:pt-14 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -216,7 +201,7 @@ export default function PropertyDetail({
             <span className="text-[#d7b57c]">{property.city}</span>
           </motion.div>
 
-          <div className="mt-9 grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="mt-7 grid gap-7 sm:mt-9 sm:gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
             <div className="max-w-4xl">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -236,7 +221,7 @@ export default function PropertyDetail({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                className="text-[42px] font-medium leading-[1.02] tracking-[-0.05em] sm:text-6xl lg:text-[72px]"
+                className="text-[clamp(2.25rem,11vw,2.625rem)] font-medium leading-[1.02] tracking-[-0.05em] sm:text-6xl lg:text-[72px]"
               >
                 {property.title}
               </motion.h1>
@@ -268,15 +253,15 @@ export default function PropertyDetail({
       </section>
 
       {/* GALLERY */}
-      <section className="relative z-10 -mt-14 sm:-mt-16">
-        <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+      <section className="relative z-10 -mt-12 sm:-mt-16">
+        <div className="mx-auto max-w-[1380px] px-4 sm:px-8 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden rounded-[28px] bg-[#d9d7cf] shadow-[0_24px_80px_rgba(20,31,27,.14)] sm:rounded-[34px]"
           >
-            <div className="relative h-[430px] overflow-hidden sm:h-[560px] lg:h-[660px]">
+            <div className="relative h-[330px] overflow-hidden sm:h-[560px] lg:h-[660px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`${property.id}-${activeImage}`}
@@ -351,7 +336,7 @@ export default function PropertyDetail({
       </section>
 
       {/* CONTENT */}
-      <section className="mx-auto grid max-w-[1380px] gap-12 px-5 py-16 sm:px-8 md:py-24 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-10 xl:gap-16">
+      <section className="mx-auto grid max-w-[1380px] gap-10 px-4 py-12 sm:gap-12 sm:px-8 sm:py-16 md:py-24 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-10 xl:gap-16">
         <div className="min-w-0">
           {/* QUICK FACTS */}
           <Reveal>
@@ -364,7 +349,7 @@ export default function PropertyDetail({
               ].map((item, index) => (
                 <div
                   key={item.label}
-                  className={`px-5 py-6 ${
+                  className={`px-4 py-5 sm:px-5 sm:py-6 ${
                     index % 2 === 0 ? 'border-r border-[#17221f]/8' : ''
                   } ${index < 2 ? 'border-b border-[#17221f]/8 sm:border-b-0' : ''} ${
                     index === 1 ? 'sm:border-r' : ''
@@ -379,7 +364,7 @@ export default function PropertyDetail({
           </Reveal>
 
           {/* DESCRIPTION */}
-          <Reveal className="mt-14">
+          <Reveal className="mt-10 sm:mt-14">
             <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">La propriété</p>
             <h2 className="mt-3 text-3xl font-medium tracking-[-0.04em] text-[#17221f] sm:text-[42px]">
               Une adresse pensée dans les moindres détails.
@@ -390,7 +375,7 @@ export default function PropertyDetail({
           </Reveal>
 
           {/* FEATURES */}
-          <Reveal className="mt-14" delay={0.05}>
+          <Reveal className="mt-10 sm:mt-14" delay={0.05}>
             <div className="border-t border-[#17221f]/10 pt-10">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
                 <div>
@@ -425,7 +410,7 @@ export default function PropertyDetail({
           </Reveal>
 
           {/* LOCATION */}
-          <Reveal className="mt-14" delay={0.08}>
+          <Reveal className="mt-10 sm:mt-14" delay={0.08}>
             <div className="overflow-hidden rounded-[28px] bg-[#17221f] text-white">
               <div className="grid md:grid-cols-[0.8fr_1.2fr]">
                 <div className="flex flex-col justify-center p-7 sm:p-9">
@@ -439,7 +424,7 @@ export default function PropertyDetail({
                     L&apos;adresse exacte et les informations d&apos;accès sont communiquées lors de l&apos;organisation d&apos;une visite.
                   </p>
                 </div>
-                <div className="relative min-h-[280px] overflow-hidden border-t border-white/8 bg-[#1d2d28] md:border-l md:border-t-0">
+                <div className="relative min-h-[220px] overflow-hidden border-t border-white/8 bg-[#1d2d28] sm:min-h-[280px] md:border-l md:border-t-0">
                   <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(255,255,255,.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.08)_1px,transparent_1px)] [background-size:36px_36px]" />
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(215,181,124,.15),transparent_35%)]" />
                   <div className="absolute inset-0 grid place-items-center">
@@ -486,17 +471,17 @@ export default function PropertyDetail({
 
                 <div className="px-6 pb-6 sm:px-7 sm:pb-7">
                   <button
-                    onClick={openWidget}
+                    onClick={openWhatsApp}
                     className="group flex w-full items-center justify-center gap-2 rounded-full bg-[#17221f] px-5 py-3.5 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
                   >
                     Organiser une visite
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </button>
                   <a
-                    href="tel:+212600000000"
+                    href="tel:+212723037305"
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-[#17221f]/12 bg-[#f8f6f1] px-5 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:border-[#b9945f]/40 hover:bg-white"
                   >
-                    <Phone className="h-3.5 w-3.5 text-[#9b7949]" /> +212 6 00 00 00 00
+                    <Phone className="h-3.5 w-3.5 text-[#9b7949]" /> +212 723-037305
                   </a>
 
                   <div className="mt-5 flex items-start gap-3 rounded-2xl bg-[#f3eee5] p-4">
@@ -522,7 +507,7 @@ export default function PropertyDetail({
                   Une question sur ce bien, son emplacement ou les modalités de visite ? Notre équipe vous répond directement.
                 </p>
                 <button
-                  onClick={openWidget}
+                  onClick={openWhatsApp}
                   className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#76572e] transition-colors hover:text-[#17221f]"
                 >
                   Poser une question <MessageCircle className="h-3.5 w-3.5" />
@@ -535,8 +520,8 @@ export default function PropertyDetail({
 
       {/* SIMILAR PROPERTIES */}
       {similar.length > 0 && (
-        <section className="border-t border-[#17221f]/8 bg-[#eee9df] py-16 sm:py-20">
-          <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+        <section className="border-t border-[#17221f]/8 bg-[#eee9df] py-14 sm:py-20">
+          <div className="mx-auto max-w-[1380px] px-4 sm:px-8 lg:px-10">
             <Reveal>
               <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
                 <div>
@@ -549,14 +534,14 @@ export default function PropertyDetail({
               </div>
             </Reveal>
 
-            <div className="mt-9 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="-mx-4 mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-8 sm:gap-6 sm:px-8 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3">
               {similar.slice(0, 3).map((item, index) => (
-                <Reveal key={item.id} delay={index * 0.07}>
+                <Reveal key={item.id} delay={index * 0.07} className="w-[86vw] max-w-[380px] shrink-0 snap-center md:w-auto md:max-w-none">
                   <Link
                     href={`/biens/${item.id}`}
                     className="group block overflow-hidden rounded-[24px] bg-[#f8f6f1] shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#17221f]/8"
                   >
-                    <div className="relative h-[250px] overflow-hidden">
+                    <div className="relative h-[220px] overflow-hidden sm:h-[250px]">
                       <Image
                         src={item.image}
                         alt={item.title}
@@ -598,7 +583,7 @@ export default function PropertyDetail({
       )}
 
       {/* CONTACT CTA */}
-      <section className="bg-[#101916] px-5 py-16 text-white sm:px-8 sm:py-20">
+      <section className="bg-[#101916] px-4 py-14 text-white sm:px-8 sm:py-20">
         <div className="mx-auto flex max-w-[1100px] flex-col items-center text-center">
           <Reveal>
             <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#d7b57c]">Une visite ? Une question ?</p>
@@ -611,14 +596,14 @@ export default function PropertyDetail({
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <button
-                onClick={openWidget}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e1c493]"
+                onClick={openWhatsApp}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e1c493] sm:w-auto"
               >
                 Organiser une visite <ArrowRight className="h-4 w-4" />
               </button>
               <a
-                href="tel:+212600000000"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 text-xs font-semibold text-white transition-all hover:bg-white hover:text-[#17221f]"
+                href="tel:+212723037305"
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 text-xs font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:w-auto"
               >
                 <Phone className="h-3.5 w-3.5" /> Nous appeler
               </a>
@@ -628,7 +613,7 @@ export default function PropertyDetail({
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0b1210] px-5 py-12 text-white/42 sm:px-8">
+      <footer className="bg-[#0b1210] px-4 py-12 text-white/42 sm:px-8">
         <div className="mx-auto max-w-[1380px]">
           <div className="flex flex-col justify-between gap-10 border-b border-white/8 pb-10 md:flex-row">
             <div>
@@ -652,7 +637,7 @@ export default function PropertyDetail({
               </div>
               <div>
                 <p className="mb-4 font-semibold text-white">Contact</p>
-                <a href="tel:+212600000000" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">+212 6 00 00 00 00</a>
+                <a href="tel:+212723037305" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">+212 723-037305</a>
                 <p>Maroc</p>
               </div>
             </div>
@@ -664,11 +649,6 @@ export default function PropertyDetail({
         </div>
       </footer>
 
-      <LeadWidget
-        agencyName="Maison Atlas Immobilier"
-        propertyContext={propertyContext}
-        externalOpen={widgetOpen}
-      />
     </main>
   )
 }

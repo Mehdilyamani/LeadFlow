@@ -25,9 +25,9 @@ const contactOptions = [
     number: '03',
     icon: '✆',
     title: 'Ligne VIP',
-    desc: '+212 6 00 00 00 00',
+    desc: '+212 723-037305',
     action: 'Appeler maintenant',
-    link: 'tel:+212600000000',
+    link: 'tel:+212723037305',
   },
 ];
 

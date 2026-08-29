@@ -1,8 +1,11 @@
-import { getFeaturedProperties } from './lib/supabaseProperties'
-import { PROPERTIES } from './lib/properties'
-import HomeClient from './HomeClient'
+import type { Metadata } from 'next'
+import AgencyHome from './AgencyHome'
 
-export default async function Home() {
-  const properties = await getFeaturedProperties().catch(() => PROPERTIES.slice(0, 3))
-  return <HomeClient properties={properties} />
+export const metadata: Metadata = {
+  title: 'LeadFlow — Studio de design & développement web',
+  description: 'LeadFlow conçoit et développe des sites web premium, rapides et pensés pour convertir. Studio web basé au Maroc.',
+}
+
+export default function Home() {
+  return <AgencyHome />
 }

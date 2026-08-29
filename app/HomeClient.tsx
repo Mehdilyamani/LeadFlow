@@ -25,7 +25,6 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react'
-import LeadWidget from './CSR/LeadWidget'
 import type { Property } from './lib/properties'
 
 const CITIES = [
@@ -137,14 +136,13 @@ export default function HomeClient({
   properties,
 }: {
   properties: Property[]
-  agencyContext?: string
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/85 text-white backdrop-blur-xl">
-        <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
           <Link href="/demo" aria-label="Accueil Maison Atlas">
             <AgencyLogo light />
           </Link>
@@ -166,10 +164,10 @@ export default function HomeClient({
 
           <div className="flex items-center gap-2">
             <a
-              href="tel:+212600000000"
+              href="tel:+212723037305"
               className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
             >
-              <Phone className="h-3.5 w-3.5" /> +212 6 00 00 00 00
+              <Phone className="h-3.5 w-3.5" /> +212 723-037305
             </a>
             <button
               onClick={() => setMenuOpen((value) => !value)}
@@ -206,7 +204,7 @@ export default function HomeClient({
         )}
       </header>
 
-      <section className="relative min-h-[92vh] overflow-hidden bg-[#101916] text-white">
+      <section className="relative min-h-[100svh] overflow-hidden bg-[#101916] text-white sm:min-h-[92vh]">
         <motion.div
           initial={{ scale: 1.06, opacity: 0.75 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -225,14 +223,14 @@ export default function HomeClient({
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,20,17,.88)_0%,rgba(12,20,17,.63)_43%,rgba(12,20,17,.17)_72%,rgba(12,20,17,.28)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#101916]/80 via-transparent to-[#101916]/30" />
 
-        <div className="relative mx-auto flex min-h-[92vh] max-w-[1380px] items-end px-5 pb-16 pt-32 sm:px-8 sm:pb-20 lg:px-10 lg:pb-24">
+        <div className="relative mx-auto flex min-h-[100svh] max-w-[1380px] items-end px-4 pb-10 pt-28 sm:min-h-[92vh] sm:px-8 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-24">
           <div className="grid w-full gap-12 lg:grid-cols-[1.12fr_.88fr] lg:items-end">
             <div className="max-w-3xl">
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.12 }}
-                className="mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-[#d7b57c]"
+                className="mb-4 flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b57c] sm:mb-6 sm:text-[10px] sm:tracking-[0.28em]"
               >
                 <span className="h-px w-9 bg-[#d7b57c]/70" /> Immobilier résidentiel au Maroc
               </motion.div>
@@ -241,7 +239,7 @@ export default function HomeClient({
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.85, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                className="max-w-3xl text-[46px] font-medium leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[78px]"
+                className="max-w-3xl text-[clamp(2.45rem,12vw,2.875rem)] font-medium leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[78px]"
               >
                 Des lieux rares.
                 <br />
@@ -252,7 +250,7 @@ export default function HomeClient({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, delay: 0.3 }}
-                className="mt-7 max-w-xl text-[15px] leading-7 text-white/65 sm:text-base sm:leading-8"
+                className="mt-5 max-w-xl text-[14px] leading-6 text-white/68 sm:mt-7 sm:text-base sm:leading-8"
               >
                 Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca,
                 Marrakech, Rabat et Tanger.
@@ -262,18 +260,18 @@ export default function HomeClient({
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.42 }}
-                className="mt-9 flex flex-col gap-3 sm:flex-row"
+                className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row"
               >
                 <Link
                   href="/biens"
-                  className="group inline-flex items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-[12px] font-bold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c691]"
+                  className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-[12px] font-bold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c691] sm:w-auto"
                 >
                   Découvrir les propriétés
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
                 <button
                   onClick={() => scrollTo('contact')}
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/8 px-6 py-3.5 text-[12px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/14"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/8 px-6 py-3.5 text-[12px] font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/14 sm:w-auto"
                 >
                   <MessageCircle className="h-4 w-4" /> Parler de votre projet
                 </button>
@@ -334,7 +332,7 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1380px] px-5 py-20 sm:px-8 md:py-28 lg:px-10">
+      <section className="mx-auto max-w-[1380px] px-4 py-14 sm:px-8 sm:py-20 md:py-28 lg:px-10">
         <Reveal>
           <div className="flex flex-col justify-between gap-7 md:flex-row md:items-end">
             <div className="max-w-2xl">
@@ -350,14 +348,14 @@ export default function HomeClient({
           </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-3">
+        <div className="-mx-4 mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-8 sm:mt-12 sm:gap-6 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0">
           {properties.map((property, index) => (
-            <Reveal key={property.id} delay={index * 0.08}>
+            <Reveal key={property.id} delay={index * 0.08} className="w-[86vw] max-w-[400px] shrink-0 snap-center lg:w-auto lg:max-w-none">
               <Link
                 href={`/biens/${property.id}`}
                 className="group block overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_55px_rgba(23,34,31,0.06)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_26px_70px_rgba(23,34,31,0.11)]"
               >
-                <div className="relative h-[330px] overflow-hidden">
+                <div className="relative h-[270px] overflow-hidden sm:h-[330px]">
                   <Image
                     src={property.image}
                     alt={property.title}
@@ -403,8 +401,8 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section id="villes" className="bg-[#111a17] py-20 text-white md:py-28">
-        <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
+      <section id="villes" className="bg-[#111a17] py-14 text-white sm:py-20 md:py-28">
+        <div className="mx-auto max-w-[1380px] px-4 sm:px-8 lg:px-10">
           <Reveal>
             <div className="max-w-2xl">
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#d7b57c]">Nos territoires</p>
@@ -414,20 +412,32 @@ export default function HomeClient({
             </div>
           </Reveal>
 
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="-mx-4 mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
             {CITIES.map((city, index) => (
-              <Reveal key={city.name} delay={index * 0.06}>
+              <Reveal key={city.name} delay={index * 0.06} className="w-[78vw] max-w-[330px] shrink-0 snap-center sm:w-auto sm:max-w-none">
                 <button
                   onClick={() => scrollTo('contact')}
-                  className="group relative block h-[420px] w-full overflow-hidden rounded-[24px] text-left"
+                  className="group relative block h-[360px] w-full overflow-hidden rounded-[24px] text-left sm:h-[420px]"
                 >
-                  <img
-                    src={city.image}
-                    alt={`Vue de ${city.name}`}
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                    decoding="async"
-                  />
+                  {city.image.includes('commons.wikimedia.org') ? (
+                    // Wikimedia is intentionally kept as a lazy native image because it is outside the Next image allowlist.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={city.image}
+                      alt={`Vue de ${city.name}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
+                    />
+                  ) : (
+                    <Image
+                      src={city.image}
+                      alt={`Vue de ${city.name}`}
+                      fill
+                      className="object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
+                      sizes="(max-width: 640px) 78vw, (max-width: 1024px) 50vw, 25vw"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/10" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
                     <p className="text-2xl font-medium tracking-[-0.03em]">{city.name}</p>
@@ -443,9 +453,9 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section id="expertise" className="bg-white py-20 md:py-28">
-        <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-10">
-          <div className="grid gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
+      <section id="expertise" className="bg-white py-14 sm:py-20 md:py-28">
+        <div className="mx-auto max-w-[1380px] px-4 sm:px-8 lg:px-10">
+          <div className="grid gap-10 sm:gap-14 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
             <Reveal>
               <div className="lg:sticky lg:top-28">
                 <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#9a743f]">Notre approche</p>
@@ -461,7 +471,7 @@ export default function HomeClient({
             <div className="space-y-4">
               {SERVICES.map((service, index) => (
                 <Reveal key={service.title} delay={index * 0.06}>
-                  <div className="group grid gap-6 rounded-[24px] border border-[#17221f]/8 bg-[#f7f5f0] p-6 transition-all duration-500 hover:border-[#b9945f]/40 hover:bg-white hover:shadow-[0_22px_60px_rgba(23,34,31,0.07)] sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-8">
+                  <div className="group grid gap-5 rounded-[22px] border border-[#17221f]/8 bg-[#f7f5f0] p-5 transition-all duration-500 hover:border-[#b9945f]/40 hover:bg-white hover:shadow-[0_22px_60px_rgba(23,34,31,0.07)] sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-6 sm:rounded-[24px] sm:p-8">
                     <span className="grid h-12 w-12 place-items-center rounded-full bg-[#17221f] text-[#e0c28c]">
                       <service.icon className="h-4.5 w-4.5" />
                     </span>
@@ -479,9 +489,9 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1380px] px-5 py-20 sm:px-8 md:py-28 lg:px-10">
+      <section className="mx-auto max-w-[1380px] px-4 py-14 sm:px-8 sm:py-20 md:py-28 lg:px-10">
         <div className="grid overflow-hidden rounded-[30px] bg-[#e9e2d6] lg:grid-cols-2">
-          <div className="relative min-h-[420px] lg:min-h-[560px]">
+          <div className="relative min-h-[300px] sm:min-h-[420px] lg:min-h-[560px]">
             <Image
               src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1400&q=85"
               alt="Intérieur résidentiel haut de gamme"
@@ -490,7 +500,7 @@ export default function HomeClient({
               sizes="(max-width: 1024px) 100vw, 50vw"
             />
           </div>
-          <div className="flex items-center px-6 py-12 sm:px-10 md:p-14 lg:p-16">
+          <div className="flex items-center px-5 py-10 sm:px-10 sm:py-12 md:p-14 lg:p-16">
             <Reveal>
               <div className="max-w-xl">
                 <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#17221f] text-[#e1c795]">
@@ -516,12 +526,12 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section id="contact" className="bg-[#111a17] px-5 py-20 text-white sm:px-8 md:py-28 lg:px-10">
-        <div className="mx-auto grid max-w-[1380px] gap-12 lg:grid-cols-[1fr_.85fr] lg:items-center">
+      <section id="contact" className="bg-[#111a17] px-4 py-14 text-white sm:px-8 sm:py-20 md:py-28 lg:px-10">
+        <div className="mx-auto grid max-w-[1380px] gap-9 sm:gap-12 lg:grid-cols-[1fr_.85fr] lg:items-center">
           <Reveal>
             <div className="max-w-2xl">
               <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#d7b57c]">Parlons de votre projet</p>
-              <h2 className="mt-4 text-4xl font-medium leading-[1.04] tracking-[-0.045em] sm:text-5xl md:text-[64px]">
+              <h2 className="mt-4 text-[34px] font-medium leading-[1.04] tracking-[-0.045em] sm:text-5xl md:text-[64px]">
                 Une recherche, un bien à vendre, une question ?
               </h2>
               <p className="mt-6 max-w-xl text-[14px] leading-7 text-white/55">
@@ -550,14 +560,14 @@ export default function HomeClient({
                 Bonjour, dites-moi simplement ce que vous recherchez : ville, type de bien, budget et délai.
               </div>
               <div className="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3.5 text-[11px] text-white/45">
-                <span>Ouvrez le conseiller en bas à droite</span>
+                <span>Contactez directement notre équipe</span>
                 <ArrowRight className="h-4 w-4 text-[#d7b57c]" />
               </div>
               <a
-                href="https://wa.me/212600000000"
+                href="https://wa.me/212723037305"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 flex items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/8 px-4 py-3.5 text-[11px] font-semibold text-white transition-colors hover:bg-white/12"
+                className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/8 px-4 py-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-white/12 sm:text-[11px]"
               >
                 <MessageCircle className="h-4 w-4" /> Continuer sur WhatsApp
               </a>
@@ -585,7 +595,7 @@ export default function HomeClient({
 
             <div className="text-[12px]">
               <p className="mb-4 font-semibold text-white">Contact</p>
-              <a href="tel:+212600000000" className="mb-2.5 block transition-colors hover:text-white">+212 6 00 00 00 00</a>
+              <a href="tel:+212723037305" className="mb-2.5 block transition-colors hover:text-white">+212 723-037305</a>
               <a href="mailto:contact@maisonatlas.ma" className="mb-2.5 block transition-colors hover:text-white">contact@maisonatlas.ma</a>
               <p>Casablanca, Maroc</p>
             </div>
@@ -598,7 +608,6 @@ export default function HomeClient({
         </div>
       </footer>
 
-      <LeadWidget agencyName="Maison Atlas Immobilier" />
     </main>
   )
 }

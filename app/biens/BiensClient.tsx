@@ -9,7 +9,6 @@ import {
   ArrowUpRight,
   Bath,
   BedDouble,
-  Building2,
   Check,
   ChevronRight,
   MapPin,
@@ -23,7 +22,8 @@ import {
   X,
 } from 'lucide-react'
 import type { Property, PropertyType } from '../lib/properties'
-import LeadWidget from '../CSR/LeadWidget'
+
+const WHATSAPP_URL = 'https://wa.me/212723037305'
 
 const FILTERS: { label: string; value: 'Tous' | PropertyType }[] = [
   { label: 'Tous les biens', value: 'Tous' },
@@ -91,24 +91,21 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
   const [activeFilter, setActiveFilter] = useState<'Tous' | PropertyType>('Tous')
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [widgetOpen, setWidgetOpen] = useState(false)
 
   const filtered =
     activeFilter === 'Tous'
       ? properties
       : properties.filter((property) => property.type === activeFilter)
 
-  const openWidget = () => {
-    // Toggle first so the same CTA can trigger the widget again after it has been closed.
-    setWidgetOpen(false)
-    window.setTimeout(() => setWidgetOpen(true), 0)
+  const openWhatsApp = () => {
+    window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer')
   }
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
       {/* NAVIGATION */}
       <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#101916]/90 text-white backdrop-blur-xl">
-        <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
           <Link href="/demo" aria-label="Accueil Maison Atlas">
             <AgencyLogo light />
           </Link>
@@ -133,10 +130,10 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
 
           <div className="flex items-center gap-2">
             <a
-              href="tel:+212600000000"
+              href="tel:+212723037305"
               className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
             >
-              <Phone className="h-3.5 w-3.5" /> +212 6 00 00 00 00
+              <Phone className="h-3.5 w-3.5" /> +212 723-037305
             </a>
             <button
               onClick={() => setMenuOpen((value) => !value)}
@@ -171,8 +168,8 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
                 <Link href="/demo#villes" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Villes
                 </Link>
-                <a href="tel:+212600000000" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
-                  <Phone className="h-4 w-4" /> +212 6 00 00 00 00
+                <a href="tel:+212723037305" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
+                  <Phone className="h-4 w-4" /> +212 723-037305
                 </a>
               </div>
             </motion.div>
@@ -181,7 +178,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       </header>
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#101916] pt-[76px] text-white">
+      <section className="relative overflow-hidden bg-[#101916] pt-[68px] text-white sm:pt-[76px]">
         <motion.div
           initial={{ scale: 1.05, opacity: 0.72 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -200,7 +197,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,20,17,.94)_0%,rgba(12,20,17,.76)_48%,rgba(12,20,17,.30)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#101916]/80 via-transparent to-[#101916]/25" />
 
-        <div className="relative mx-auto flex min-h-[520px] max-w-[1380px] items-end px-5 pb-16 pt-24 sm:px-8 sm:pb-20 lg:px-10">
+        <div className="relative mx-auto flex min-h-[450px] max-w-[1380px] items-end px-4 pb-12 pt-20 sm:min-h-[520px] sm:px-8 sm:pb-20 sm:pt-24 lg:px-10">
           <div className="max-w-3xl">
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -215,7 +212,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-              className="text-[43px] font-medium leading-[1] tracking-[-0.05em] sm:text-6xl lg:text-[72px]"
+              className="text-[clamp(2.35rem,11.5vw,2.6875rem)] font-medium leading-[1] tracking-[-0.05em] sm:text-6xl lg:text-[72px]"
             >
               Des propriétés choisies,
               <br />
@@ -236,8 +233,8 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       </section>
 
       {/* FILTERS */}
-      <section className="sticky top-[76px] z-30 border-b border-[#17221f]/8 bg-[#f7f5f0]/94 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1380px] items-center gap-3 overflow-x-auto px-5 py-4 sm:px-8 lg:px-10">
+      <section className="sticky top-[68px] z-30 border-b border-[#17221f]/8 bg-[#f7f5f0]/94 backdrop-blur-xl sm:top-[76px]">
+        <div className="mx-auto flex max-w-[1380px] items-center gap-2.5 overflow-x-auto px-4 py-3.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:gap-3 sm:px-8 sm:py-4 lg:px-10">
           <span className="mr-1 inline-flex shrink-0 items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#857763]">
             <SlidersHorizontal className="h-3.5 w-3.5" /> Filtrer
           </span>
@@ -273,8 +270,8 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       </section>
 
       {/* PROPERTY GRID */}
-      <section className="mx-auto max-w-[1380px] px-5 py-16 sm:px-8 md:py-24 lg:px-10">
-        <div className="mb-10 flex flex-col justify-between gap-5 md:flex-row md:items-end">
+      <section className="mx-auto max-w-[1380px] px-4 py-12 sm:px-8 sm:py-16 md:py-24 lg:px-10">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:mb-10 sm:gap-5 md:flex-row md:items-end">
           <Reveal>
             <div>
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">
@@ -292,7 +289,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
           </Reveal>
         </div>
 
-        <motion.div layout className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">
+        <motion.div layout className="grid gap-5 sm:gap-7 md:grid-cols-2 xl:grid-cols-3">
           <AnimatePresence mode="popLayout">
             {filtered.map((property, index) => (
               <PropertyCard
@@ -316,7 +313,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
                 Certaines opportunités sont commercialisées confidentiellement. Parlez-nous de votre recherche pour accéder à une sélection plus large.
               </p>
               <button
-                onClick={openWidget}
+                onClick={openWhatsApp}
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#17221f] px-5 py-3 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
               >
                 Nous confier votre recherche <ArrowRight className="h-4 w-4" />
@@ -327,7 +324,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       </section>
 
       {/* PRIVATE SEARCH CTA */}
-      <section className="px-5 pb-20 sm:px-8 md:pb-28 lg:px-10">
+      <section className="px-4 pb-14 sm:px-8 sm:pb-20 md:pb-28 lg:px-10">
         <Reveal>
           <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-[30px] bg-[#101916] text-white md:rounded-[38px]">
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#c9a56d]/10 blur-3xl" />
@@ -352,8 +349,8 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
               </div>
 
               <button
-                onClick={openWidget}
-                className="inline-flex w-fit items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-sm font-semibold text-[#101916] transition-all hover:-translate-y-0.5 hover:bg-[#e4c58f]"
+                onClick={openWhatsApp}
+                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-sm font-semibold text-[#101916] transition-all hover:-translate-y-0.5 hover:bg-[#e4c58f] sm:w-fit"
               >
                 Parler à un conseiller <MessageCircle className="h-4 w-4" />
               </button>
@@ -385,7 +382,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Contact</p>
               <div className="space-y-3 text-sm">
-                <a href="tel:+212600000000" className="block transition-colors hover:text-white">+212 6 00 00 00 00</a>
+                <a href="tel:+212723037305" className="block transition-colors hover:text-white">+212 723-037305</a>
                 <a href="mailto:contact@maisonatlas.ma" className="block transition-colors hover:text-white">contact@maisonatlas.ma</a>
                 <p>Casablanca, Maroc</p>
               </div>
@@ -407,13 +404,12 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
             onClose={() => setSelectedProperty(null)}
             onContact={() => {
               setSelectedProperty(null)
-              openWidget()
+              openWhatsApp()
             }}
           />
         )}
       </AnimatePresence>
 
-      <LeadWidget agencyName="Maison Atlas Immobilier" externalOpen={widgetOpen} />
     </main>
   )
 }
@@ -436,7 +432,7 @@ function PropertyCard({
       transition={{ duration: 0.55, delay: Math.min(index * 0.06, 0.24), ease: [0.22, 1, 0.36, 1] }}
       className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_50px_rgba(23,34,31,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(23,34,31,0.10)]"
     >
-      <button onClick={onOpen} className="relative block h-[300px] w-full overflow-hidden text-left sm:h-[330px]">
+      <button onClick={onOpen} className="relative block h-[260px] w-full overflow-hidden text-left sm:h-[330px]">
         <Image
           src={p.image}
           alt={p.title}
@@ -518,7 +514,7 @@ function PropertyModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.22 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#07100d]/78 px-3 py-4 backdrop-blur-sm sm:px-5 sm:py-8"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#07100d]/78 px-0 pt-4 backdrop-blur-sm sm:items-center sm:px-5 sm:py-8"
       onClick={onClose}
     >
       <motion.div
@@ -526,10 +522,10 @@ function PropertyModal({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 16, scale: 0.985 }}
         transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-        className="flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-[24px] bg-[#f8f6f1] shadow-2xl sm:rounded-[30px]"
+        className="flex max-h-[calc(100svh-8px)] w-full max-w-4xl flex-col overflow-hidden rounded-t-[26px] bg-[#f8f6f1] shadow-2xl sm:max-h-[92vh] sm:rounded-[30px]"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="relative h-[280px] shrink-0 overflow-hidden sm:h-[370px]">
+        <div className="relative h-[220px] shrink-0 overflow-hidden sm:h-[370px]">
           <Image
             src={p.image}
             alt={p.title}
@@ -557,11 +553,11 @@ function PropertyModal({
             <p className="mb-2 inline-flex items-center gap-1.5 text-[11px] text-white/75">
               <MapPin className="h-3.5 w-3.5 text-[#e0bd82]" /> {p.location}
             </p>
-            <h2 className="text-3xl font-medium tracking-[-0.04em] sm:text-4xl">{p.title}</h2>
+            <h2 className="text-[28px] font-medium leading-tight tracking-[-0.04em] sm:text-4xl">{p.title}</h2>
           </div>
         </div>
 
-        <div className="overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
+        <div className="overscroll-contain overflow-y-auto px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-5 sm:px-8 sm:py-8">
           <div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-start">
             <div>
               <p className="text-sm leading-7 text-[#626a64]">{p.description}</p>

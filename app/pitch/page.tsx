@@ -400,7 +400,7 @@ function PitchContent() {
                 💳 Payer avec PayPal
               </a>
               <a
-                href={`https://wa.me/212600000000?text=${encodeURIComponent(`Bonjour, je souhaite activer Leadflow pour ${agencyName} à ${city}`)}`}
+                href={`https://wa.me/212723037305?text=${encodeURIComponent(`Bonjour, je souhaite activer Leadflow pour ${agencyName} à ${city}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full py-3.5 rounded-xl font-semibold text-center text-white bg-emerald-500 hover:bg-emerald-600 transition-colors"
