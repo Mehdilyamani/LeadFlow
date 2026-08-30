@@ -24,29 +24,37 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react'
+import { DemoBrandMark, useDemoBrand } from '../../demoBranding'
 import type { Property } from '../../lib/properties'
 
 const WHATSAPP_URL = 'https://wa.me/212723037305'
 
 function AgencyLogo({ light = false }: { light?: boolean }) {
+  const demoBrand = useDemoBrand()
+
   return (
     <span className="inline-flex items-center gap-3">
-      <span
-        className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
-          light
-            ? 'border-white/20 bg-white/10 text-white'
-            : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
-        }`}
-      >
-        MA
-      </span>
+      <DemoBrandMark
+        className="h-10 w-10 rounded-full object-contain"
+        fallback={
+          <span
+            className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
+              light
+                ? 'border-white/20 bg-white/10 text-white'
+                : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
+            }`}
+          >
+            MA
+          </span>
+        }
+      />
       <span className="leading-none">
         <span
           className={`block text-[13px] font-semibold tracking-[0.17em] ${
             light ? 'text-white' : 'text-[#17221f]'
           }`}
         >
-          MAISON ATLAS
+          {demoBrand?.agencyName.toUpperCase() ?? 'MAISON ATLAS'}
         </span>
         <span
           className={`mt-1 block text-[8px] font-medium uppercase tracking-[0.31em] ${
@@ -96,6 +104,9 @@ export default function PropertyDetail({
 
   const [activeImage, setActiveImage] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
+  const demoBrand = useDemoBrand()
+  const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
+  const shortAgencyName = demoBrand?.agencyName ?? 'Maison Atlas'
 
   const openWhatsApp = () => {
     window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer')
@@ -110,11 +121,11 @@ export default function PropertyDetail({
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
+    <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
       {/* NAVIGATION */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/92 text-white backdrop-blur-xl">
+      <header className="brand-secondary-bg fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/92 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
-          <Link href="/demo" aria-label="Accueil Maison Atlas">
+          <Link href="/demo" aria-label={`Accueil ${agencyName}`}>
             <AgencyLogo light />
           </Link>
 
@@ -186,7 +197,7 @@ export default function PropertyDetail({
       </header>
 
       {/* PROPERTY INTRO */}
-      <section className="bg-[#101916] pb-20 pt-[68px] text-white sm:pb-28 sm:pt-[76px]">
+      <section className="brand-secondary-bg bg-[#101916] pb-20 pt-[68px] text-white sm:pb-28 sm:pt-[76px]">
         <div className="mx-auto max-w-[1380px] px-4 pt-8 sm:px-8 sm:pt-14 lg:px-10">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -487,7 +498,7 @@ export default function PropertyDetail({
                   <div className="mt-5 flex items-start gap-3 rounded-2xl bg-[#f3eee5] p-4">
                     <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#8f6d3b]" />
                     <p className="text-[11px] leading-5 text-[#6e695f]">
-                      Votre demande est traitée de manière confidentielle par un conseiller Maison Atlas.
+                      Votre demande est traitée de manière confidentielle par un conseiller {shortAgencyName}.
                     </p>
                   </div>
                 </div>
@@ -499,7 +510,7 @@ export default function PropertyDetail({
                 <div className="flex items-center gap-3">
                   <span className="grid h-10 w-10 place-items-center rounded-full bg-[#17221f] text-[10px] font-semibold tracking-[0.14em] text-[#d7b57c]">MA</span>
                   <div>
-                    <p className="text-sm font-semibold text-[#17221f]">Maison Atlas Immobilier</p>
+                    <p className="text-sm font-semibold text-[#17221f]">{agencyName}</p>
                     <p className="mt-0.5 text-[10px] text-[#898276]">Casablanca · Marrakech · Rabat · Tanger</p>
                   </div>
                 </div>
@@ -583,7 +594,7 @@ export default function PropertyDetail({
       )}
 
       {/* CONTACT CTA */}
-      <section className="bg-[#101916] px-4 py-14 text-white sm:px-8 sm:py-20">
+      <section className="brand-secondary-bg bg-[#101916] px-4 py-14 text-white sm:px-8 sm:py-20">
         <div className="mx-auto flex max-w-[1100px] flex-col items-center text-center">
           <Reveal>
             <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#d7b57c]">Une visite ? Une question ?</p>
@@ -592,12 +603,12 @@ export default function PropertyDetail({
               <span className="font-serif font-normal italic text-[#d7b57c]"> en toute simplicité.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-sm leading-7 text-white/52">
-              Décrivez votre projet ou demandez une visite. Un conseiller Maison Atlas pourra reprendre votre demande avec le contexte de ce bien.
+              Décrivez votre projet ou demandez une visite. Un conseiller {shortAgencyName} pourra reprendre votre demande avec le contexte de ce bien.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
               <button
                 onClick={openWhatsApp}
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e1c493] sm:w-auto"
+                className="brand-primary-bg brand-secondary-text inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e1c493] sm:w-auto"
               >
                 Organiser une visite <ArrowRight className="h-4 w-4" />
               </button>
@@ -613,7 +624,7 @@ export default function PropertyDetail({
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0b1210] px-4 py-12 text-white/42 sm:px-8">
+      <footer className="brand-secondary-bg bg-[#0b1210] px-4 py-12 text-white/42 sm:px-8">
         <div className="mx-auto max-w-[1380px]">
           <div className="flex flex-col justify-between gap-10 border-b border-white/8 pb-10 md:flex-row">
             <div>
@@ -643,7 +654,7 @@ export default function PropertyDetail({
             </div>
           </div>
           <div className="flex flex-col justify-between gap-3 pt-6 text-[10px] text-white/25 sm:flex-row">
-            <p>© 2026 Maison Atlas Immobilier.</p>
+            <p>© 2026 {agencyName}.</p>
             <p>Casablanca · Marrakech · Rabat · Tanger</p>
           </div>
         </div>

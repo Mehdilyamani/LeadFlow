@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   X,
 } from 'lucide-react'
+import { DemoBrandMark, useDemoBrand } from '../demoBranding'
 import type { Property, PropertyType } from '../lib/properties'
 
 const WHATSAPP_URL = 'https://wa.me/212723037305'
@@ -34,24 +35,31 @@ const FILTERS: { label: string; value: 'Tous' | PropertyType }[] = [
 ]
 
 function AgencyLogo({ light = false }: { light?: boolean }) {
+  const demoBrand = useDemoBrand()
+
   return (
     <span className="inline-flex items-center gap-3">
-      <span
-        className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
-          light
-            ? 'border-white/20 bg-white/10 text-white'
-            : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
-        }`}
-      >
-        MA
-      </span>
+      <DemoBrandMark
+        className="h-10 w-10 rounded-full object-contain"
+        fallback={
+          <span
+            className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
+              light
+                ? 'border-white/20 bg-white/10 text-white'
+                : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
+            }`}
+          >
+            MA
+          </span>
+        }
+      />
       <span className="leading-none">
         <span
           className={`block text-[13px] font-semibold tracking-[0.17em] ${
             light ? 'text-white' : 'text-[#17221f]'
           }`}
         >
-          MAISON ATLAS
+          {demoBrand?.agencyName.toUpperCase() ?? 'MAISON ATLAS'}
         </span>
         <span
           className={`mt-1 block text-[8px] font-medium uppercase tracking-[0.31em] ${
@@ -91,6 +99,8 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
   const [activeFilter, setActiveFilter] = useState<'Tous' | PropertyType>('Tous')
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const demoBrand = useDemoBrand()
+  const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
 
   const filtered =
     activeFilter === 'Tous'
@@ -102,11 +112,11 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
+    <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
       {/* NAVIGATION */}
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#101916]/90 text-white backdrop-blur-xl">
+      <header className="brand-secondary-bg fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#101916]/90 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
-          <Link href="/demo" aria-label="Accueil Maison Atlas">
+          <Link href="/demo" aria-label={`Accueil ${agencyName}`}>
             <AgencyLogo light />
           </Link>
 
@@ -178,7 +188,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       </header>
 
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#101916] pt-[68px] text-white sm:pt-[76px]">
+      <section className="brand-secondary-bg relative overflow-hidden bg-[#101916] pt-[68px] text-white sm:pt-[76px]">
         <motion.div
           initial={{ scale: 1.05, opacity: 0.72 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -216,7 +226,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
             >
               Des propriétés choisies,
               <br />
-              <span className="font-serif font-normal italic text-[#d7b57c]">pas simplement listées.</span>
+              <span className="brand-primary-text font-serif font-normal italic text-[#d7b57c]">pas simplement listées.</span>
             </motion.h1>
 
             <motion.p
@@ -326,7 +336,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       {/* PRIVATE SEARCH CTA */}
       <section className="px-4 pb-14 sm:px-8 sm:pb-20 md:pb-28 lg:px-10">
         <Reveal>
-          <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-[30px] bg-[#101916] text-white md:rounded-[38px]">
+          <div className="brand-secondary-bg relative mx-auto max-w-[1380px] overflow-hidden rounded-[30px] bg-[#101916] text-white md:rounded-[38px]">
             <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-[#c9a56d]/10 blur-3xl" />
             <div className="absolute -bottom-32 left-1/4 h-72 w-72 rounded-full bg-white/5 blur-3xl" />
 
@@ -350,7 +360,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
 
               <button
                 onClick={openWhatsApp}
-                className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-sm font-semibold text-[#101916] transition-all hover:-translate-y-0.5 hover:bg-[#e4c58f] sm:w-fit"
+                className="brand-primary-bg brand-secondary-text inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-sm font-semibold text-[#101916] transition-all hover:-translate-y-0.5 hover:bg-[#e4c58f] sm:w-fit"
               >
                 Parler à un conseiller <MessageCircle className="h-4 w-4" />
               </button>
@@ -360,7 +370,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       </section>
 
       {/* FOOTER */}
-      <footer className="bg-[#0b1210] px-5 py-12 text-white/45 sm:px-8 lg:px-10">
+      <footer className="brand-secondary-bg bg-[#0b1210] px-5 py-12 text-white/45 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-[1380px]">
           <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-[1.25fr_.75fr_.75fr]">
             <div>
@@ -390,7 +400,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
           </div>
 
           <div className="flex flex-col gap-3 pt-7 text-[10px] tracking-wide text-white/28 sm:flex-row sm:items-center sm:justify-between">
-            <p>© 2026 Maison Atlas Immobilier. Tous droits réservés.</p>
+            <p>© 2026 {agencyName}. Tous droits réservés.</p>
             <p>Immobilier résidentiel · Maroc</p>
           </div>
         </div>

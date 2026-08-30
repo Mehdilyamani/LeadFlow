@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -25,6 +25,7 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react'
+import { DemoBrandMark, useDemoBrand } from './demoBranding'
 import type { Property } from './lib/properties'
 
 const CITIES = [
@@ -78,6 +79,86 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
+function useMobileAutoCarousel(itemCount: number) {
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const stoppedByUserRef = useRef(false)
+
+  const clearAutoSlide = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+  }, [])
+
+  const stopAutoSlide = useCallback(() => {
+    stoppedByUserRef.current = true
+    clearAutoSlide()
+  }, [clearAutoSlide])
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 639px)')
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    const advance = () => {
+      const carousel = carouselRef.current
+      if (!carousel || document.hidden) return
+
+      const cards = Array.from(carousel.children) as HTMLElement[]
+      if (cards.length < 2) return
+
+      const visibleCenter = carousel.scrollLeft + carousel.clientWidth / 2
+      let currentIndex = 0
+      let closestDistance = Number.POSITIVE_INFINITY
+
+      cards.forEach((card, index) => {
+        const cardCenter = card.offsetLeft + card.offsetWidth / 2
+        const distance = Math.abs(cardCenter - visibleCenter)
+
+        if (distance < closestDistance) {
+          closestDistance = distance
+          currentIndex = index
+        }
+      })
+
+      const nextCard = cards[(currentIndex + 1) % cards.length]
+      const centeredPosition = nextCard.offsetLeft - (carousel.clientWidth - nextCard.offsetWidth) / 2
+
+      carousel.scrollTo({
+        left: Math.max(0, Math.min(centeredPosition, carousel.scrollWidth - carousel.clientWidth)),
+        behavior: 'smooth',
+      })
+    }
+
+    const syncAutoSlide = () => {
+      clearAutoSlide()
+
+      if (
+        stoppedByUserRef.current ||
+        !mobileQuery.matches ||
+        reducedMotionQuery.matches ||
+        itemCount < 2
+      ) {
+        return
+      }
+
+      intervalRef.current = setInterval(advance, 5200)
+    }
+
+    syncAutoSlide()
+    mobileQuery.addEventListener('change', syncAutoSlide)
+    reducedMotionQuery.addEventListener('change', syncAutoSlide)
+
+    return () => {
+      clearAutoSlide()
+      mobileQuery.removeEventListener('change', syncAutoSlide)
+      reducedMotionQuery.removeEventListener('change', syncAutoSlide)
+    }
+  }, [clearAutoSlide, itemCount])
+
+  return { carouselRef, stopAutoSlide }
+}
+
 function Reveal({
   children,
   delay = 0,
@@ -101,24 +182,31 @@ function Reveal({
 }
 
 function AgencyLogo({ light = false }: { light?: boolean }) {
+  const demoBrand = useDemoBrand()
+
   return (
     <span className="inline-flex items-center gap-3">
-      <span
-        className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
-          light
-            ? 'border-white/20 bg-white/10 text-white'
-            : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
-        }`}
-      >
-        MA
-      </span>
+      <DemoBrandMark
+        className="h-10 w-10 rounded-full object-contain"
+        fallback={
+          <span
+            className={`grid h-10 w-10 place-items-center rounded-full border text-[11px] font-semibold tracking-[0.16em] ${
+              light
+                ? 'border-white/20 bg-white/10 text-white'
+                : 'border-[#c8b28d]/60 bg-[#f7f1e7] text-[#7a5c2f]'
+            }`}
+          >
+            MA
+          </span>
+        }
+      />
       <span className="leading-none">
         <span
           className={`block text-[13px] font-semibold tracking-[0.17em] ${
             light ? 'text-white' : 'text-[#17221f]'
           }`}
         >
-          MAISON ATLAS
+          {demoBrand?.agencyName.toUpperCase() ?? 'MAISON ATLAS'}
         </span>
         <span
           className={`mt-1 block text-[8px] font-medium uppercase tracking-[0.31em] ${
@@ -138,12 +226,17 @@ export default function HomeClient({
   properties: Property[]
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const demoBrand = useDemoBrand()
+  const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
+  const shortAgencyName = demoBrand?.agencyName ?? 'Maison Atlas'
+  const propertiesCarousel = useMobileAutoCarousel(properties.length)
+  const citiesCarousel = useMobileAutoCarousel(CITIES.length)
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/85 text-white backdrop-blur-xl">
+    <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
+      <header className="brand-secondary-bg fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/85 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
-          <Link href="/demo" aria-label="Accueil Maison Atlas">
+          <Link href="/demo" aria-label={`Accueil ${agencyName}`}>
             <AgencyLogo light />
           </Link>
 
@@ -204,7 +297,7 @@ export default function HomeClient({
         )}
       </header>
 
-      <section className="relative min-h-[100svh] overflow-hidden bg-[#101916] text-white sm:min-h-[92vh]">
+      <section className="brand-secondary-bg relative min-h-[100svh] overflow-hidden bg-[#101916] text-white sm:min-h-[92vh]">
         <motion.div
           initial={{ scale: 1.06, opacity: 0.75 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -243,7 +336,7 @@ export default function HomeClient({
               >
                 Des lieux rares.
                 <br />
-                <span className="font-serif font-normal italic text-[#d7b57c]">Des décisions justes.</span>
+                <span className="brand-primary-text font-serif font-normal italic text-[#d7b57c]">Des décisions justes.</span>
               </motion.h1>
 
               <motion.p
@@ -264,7 +357,7 @@ export default function HomeClient({
               >
                 <Link
                   href="/biens"
-                  className="group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-[12px] font-bold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c691] sm:w-auto"
+                  className="brand-primary-bg brand-secondary-text group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-[12px] font-bold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c691] sm:w-auto"
                 >
                   Découvrir les propriétés
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
@@ -348,7 +441,16 @@ export default function HomeClient({
           </div>
         </Reveal>
 
-        <div className="-mx-4 mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-8 sm:mt-12 sm:gap-6 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0">
+        <div
+          ref={propertiesCarousel.carouselRef}
+          role="region"
+          aria-label="Propriétés à la une"
+          onPointerDown={propertiesCarousel.stopAutoSlide}
+          onWheel={propertiesCarousel.stopAutoSlide}
+          onKeyDown={propertiesCarousel.stopAutoSlide}
+          onFocusCapture={propertiesCarousel.stopAutoSlide}
+          className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-8 sm:mt-12 sm:gap-6 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0"
+        >
           {properties.map((property, index) => (
             <Reveal key={property.id} delay={index * 0.08} className="w-[86vw] max-w-[400px] shrink-0 snap-center lg:w-auto lg:max-w-none">
               <Link
@@ -401,7 +503,7 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section id="villes" className="bg-[#111a17] py-14 text-white sm:py-20 md:py-28">
+      <section id="villes" className="brand-secondary-bg bg-[#111a17] py-14 text-white sm:py-20 md:py-28">
         <div className="mx-auto max-w-[1380px] px-4 sm:px-8 lg:px-10">
           <Reveal>
             <div className="max-w-2xl">
@@ -412,7 +514,16 @@ export default function HomeClient({
             </div>
           </Reveal>
 
-          <div className="-mx-4 mt-9 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
+          <div
+            ref={citiesCarousel.carouselRef}
+            role="region"
+            aria-label="Villes couvertes"
+            onPointerDown={citiesCarousel.stopAutoSlide}
+            onWheel={citiesCarousel.stopAutoSlide}
+            onKeyDown={citiesCarousel.stopAutoSlide}
+            onFocusCapture={citiesCarousel.stopAutoSlide}
+            className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4"
+          >
             {CITIES.map((city, index) => (
               <Reveal key={city.name} delay={index * 0.06} className="w-[78vw] max-w-[330px] shrink-0 snap-center sm:w-auto sm:max-w-none">
                 <button
@@ -526,7 +637,7 @@ export default function HomeClient({
         </div>
       </section>
 
-      <section id="contact" className="bg-[#111a17] px-4 py-14 text-white sm:px-8 sm:py-20 md:py-28 lg:px-10">
+      <section id="contact" className="brand-secondary-bg bg-[#111a17] px-4 py-14 text-white sm:px-8 sm:py-20 md:py-28 lg:px-10">
         <div className="mx-auto grid max-w-[1380px] gap-9 sm:gap-12 lg:grid-cols-[1fr_.85fr] lg:items-center">
           <Reveal>
             <div className="max-w-2xl">
@@ -548,11 +659,11 @@ export default function HomeClient({
           <Reveal delay={0.12}>
             <div className="rounded-[26px] border border-white/12 bg-white/6 p-5 backdrop-blur-sm sm:p-7">
               <div className="flex items-center gap-4 border-b border-white/10 pb-5">
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-[#d7b57c] text-[#17221f]">
+                <span className="brand-primary-bg brand-secondary-text grid h-12 w-12 place-items-center rounded-full bg-[#d7b57c] text-[#17221f]">
                   <MessageCircle className="h-5 w-5" />
                 </span>
                 <div>
-                  <p className="text-sm font-semibold">Conseiller Maison Atlas</p>
+                  <p className="text-sm font-semibold">Conseiller {shortAgencyName}</p>
                   <p className="mt-1 text-[11px] text-white/40">Disponible pour votre recherche immobilière</p>
                 </div>
               </div>
@@ -576,7 +687,7 @@ export default function HomeClient({
         </div>
       </section>
 
-      <footer className="border-t border-white/8 bg-[#0c1311] px-5 py-12 text-white/45 sm:px-8 lg:px-10">
+      <footer className="brand-secondary-bg border-t border-white/8 bg-[#0c1311] px-5 py-12 text-white/45 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-[1380px]">
           <div className="grid gap-10 md:grid-cols-[1fr_auto_auto]">
             <div>
@@ -602,7 +713,7 @@ export default function HomeClient({
           </div>
 
           <div className="mt-10 flex flex-col justify-between gap-3 border-t border-white/8 pt-6 text-[10px] text-white/25 sm:flex-row">
-            <p>© 2026 Maison Atlas Immobilier. Tous droits réservés.</p>
+            <p>© 2026 {agencyName}. Tous droits réservés.</p>
             <p>Casablanca · Marrakech · Rabat · Tanger</p>
           </div>
         </div>

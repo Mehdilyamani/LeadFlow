@@ -1,3 +1,19 @@
 @import "tailwindcss";
 
 @source "../app/**/*.{js,ts,jsx,tsx}";
+
+:root[data-demo-brand] .brand-primary-bg {
+  background-color: var(--demo-primary) !important;
+}
+
+:root[data-demo-brand] .brand-primary-text {
+  color: var(--demo-primary) !important;
+}
+
+:root[data-demo-brand] .brand-secondary-bg {
+  background-color: var(--demo-secondary) !important;
+}
+
+:root[data-demo-brand] .brand-secondary-text {
+  color: var(--demo-secondary) !important;
+}

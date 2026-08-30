@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { DemoBrandProvider } from './demoBranding'
 import './global.css'
 
 const WHATSAPP_URL =
@@ -21,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased">
         <Analytics />
         <SpeedInsights />
-        {children}
+        <DemoBrandProvider>{children}</DemoBrandProvider>
         <style>{`
           .whatsapp-float {
             position: fixed;

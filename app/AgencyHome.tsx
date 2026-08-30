@@ -20,6 +20,7 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
+import { DemoBrandMark, useDemoBrand } from './demoBranding'
 
 const CONTACT = 'https://wa.me/212723037305?text=Bonjour%20LeadFlow%2C%20j%27aimerais%20discuter%20d%27un%20projet%20web.'
 
@@ -58,11 +59,17 @@ const PROCESS = [
 ]
 
 function Brand({ light = false }: { light?: boolean }) {
+  const demoBrand = useDemoBrand()
+
   return (
     <span className="inline-flex items-center gap-2.5">
-      <Image src="/icon.png" alt="" width={38} height={38} className="h-[38px] w-[38px] rounded-xl" priority />
-      <span className={`text-[17px] font-bold tracking-[-0.03em] ${light ? 'text-white' : 'text-[#111a2f]'}`}>
-        Lead<span className="text-[#d4af50]">Flow</span>
+      <DemoBrandMark
+        priority
+        className="h-[38px] w-[38px] rounded-xl object-contain"
+        fallback={<Image src="/icon.png" alt="" width={38} height={38} className="h-[38px] w-[38px] rounded-xl" priority />}
+      />
+      <span className={`text-[17px] font-bold tracking-[-0.03em] ${light ? 'text-white' : 'brand-secondary-text text-[#111a2f]'}`}>
+        {demoBrand ? demoBrand.agencyName : <>Lead<span className="brand-primary-text text-[#d4af50]">Flow</span></>}
       </span>
     </span>
   )
@@ -98,6 +105,11 @@ function SectionTitle({ eyebrow, title, copy }: { eyebrow: string; title: string
 export default function AgencyHome() {
   const [menuOpen, setMenuOpen] = useState(false)
   const reduceMotion = useReducedMotion()
+  const demoBrand = useDemoBrand()
+  const agencyName = demoBrand?.agencyName ?? 'LeadFlow'
+  const contactUrl = demoBrand
+    ? `https://wa.me/212723037305?text=${encodeURIComponent(`Bonjour ${agencyName}, j’aimerais discuter d’un projet web.`)}`
+    : CONTACT
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
@@ -105,10 +117,10 @@ export default function AgencyHome() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f7f6f2] text-[#111a2f]">
+    <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f6f2] text-[#111a2f]">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-[#111a2f]/8 bg-[#f7f6f2]/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[76px] max-w-[1380px] items-center justify-between px-5 sm:px-8 lg:px-10">
-          <Link href="/" aria-label="Accueil LeadFlow"><Brand /></Link>
+          <Link href="/" aria-label={`Accueil ${agencyName}`}><Brand /></Link>
 
           <nav className="hidden items-center gap-8 text-[12px] font-semibold text-slate-600 md:flex">
             <button onClick={() => scrollTo('services')} className="transition-colors hover:text-[#a9852f]">Services</button>
@@ -118,8 +130,8 @@ export default function AgencyHome() {
           </nav>
 
           <div className="flex items-center gap-2">
-            <a href={CONTACT} target="_blank" rel="noreferrer" className="hidden items-center gap-2 rounded-full bg-[#111a2f] px-5 py-3 text-[11px] font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#1b2742] sm:inline-flex">
-              Écrire sur WhatsApp <MessageCircle className="h-3.5 w-3.5 text-[#d4af50]" />
+            <a href={contactUrl} target="_blank" rel="noreferrer" className="brand-secondary-bg hidden items-center gap-2 rounded-full bg-[#111a2f] px-5 py-3 text-[11px] font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#1b2742] sm:inline-flex">
+              Écrire sur WhatsApp <MessageCircle className="brand-primary-text h-3.5 w-3.5 text-[#d4af50]" />
             </a>
             <button
               onClick={() => setMenuOpen(open => !open)}
@@ -139,13 +151,13 @@ export default function AgencyHome() {
               <button onClick={() => scrollTo('work')} className="rounded-xl px-3 py-3 text-left text-sm font-semibold hover:bg-white">Réalisations</button>
               <button onClick={() => scrollTo('process')} className="rounded-xl px-3 py-3 text-left text-sm font-semibold hover:bg-white">Méthode</button>
               <Link href="/demo" className="rounded-xl px-3 py-3 text-sm font-semibold hover:bg-white">Voir la démo</Link>
-              <a href={CONTACT} target="_blank" rel="noreferrer" className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#111a2f] px-4 py-3 text-sm font-bold text-white">Écrire sur WhatsApp <MessageCircle className="h-4 w-4 text-[#d4af50]" /></a>
+              <a href={contactUrl} target="_blank" rel="noreferrer" className="brand-secondary-bg mt-2 flex items-center justify-center gap-2 rounded-xl bg-[#111a2f] px-4 py-3 text-sm font-bold text-white">Écrire sur WhatsApp <MessageCircle className="brand-primary-text h-4 w-4 text-[#d4af50]" /></a>
             </div>
           </motion.div>
         )}
       </header>
 
-      <section className="relative min-h-screen overflow-hidden bg-[#111a2f] pt-[76px] text-white">
+      <section className="brand-secondary-bg relative min-h-screen overflow-hidden bg-[#111a2f] pt-[76px] text-white">
         <div
           className="pointer-events-none absolute inset-0 opacity-35"
           style={{
@@ -172,7 +184,7 @@ export default function AgencyHome() {
               transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
               className="text-[45px] font-semibold leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[76px] xl:text-[86px]"
             >
-              Des sites qui<br />font avancer<br /><span className="font-serif font-normal italic text-[#d4af50]">votre marque.</span>
+              Des sites qui<br />font avancer<br /><span className="brand-primary-text font-serif font-normal italic text-[#d4af50]">votre marque.</span>
             </motion.h1>
             <motion.p
               initial={reduceMotion ? false : { opacity: 0, y: 18 }}
@@ -180,7 +192,7 @@ export default function AgencyHome() {
               transition={{ duration: 0.65, delay: 0.18 }}
               className="mt-7 max-w-xl text-[15px] leading-7 text-white/58 sm:text-lg sm:leading-8"
             >
-              LeadFlow conçoit et développe des expériences web premium, rapides et pensées pour transformer l&apos;attention en vraies opportunités.
+              {agencyName} conçoit et développe des expériences web premium, rapides et pensées pour transformer l&apos;attention en vraies opportunités.
             </motion.p>
             <motion.div
               initial={reduceMotion ? false : { opacity: 0, y: 18 }}
@@ -188,7 +200,7 @@ export default function AgencyHome() {
               transition={{ duration: 0.65, delay: 0.26 }}
               className="mt-9 flex flex-col gap-3 sm:flex-row"
             >
-              <a href={CONTACT} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full bg-[#d4af50] px-6 py-4 text-[12px] font-extrabold text-[#111a2f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c471]">
+              <a href={contactUrl} target="_blank" rel="noreferrer" className="brand-primary-bg brand-secondary-text inline-flex items-center justify-center gap-2 rounded-full bg-[#d4af50] px-6 py-4 text-[12px] font-extrabold text-[#111a2f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c471]">
                 Parlons sur WhatsApp <MessageCircle className="h-4 w-4" />
               </a>
               <Link href="/demo" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/5 px-6 py-4 text-[12px] font-bold text-white transition-colors hover:bg-white/10">
@@ -318,24 +330,24 @@ export default function AgencyHome() {
 
       <section className="px-5 pb-20 sm:px-8 md:pb-28 lg:px-10">
         <Reveal>
-          <div className="relative mx-auto max-w-[1380px] overflow-hidden rounded-[30px] bg-[#111a2f] px-6 py-16 text-white sm:px-10 md:rounded-[38px] md:px-16 md:py-20">
+          <div className="brand-secondary-bg relative mx-auto max-w-[1380px] overflow-hidden rounded-[30px] bg-[#111a2f] px-6 py-16 text-white sm:px-10 md:rounded-[38px] md:px-16 md:py-20">
             <div className="pointer-events-none absolute -right-32 -top-40 h-96 w-96 rounded-full bg-[#d4af50]/12 blur-[100px]" />
             <div className="relative z-10 flex flex-col justify-between gap-10 lg:flex-row lg:items-end">
               <div className="max-w-3xl"><p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#e4c471]">Un projet en tête ?</p><h2 className="mt-5 text-4xl font-semibold leading-[1.04] tracking-[-0.05em] sm:text-5xl md:text-6xl">Créons quelque chose<br />qui vous ressemble.</h2><p className="mt-5 max-w-xl text-[14px] leading-7 text-white/50">Parlez-nous de votre activité, de votre site actuel ou simplement de ce que vous aimeriez améliorer.</p></div>
-              <a href={CONTACT} target="_blank" rel="noreferrer" className="inline-flex w-fit shrink-0 items-center gap-3 rounded-full bg-[#d4af50] px-6 py-4 text-[12px] font-extrabold text-[#111a2f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c471]"><MessageCircle className="h-4 w-4" /> Écrire sur WhatsApp <ArrowRight className="h-4 w-4" /></a>
+              <a href={contactUrl} target="_blank" rel="noreferrer" className="brand-primary-bg brand-secondary-text inline-flex w-fit shrink-0 items-center gap-3 rounded-full bg-[#d4af50] px-6 py-4 text-[12px] font-extrabold text-[#111a2f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c471]"><MessageCircle className="h-4 w-4" /> Écrire sur WhatsApp <ArrowRight className="h-4 w-4" /></a>
             </div>
           </div>
         </Reveal>
       </section>
 
-      <footer className="border-t border-white/8 bg-[#0b1222] px-5 py-12 text-white/42 sm:px-8 lg:px-10">
+      <footer className="brand-secondary-bg border-t border-white/8 bg-[#0b1222] px-5 py-12 text-white/42 sm:px-8 lg:px-10">
         <div className="mx-auto max-w-[1380px]">
           <div className="grid gap-10 md:grid-cols-[1fr_auto_auto]">
             <div><Brand light /><p className="mt-5 max-w-sm text-[12px] leading-6 text-white/35">Studio de design et développement web basé au Maroc. Des sites clairs, rapides et construits pour durer.</p></div>
             <div className="text-[12px]"><p className="mb-4 font-bold text-white">Navigation</p><button onClick={() => scrollTo('services')} className="mb-2.5 block transition-colors hover:text-white">Services</button><button onClick={() => scrollTo('work')} className="mb-2.5 block transition-colors hover:text-white">Réalisations</button><button onClick={() => scrollTo('process')} className="block transition-colors hover:text-white">Méthode</button></div>
-            <div className="text-[12px]"><p className="mb-4 font-bold text-white">Contact</p><a href={CONTACT} target="_blank" rel="noreferrer" className="mb-2.5 block transition-colors hover:text-white">WhatsApp · +212 723-037305</a><p>Casablanca, Maroc</p></div>
+            <div className="text-[12px]"><p className="mb-4 font-bold text-white">Contact</p><a href={contactUrl} target="_blank" rel="noreferrer" className="mb-2.5 block transition-colors hover:text-white">WhatsApp · +212 723-037305</a><p>Casablanca, Maroc</p></div>
           </div>
-          <div className="mt-10 flex flex-col justify-between gap-3 border-t border-white/8 pt-6 text-[10px] text-white/22 sm:flex-row"><p>© 2026 LeadFlow. Tous droits réservés.</p><p className="inline-flex items-center gap-1.5"><MessageSquareText className="h-3 w-3 text-[#d4af50]" /> Design · Code · Croissance</p></div>
+          <div className="mt-10 flex flex-col justify-between gap-3 border-t border-white/8 pt-6 text-[10px] text-white/22 sm:flex-row"><p>© 2026 {agencyName}. Tous droits réservés.</p><p className="inline-flex items-center gap-1.5"><MessageSquareText className="brand-primary-text h-3 w-3 text-[#d4af50]" /> Design · Code · Croissance</p></div>
         </div>
       </footer>
     </main>
