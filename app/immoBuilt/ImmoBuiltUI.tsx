@@ -1,25 +1,21 @@
-'use client'
-
-import { useState, type ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowUpRight,
   Bath,
   BedDouble,
   MapPin,
   Maximize2,
-  Menu,
   MessageCircle,
   Phone,
-  X,
 } from 'lucide-react'
 import type { DemoBrand } from '../demoBrands'
-import { getWhatsAppUrl } from '../demoBrands'
+import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
 import type { Property } from '../lib/properties'
+import ImmoBuiltMobileMenu from './ImmoBuiltMobileMenu'
 
-export function ImmoBuiltLogo({ brand, light = false }: { brand: DemoBrand; light?: boolean }) {
+export function ImmoBuiltLogo({ brand, light = false, priority = false }: { brand: DemoBrand; light?: boolean; priority?: boolean }) {
   return (
     <span className="inline-flex min-w-0 items-center gap-2.5">
       <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-[#081a2b] ring-1 ring-[#c69a62]/55 sm:h-14 sm:w-14">
@@ -29,7 +25,7 @@ export function ImmoBuiltLogo({ brand, light = false }: { brand: DemoBrand; ligh
           fill
           sizes="56px"
           className="scale-[1.055] object-cover"
-          priority
+          priority={priority}
         />
       </span>
       <span className="min-w-0">
@@ -45,7 +41,6 @@ export function ImmoBuiltLogo({ brand, light = false }: { brand: DemoBrand; ligh
 }
 
 export function ImmoBuiltHeader({ brand, active = 'home' }: { brand: DemoBrand; active?: 'home' | 'properties' }) {
-  const [menuOpen, setMenuOpen] = useState(false)
   const whatsapp = getWhatsAppUrl(brand)
   const links = [
     { label: 'Accueil', href: '/', key: 'home' },
@@ -55,15 +50,15 @@ export function ImmoBuiltHeader({ brand, active = 'home' }: { brand: DemoBrand; 
   ]
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#091b2c]/95 text-white backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#091b2c] text-white sm:bg-[#091b2c]/95 sm:backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:h-[82px] sm:px-7 lg:px-12">
-        <Link href="/" aria-label={`Accueil ${brand.agencyName}`}>
-          <ImmoBuiltLogo brand={brand} light />
+        <Link href={getBrandHref(brand, '/')} aria-label={`Accueil ${brand.agencyName}`}>
+          <ImmoBuiltLogo brand={brand} light priority />
         </Link>
 
         <nav className="hidden items-center gap-8 text-[10px] font-medium uppercase tracking-[0.13em] text-white/55 lg:flex">
           {links.map((link) => (
-            <Link key={link.key} href={link.href} className={`transition-colors hover:text-white ${active === link.key ? 'text-[#d7b37b]' : ''}`}>
+            <Link key={link.key} href={getBrandHref(brand, link.href)} className={`transition-colors hover:text-white ${active === link.key ? 'text-[#d7b37b]' : ''}`}>
               {link.label}
             </Link>
           ))}
@@ -76,35 +71,18 @@ export function ImmoBuiltHeader({ brand, active = 'home' }: { brand: DemoBrand; 
           <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="hidden items-center gap-2 bg-[#c69a62] px-4 py-2.5 text-[10px] font-semibold text-[#0c2033] transition-colors hover:bg-[#dfb77f] md:inline-flex">
             <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
           </a>
-          <button type="button" onClick={() => setMenuOpen((open) => !open)} className="grid h-10 w-10 place-items-center border border-white/18 lg:hidden" aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'} aria-expanded={menuOpen}>
-            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          <ImmoBuiltMobileMenu brand={brand} />
         </div>
       </div>
-
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }} className="border-t border-white/10 bg-[#091b2c] px-4 pb-5 pt-3 lg:hidden">
-            <nav className="mx-auto flex max-w-[1440px] flex-col">
-              {links.map((link) => <Link key={link.key} href={link.href} onClick={() => setMenuOpen(false)} className="border-b border-white/8 py-3.5 text-sm text-white/72">{link.label}</Link>)}
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <a href={`tel:+${brand.whatsappNumber}`} className="flex min-h-11 items-center justify-center gap-2 border border-white/16 text-xs"><Phone className="h-4 w-4" /> Appeler</a>
-                <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center justify-center gap-2 bg-[#c69a62] text-xs font-semibold text-[#0c2033]"><MessageCircle className="h-4 w-4" /> WhatsApp</a>
-              </div>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   )
 }
 
 export function ImmoReveal({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const reduceMotion = useReducedMotion()
   return (
-    <motion.div initial={reduceMotion ? false : { opacity: 0, y: 16 }} whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.14 }} transition={{ duration: 0.58, delay, ease: [0.22, 1, 0.36, 1] }} className={className}>
+    <div className={`demo-reveal ${className}`} style={{ '--demo-delay': `${delay}s` } as CSSProperties}>
       {children}
-    </motion.div>
+    </div>
   )
 }
 
@@ -122,13 +100,13 @@ export function ImmoPropertyCard({ brand, property, priority = false }: { brand:
   const message = `Bonjour, je souhaite avoir plus d'informations sur ce bien : « ${property.title} ».`
   return (
     <article className="group bg-white">
-      <Link href={`/biens/${property.id}`} className="relative block aspect-[4/3] overflow-hidden bg-[#dfe2e3]">
+      <Link prefetch={false} href={getBrandHref(brand, `/biens/${property.id}`)} className="relative block aspect-[4/3] overflow-hidden bg-[#dfe2e3]">
         <Image src={property.image} alt={property.title} fill priority={priority} sizes="(max-width: 768px) 92vw, (max-width: 1100px) 47vw, 31vw" className="object-cover transition-transform duration-700 group-hover:scale-[1.035]" />
         <span className="absolute left-4 top-4 bg-[#0c2033]/88 px-3 py-1.5 text-[8px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">Bien de démonstration</span>
       </Link>
       <div className="border-x border-b border-[#0c2033]/10 p-5 sm:p-6">
         <p className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#9b7446]"><MapPin className="h-3 w-3" /> {property.location}</p>
-        <Link href={`/biens/${property.id}`}><h3 className="mt-2.5 min-h-[52px] text-[21px] font-semibold leading-[1.18] tracking-[-0.025em] text-[#0c2033] transition-colors group-hover:text-[#9b7446]">{property.title}</h3></Link>
+        <Link prefetch={false} href={getBrandHref(brand, `/biens/${property.id}`)}><h3 className="mt-2.5 min-h-[52px] text-[21px] font-semibold leading-[1.18] tracking-[-0.025em] text-[#0c2033] transition-colors group-hover:text-[#9b7446]">{property.title}</h3></Link>
         <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 border-y border-[#0c2033]/8 py-3 text-[10px] text-[#687078]">
           {property.beds > 0 && <span className="flex items-center gap-1.5"><BedDouble className="h-3.5 w-3.5" /> {property.beds} ch.</span>}
           {property.baths > 0 && <span className="flex items-center gap-1.5"><Bath className="h-3.5 w-3.5" /> {property.baths} sdb</span>}
@@ -149,10 +127,10 @@ export function ImmoBuiltFooter({ brand }: { brand: DemoBrand }) {
       <div className="mx-auto max-w-[1440px]">
         <div className="grid gap-10 border-b border-white/10 pb-11 md:grid-cols-[1.35fr_.75fr_.8fr]">
           <div><ImmoBuiltLogo brand={brand} light /><p className="mt-5 max-w-md text-sm leading-6 text-white/46">Une expérience immobilière moderne pour découvrir des biens de démonstration à Casablanca et échanger simplement sur votre projet.</p></div>
-          <div><p className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b37b]">Navigation</p><div className="mt-4 flex flex-col gap-2.5 text-sm text-white/55"><Link href="/">Accueil</Link><Link href="/biens">Nos biens</Link><Link href="/#quartiers">Quartiers</Link></div></div>
+          <div><p className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b37b]">Navigation</p><div className="mt-4 flex flex-col gap-2.5 text-sm text-white/55"><Link href={getBrandHref(brand, '/')}>Accueil</Link><Link href={getBrandHref(brand, '/biens')}>Nos biens</Link><Link href={getBrandHref(brand, '/#quartiers')}>Quartiers</Link></div></div>
           <div><p className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b37b]">Contact</p><div className="mt-4 flex flex-col gap-2.5 text-sm text-white/55"><a href={`tel:+${brand.whatsappNumber}`}>{brand.displayPhone}</a><a href={getWhatsAppUrl(brand)} target="_blank" rel="noopener noreferrer">Écrire sur WhatsApp</a><span>Casablanca, Maroc</span></div></div>
         </div>
-        <div className="flex flex-col gap-2 pt-6 text-[10px] tracking-[0.08em] text-white/30 sm:flex-row sm:justify-between"><span>© {new Date().getFullYear()} {brand.agencyName}</span><span>Immobilier · Casablanca</span></div>
+        <div className="flex flex-col gap-2 pt-6 text-[10px] tracking-[0.08em] text-white/30 sm:flex-row sm:justify-between"><span suppressHydrationWarning>© {new Date().getFullYear()} {brand.agencyName}</span><span>Immobilier · Casablanca</span></div>
       </div>
     </footer>
   )

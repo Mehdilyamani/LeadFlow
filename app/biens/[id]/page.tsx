@@ -7,6 +7,9 @@ import { PROPERTIES } from '../../lib/properties'
 import { DEMO_PROPERTIES } from '../../lib/demoProperties'
 import { GOOD_KECH_PROPERTIES } from '../../goodKech/data'
 import { IMMO_BUILT_PROPERTIES } from '../../immoBuilt/data'
+import GoodKechPropertyDetail from '../../goodKech/GoodKechPropertyDetail'
+import ImmoBuiltPropertyDetail from '../../immoBuilt/ImmoBuiltPropertyDetail'
+import { getRequestDemoBrand } from '../../requestDemoBrand'
 import PropertyDetail from './PropertyDetail'
 
 export default async function PropertyPage({
@@ -15,9 +18,31 @@ export default async function PropertyPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const brand = await getRequestDemoBrand()
 
   const goodKechProperty = GOOD_KECH_PROPERTIES.find((item) => item.id === id) ?? null
   const immoBuiltProperty = IMMO_BUILT_PROPERTIES.find((item) => item.id === id) ?? null
+
+  if (brand?.experience === 'good-kech-immo') {
+    if (!goodKechProperty) notFound()
+
+    const similar = GOOD_KECH_PROPERTIES
+      .filter((item) => item.id !== id)
+      .slice(0, 3)
+
+    return <GoodKechPropertyDetail brand={brand} property={goodKechProperty} similar={similar} />
+  }
+
+  if (brand?.experience === 'immo-built') {
+    if (!immoBuiltProperty) notFound()
+
+    const similar = IMMO_BUILT_PROPERTIES
+      .filter((item) => item.id !== id)
+      .slice(0, 3)
+
+    return <ImmoBuiltPropertyDetail brand={brand} property={immoBuiltProperty} similar={similar} />
+  }
+
   let property = goodKechProperty ?? immoBuiltProperty ?? await getProperty(id).catch(() => null)
 
   // Normal static fallback

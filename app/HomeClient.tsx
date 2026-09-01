@@ -26,8 +26,6 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from './demoBranding'
-import GoodKechHome from './goodKech/GoodKechHome'
-import ImmoBuiltHome from './immoBuilt/ImmoBuiltHome'
 import type { Property } from './lib/properties'
 
 const CITIES = [
@@ -233,14 +231,6 @@ export default function HomeClient({
   const shortAgencyName = demoBrand?.agencyName ?? 'Maison Atlas'
   const propertiesCarousel = useMobileAutoCarousel(properties.length)
   const citiesCarousel = useMobileAutoCarousel(CITIES.length)
-
-  if (demoBrand?.experience === 'good-kech-immo') {
-    return <GoodKechHome brand={demoBrand} />
-  }
-
-  if (demoBrand?.experience === 'immo-built') {
-    return <ImmoBuiltHome brand={demoBrand} />
-  }
 
   return (
     <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">

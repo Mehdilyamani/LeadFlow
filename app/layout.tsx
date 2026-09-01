@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import { headers } from 'next/headers'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { DemoBrandProvider, DemoWhatsAppButton } from './demoBranding'
-import { getDemoBrand, getHostname, getWhatsAppUrl } from './demoBrands'
+import { getWhatsAppUrl } from './demoBrands'
+import { getRequestDemoBrand } from './requestDemoBrand'
 import './global.css'
 
 const WHATSAPP_URL =
@@ -14,18 +14,13 @@ const DEFAULT_METADATA: Metadata = {
   description: 'Design et développement de sites web premium, rapides et pensés pour convertir.',
 }
 
-async function requestBrand() {
-  const requestHeaders = await headers()
-  return getDemoBrand(getHostname(requestHeaders.get('host')))
-}
-
 export async function generateMetadata(): Promise<Metadata> {
-  const brand = await requestBrand()
+  const brand = await getRequestDemoBrand()
   return brand?.metadata ?? DEFAULT_METADATA
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const initialBrand = await requestBrand()
+  const initialBrand = await getRequestDemoBrand()
 
   return (
     <html lang="fr">
@@ -36,7 +31,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="antialiased">
         <Analytics />
         <SpeedInsights />
-        <DemoBrandProvider initialBrand={initialBrand}>{children}</DemoBrandProvider>
+        <DemoBrandProvider initialBrand={initialBrand}>
+          {children}
+          <DemoWhatsAppButton
+            defaultHref={initialBrand?.whatsappNumber ? getWhatsAppUrl(initialBrand) : WHATSAPP_URL}
+          />
+        </DemoBrandProvider>
         <style>{`
           .whatsapp-float {
             position: fixed;
@@ -92,9 +92,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             .whatsapp-float:hover { animation: none; }
           }
         `}</style>
-        <DemoWhatsAppButton
-          defaultHref={initialBrand?.whatsappNumber ? getWhatsAppUrl(initialBrand) : WHATSAPP_URL}
-        />
       </body>
     </html>
   )

@@ -1,4 +1,7 @@
 export type DemoBrand = {
+  slug?: string
+  hostname?: string
+  basePath?: string
   agencyName: string
   primaryColor: string
   secondaryColor: string
@@ -16,12 +19,16 @@ export type DemoBrand = {
 
 export const DEMO_BRANDS: Record<string, DemoBrand> = {
   'test-agency.leadflowimmo.com': {
+    slug: 'test-agency',
+    hostname: 'test-agency.leadflowimmo.com',
     agencyName: 'Test Agency',
     primaryColor: '#dc2626',
     secondaryColor: '#000000',
     logoPath: '/test-agency-logo.png',
   },
   'good-kech-immo.leadflowimmo.com': {
+    slug: 'good-kech-immo',
+    hostname: 'good-kech-immo.leadflowimmo.com',
     agencyName: 'Good Kech Immo',
     primaryColor: '#b28a55',
     secondaryColor: '#171512',
@@ -39,10 +46,12 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
     },
   },
   'immo-built.leadflowimmo.com': {
+    slug: 'immo-built',
+    hostname: 'immo-built.leadflowimmo.com',
     agencyName: 'Immo Built',
     primaryColor: '#c69a62',
     secondaryColor: '#0c2033',
-    logoPath: '/ChatGPT Image 1 sept. 2026, 18_56_59.png',
+    logoPath: '/demos/immo-built/logo.webp',
     experience: 'immo-built',
     city: 'Casablanca',
     whatsappNumber: '212687004021',
@@ -61,6 +70,12 @@ export function getDemoBrand(hostname: string): DemoBrand | null {
   return DEMO_BRANDS[hostname.trim().toLowerCase()] ?? null
 }
 
+export function getDemoBrandBySlug(slug: string): DemoBrand | null {
+  const normalizedSlug = slug.trim().toLowerCase()
+  const brand = Object.values(DEMO_BRANDS).find((candidate) => candidate.slug === normalizedSlug)
+  return brand ? { ...brand, basePath: `/demo-preview/${normalizedSlug}` } : null
+}
+
 export function getHostname(hostHeader: string | null): string {
   return (hostHeader ?? '').split(':')[0].trim().toLowerCase()
 }
@@ -70,4 +85,11 @@ export function getWhatsAppUrl(brand: DemoBrand, message?: string): string {
 
   const text = message ?? brand.whatsappMessage
   return `https://wa.me/${brand.whatsappNumber}${text ? `?text=${encodeURIComponent(text)}` : ''}`
+}
+
+export function getBrandHref(brand: DemoBrand, href: string): string {
+  if (!brand.basePath) return href
+  if (href === '/') return brand.basePath
+  if (href.startsWith('/#')) return `${brand.basePath}${href.slice(1)}`
+  return `${brand.basePath}${href}`
 }

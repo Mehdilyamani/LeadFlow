@@ -1,11 +1,29 @@
 import type { Metadata } from 'next'
 import AgencyHome from './AgencyHome'
+import GoodKechHome from './goodKech/GoodKechHome'
+import ImmoBuiltHome from './immoBuilt/ImmoBuiltHome'
+import { getRequestDemoBrand } from './requestDemoBrand'
 
-export const metadata: Metadata = {
+const DEFAULT_METADATA: Metadata = {
   title: 'LeadFlow — Studio de design & développement web',
   description: 'LeadFlow conçoit et développe des sites web premium, rapides et pensés pour convertir. Studio web basé au Maroc.',
 }
 
-export default function Home() {
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getRequestDemoBrand()
+  return brand?.metadata ?? DEFAULT_METADATA
+}
+
+export default async function Home() {
+  const brand = await getRequestDemoBrand()
+
+  if (brand?.experience === 'good-kech-immo') {
+    return <GoodKechHome brand={brand} />
+  }
+
+  if (brand?.experience === 'immo-built') {
+    return <ImmoBuiltHome brand={brand} />
+  }
+
   return <AgencyHome />
 }

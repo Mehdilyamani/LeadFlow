@@ -86,7 +86,7 @@ export default function GoodKechCatalogue({ brand, properties }: { brand: DemoBr
             <div className="grid gap-x-5 gap-y-9 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((property, index) => (
                 <Reveal key={property.id} delay={Math.min(index * 0.04, 0.12)}>
-                  <GoodKechPropertyCard brand={brand} property={property} priority={index < 3} />
+                  <GoodKechPropertyCard brand={brand} property={property} priority={index === 0} />
                 </Reveal>
               ))}
             </div>

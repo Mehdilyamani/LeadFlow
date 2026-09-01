@@ -17,7 +17,7 @@ import {
   Phone,
 } from 'lucide-react'
 import type { DemoBrand } from '../demoBrands'
-import { getWhatsAppUrl } from '../demoBrands'
+import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
 import type { Property } from '../lib/properties'
 import {
   ImmoBuiltFooter,
@@ -37,7 +37,7 @@ export default function ImmoBuiltPropertyDetail({ brand, property, similar }: { 
       <ImmoBuiltHeader brand={brand} active="properties" />
       <section className="bg-[#0c2033] px-4 pb-8 pt-[106px] text-white sm:px-7 sm:pb-10 sm:pt-[122px] lg:px-12">
         <div className="mx-auto max-w-[1440px]">
-          <Link href="/biens" className="inline-flex items-center gap-2 text-[10px] font-semibold text-white/48 hover:text-white"><ArrowLeft className="h-3.5 w-3.5" /> Retour aux biens</Link>
+          <Link href={getBrandHref(brand, '/biens')} className="inline-flex items-center gap-2 text-[10px] font-semibold text-white/48 hover:text-white"><ArrowLeft className="h-3.5 w-3.5" /> Retour aux biens</Link>
           <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-4xl"><p className="flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.2em] text-[#d7b37b]"><MapPin className="h-3 w-3" /> {property.location}</p><h1 className="mt-4 text-[38px] font-semibold leading-[1.02] tracking-[-0.05em] sm:text-6xl lg:text-[68px]">{property.title}</h1></div>
             <div className="lg:text-right"><p className="text-[8px] uppercase tracking-[0.2em] text-white/36">Prix indicatif</p><p className="mt-1 text-xl font-semibold sm:text-2xl">{property.price} MAD</p></div>

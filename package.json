@@ -6,7 +6,14 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:demo": "eslint app/demoBrands.ts app/requestDemoBrand.ts app/demoBranding.tsx app/page.tsx app/demo/page.tsx app/biens/page.tsx app/biens/[id]/page.tsx app/demo-preview app/goodKech app/immoBuilt scripts",
+    "typecheck": "tsc --noEmit --incremental false",
+    "demo:validate": "node scripts/validate-demo-config.mjs",
+    "audit:assets": "node scripts/audit-assets.mjs",
+    "demo:smoke": "node scripts/smoke-demo.mjs",
+    "demo:mobile": "node scripts/mobile-smoke.mjs",
+    "demo:check": "npm run lint:demo && npm run typecheck && npm run demo:validate && npm run audit:assets && npm run build"
   },
   "dependencies": {
     "@ai-sdk/google": "^2.0.47",

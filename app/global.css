@@ -17,3 +17,60 @@
 :root[data-demo-brand] .brand-secondary-text {
   color: var(--demo-secondary) !important;
 }
+
+@keyframes gki-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes gki-menu-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.gki-hero-enter,
+.gki-reveal,
+.demo-hero-enter,
+.demo-reveal {
+  animation: gki-enter 620ms cubic-bezier(.22, 1, .36, 1) both;
+  animation-delay: var(--gki-delay, var(--demo-delay, 0s));
+}
+
+.gki-hero-enter,
+.demo-hero-enter {
+  animation-duration: 780ms;
+}
+
+.gki-menu-enter,
+.demo-menu-enter {
+  animation: gki-menu-enter 180ms ease-out both;
+}
+
+.gki-deferred-section,
+.demo-deferred-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gki-hero-enter,
+  .gki-reveal,
+  .gki-menu-enter,
+  .demo-hero-enter,
+  .demo-reveal,
+  .demo-menu-enter {
+    animation: none;
+  }
+}

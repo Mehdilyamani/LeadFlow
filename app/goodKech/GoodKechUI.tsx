@@ -1,23 +1,19 @@
-'use client'
-
-import { useState, type ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
   Bath,
   BedDouble,
   MapPin,
   Maximize2,
-  Menu,
   MessageCircle,
   Phone,
-  X,
 } from 'lucide-react'
 import type { DemoBrand } from '../demoBrands'
-import { getWhatsAppUrl } from '../demoBrands'
+import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
 import type { Property } from '../lib/properties'
+import GoodKechMobileMenu from './GoodKechMobileMenu'
 
 export const GKI = {
   ink: '#171512',
@@ -27,7 +23,7 @@ export const GKI = {
   earth: '#9a5b44',
 }
 
-export function GoodKechLogo({ brand, light = false }: { brand: DemoBrand; light?: boolean }) {
+export function GoodKechLogo({ brand, light = false, priority = false }: { brand: DemoBrand; light?: boolean; priority?: boolean }) {
   return (
     <span className="inline-flex min-w-0 items-center gap-3">
       <span className={`relative h-11 w-11 shrink-0 overflow-hidden border ${light ? 'border-white/20' : 'border-black/10'} bg-black sm:h-12 sm:w-12`}>
@@ -37,7 +33,7 @@ export function GoodKechLogo({ brand, light = false }: { brand: DemoBrand; light
           fill
           sizes="48px"
           className="object-contain"
-          priority
+          priority={priority}
         />
       </span>
       <span className="min-w-0 leading-none">
@@ -53,7 +49,6 @@ export function GoodKechLogo({ brand, light = false }: { brand: DemoBrand; light
 }
 
 export function GoodKechHeader({ brand, active = 'home' }: { brand: DemoBrand; active?: 'home' | 'properties' }) {
-  const [menuOpen, setMenuOpen] = useState(false)
   const generalWhatsApp = getWhatsAppUrl(brand)
 
   const links = [
@@ -64,17 +59,17 @@ export function GoodKechHeader({ brand, active = 'home' }: { brand: DemoBrand; a
   ]
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#171512]/94 text-white backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#171512] text-white sm:bg-[#171512]/94 sm:backdrop-blur-xl">
       <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-4 sm:h-[82px] sm:px-7 lg:px-12">
-        <Link href="/" aria-label={`Accueil ${brand.agencyName}`}>
-          <GoodKechLogo brand={brand} light />
+        <Link href={getBrandHref(brand, '/')} aria-label={`Accueil ${brand.agencyName}`}>
+          <GoodKechLogo brand={brand} light priority />
         </Link>
 
         <nav className="hidden items-center gap-8 text-[11px] font-medium tracking-[0.08em] text-white/62 lg:flex">
           {links.map((link) => (
             <Link
               key={link.key}
-              href={link.href}
+              href={getBrandHref(brand, link.href)}
               className={`transition-colors duration-200 hover:text-white ${active === link.key ? 'text-[#d7b986]' : ''}`}
             >
               {link.label}
@@ -97,66 +92,21 @@ export function GoodKechHeader({ brand, active = 'home' }: { brand: DemoBrand; a
           >
             <MessageCircle className="h-3.5 w-3.5" /> WhatsApp
           </a>
-          <button
-            type="button"
-            onClick={() => setMenuOpen((open) => !open)}
-            className="grid h-10 w-10 place-items-center border border-white/18 text-white lg:hidden"
-            aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-            aria-expanded={menuOpen}
-          >
-            {menuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          <GoodKechMobileMenu brand={brand} />
         </div>
       </div>
-
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-white/10 bg-[#171512] px-4 pb-5 pt-3 lg:hidden"
-          >
-            <nav className="mx-auto flex max-w-[1440px] flex-col">
-              {links.map((link) => (
-                <Link
-                  key={link.key}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="border-b border-white/8 px-1 py-3.5 text-sm text-white/78"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="mt-4 grid grid-cols-1 gap-2 min-[380px]:grid-cols-2">
-                <a href={`tel:+${brand.whatsappNumber}`} className="flex items-center justify-center gap-2 border border-white/16 px-3 py-3 text-xs text-white">
-                  <Phone className="h-4 w-4" /> Appeler
-                </a>
-                <a href={generalWhatsApp} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-[#b28a55] px-3 py-3 text-xs font-semibold text-white">
-                  <MessageCircle className="h-4 w-4" /> WhatsApp
-                </a>
-              </div>
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
   )
 }
 
 export function Reveal({ children, className = '', delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const reduceMotion = useReducedMotion()
   return (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.15 }}
-      transition={{ duration: 0.62, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
+    <div
+      className={`gki-reveal ${className}`}
+      style={{ '--gki-delay': `${delay}s` } as CSSProperties}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
 
@@ -179,7 +129,7 @@ export function GoodKechPropertyCard({ brand, property, priority = false }: { br
 
   return (
     <article className="group min-w-0 bg-[#fcfaf6]">
-      <Link href={`/biens/${property.id}`} className="relative block aspect-[4/3] overflow-hidden bg-[#dfd7ca] sm:aspect-[5/4]">
+      <Link prefetch={false} href={getBrandHref(brand, `/biens/${property.id}`)} className="relative block aspect-[4/3] overflow-hidden bg-[#dfd7ca] sm:aspect-[5/4]">
         <Image
           src={property.image}
           alt={property.title}
@@ -197,7 +147,7 @@ export function GoodKechPropertyCard({ brand, property, priority = false }: { br
         <p className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-[#9a7241]">
           <MapPin className="h-3 w-3" /> {property.location}
         </p>
-        <Link href={`/biens/${property.id}`}>
+        <Link prefetch={false} href={getBrandHref(brand, `/biens/${property.id}`)}>
           <h3 className="mt-2.5 min-h-[52px] font-serif text-[23px] leading-[1.12] tracking-[-0.025em] text-[#171512] transition-colors group-hover:text-[#8f693d]">
             {property.title}
           </h3>
@@ -241,9 +191,9 @@ export function GoodKechFooter({ brand }: { brand: DemoBrand }) {
           <div>
             <p className="text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b986]">Navigation</p>
             <div className="mt-4 flex flex-col gap-2.5 text-sm text-white/58">
-              <Link href="/">Accueil</Link>
-              <Link href="/biens">Nos propriétés</Link>
-              <Link href="/#quartiers">Quartiers</Link>
+              <Link href={getBrandHref(brand, '/')}>Accueil</Link>
+              <Link href={getBrandHref(brand, '/biens')}>Nos propriétés</Link>
+              <Link href={getBrandHref(brand, '/#quartiers')}>Quartiers</Link>
             </div>
           </div>
           <div>
@@ -256,7 +206,7 @@ export function GoodKechFooter({ brand }: { brand: DemoBrand }) {
           </div>
         </div>
         <div className="flex flex-col gap-2 pt-6 text-[10px] tracking-[0.08em] text-white/32 sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} {brand.agencyName}</span>
+          <span suppressHydrationWarning>© {new Date().getFullYear()} {brand.agencyName}</span>
           <span>Immobilier · Marrakech</span>
         </div>
       </div>

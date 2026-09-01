@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    // !! ATTENTION !! Permet de déployer même s'il y a des erreurs de types
-    ignoreBuildErrors: true,
+  turbopack: {
+    root: process.cwd(),
   },
+  outputFileTracingRoot: process.cwd(),
   images: {
     remotePatterns: [
       {

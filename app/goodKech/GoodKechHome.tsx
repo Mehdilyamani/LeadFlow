@@ -1,8 +1,5 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowDown,
   ArrowRight,
@@ -18,7 +15,7 @@ import {
   Trees,
 } from 'lucide-react'
 import type { DemoBrand } from '../demoBrands'
-import { getWhatsAppUrl } from '../demoBrands'
+import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
 import { GOOD_KECH_LOCATIONS, GOOD_KECH_PROPERTIES } from './data'
 import {
   GoodKechFooter,
@@ -46,16 +43,15 @@ const BENEFITS = [
 ]
 
 export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
-  const reduceMotion = useReducedMotion()
   const whatsapp = getWhatsAppUrl(brand)
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f6f0e6] text-[#171512] selection:bg-[#b28a55] selection:text-white">
       <GoodKechHeader brand={brand} />
 
-      <section className="relative min-h-[760px] overflow-hidden bg-[#171512] text-white sm:min-h-[820px] lg:min-h-[780px]">
+      <section className="relative h-[100svh] min-h-[680px] max-h-[860px] overflow-hidden bg-[#171512] text-white sm:min-h-[820px] lg:h-auto lg:min-h-[780px] lg:max-h-none">
         <Image
-          src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=2000&q=90"
+          src="/demos/good-kech-immo/hero.webp"
           alt="Villa contemporaine à Marrakech"
           fill
           priority
@@ -65,16 +61,11 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(16,14,12,.88)_0%,rgba(16,14,12,.63)_43%,rgba(16,14,12,.17)_78%),linear-gradient(0deg,rgba(16,14,12,.55)_0%,transparent_45%)]" />
         <div className="absolute inset-x-0 bottom-0 top-[72px] sm:top-[82px]">
           <div className="mx-auto flex h-full max-w-[1440px] items-end px-4 pb-16 sm:px-7 sm:pb-20 lg:items-center lg:px-12 lg:pb-0">
-            <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-              animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-[760px]"
-            >
+            <div className="gki-hero-enter w-full min-w-0 max-w-[760px]">
               <p className="mb-6 flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#ddc397] sm:text-[10px]">
                 <span className="h-px w-9 bg-[#ddc397]" /> {brand.agencyName} · Marrakech
               </p>
-              <h1 className="max-w-[750px] font-serif text-[46px] leading-[0.98] tracking-[-0.045em] text-white sm:text-[66px] lg:text-[82px]">
+              <h1 className="max-w-full text-balance font-serif text-[40px] leading-[0.98] tracking-[-0.04em] text-white min-[360px]:text-[43px] sm:max-w-[750px] sm:text-[66px] lg:text-[82px]">
                 L’immobilier d’exception à Marrakech
               </h1>
               <p className="mt-6 max-w-[590px] text-[15px] leading-7 text-white/68 sm:text-[17px] sm:leading-8">
@@ -82,8 +73,8 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/biens"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 bg-[#b28a55] px-6 text-[11px] font-semibold tracking-[0.04em] text-white transition-colors hover:bg-[#c29a65]"
+                  href={getBrandHref(brand, '/biens')}
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 bg-[#b28a55] px-4 text-[11px] font-semibold tracking-[0.04em] text-white transition-colors hover:bg-[#c29a65] sm:w-auto sm:px-6"
                 >
                   Découvrir nos propriétés <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -91,12 +82,12 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
                   href={whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/28 bg-black/10 px-6 text-[11px] font-semibold tracking-[0.04em] text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-[#171512]"
+                  className="inline-flex min-h-12 w-full items-center justify-center gap-2 border border-white/28 bg-black/25 px-4 text-center text-[11px] font-semibold tracking-[0.04em] text-white transition-colors hover:bg-white hover:text-[#171512] sm:w-auto sm:px-6 sm:backdrop-blur-sm"
                 >
                   <MessageCircle className="h-4 w-4" /> Nous contacter sur WhatsApp
                 </a>
               </div>
-            </motion.div>
+            </div>
           </div>
         </div>
         <a href="#selection" aria-label="Voir la sélection" className="absolute bottom-7 right-7 hidden h-12 w-12 place-items-center border border-white/25 text-white/70 transition-colors hover:bg-white hover:text-[#171512] sm:grid lg:right-12">
@@ -115,7 +106,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
               />
             </Reveal>
             <Reveal delay={0.08}>
-              <Link href="/biens" className="inline-flex items-center gap-2 border-b border-[#8f693d] pb-1.5 text-[11px] font-semibold text-[#7c5b37] transition-colors hover:text-[#171512]">
+              <Link href={getBrandHref(brand, '/biens')} className="inline-flex items-center gap-2 border-b border-[#8f693d] pb-1.5 text-[11px] font-semibold text-[#7c5b37] transition-colors hover:text-[#171512]">
                 Voir toutes les propriétés <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </Reveal>
@@ -123,14 +114,14 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
           <div className="mt-12 grid gap-x-5 gap-y-9 md:grid-cols-2 lg:grid-cols-3">
             {GOOD_KECH_PROPERTIES.slice(0, 6).map((property, index) => (
               <Reveal key={property.id} delay={Math.min(index * 0.045, 0.14)}>
-                <GoodKechPropertyCard brand={brand} property={property} priority={index < 3} />
+                <GoodKechPropertyCard brand={brand} property={property} />
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#171512] px-4 py-20 text-white sm:px-7 sm:py-28 lg:px-12">
+      <section className="gki-deferred-section bg-[#171512] px-4 py-20 text-white sm:px-7 sm:py-28 lg:px-12">
         <div className="mx-auto max-w-[1440px]">
           <Reveal>
             <SectionHeading
@@ -145,7 +136,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
               const Icon = category.icon
               return (
                 <Reveal key={category.label} delay={Math.min(index * 0.04, 0.12)}>
-                  <Link href="/biens" className="group block min-h-[180px] border-b border-r border-white/10 p-6 transition-colors hover:bg-white/[0.045] sm:min-h-[210px] sm:p-8">
+                  <Link href={getBrandHref(brand, '/biens')} className="group block min-h-[180px] border-b border-r border-white/10 p-6 transition-colors hover:bg-white/[0.045] sm:min-h-[210px] sm:p-8">
                     <div className="flex items-start justify-between">
                       <Icon className="h-5 w-5 text-[#d7b986]" strokeWidth={1.35} />
                       <span className="text-[9px] text-white/24">0{index + 1}</span>
@@ -160,7 +151,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
         </div>
       </section>
 
-      <section id="quartiers" className="bg-[#fcfaf6] px-4 py-20 sm:px-7 sm:py-28 lg:px-12">
+      <section id="quartiers" className="gki-deferred-section bg-[#fcfaf6] px-4 py-20 sm:px-7 sm:py-28 lg:px-12">
         <div className="mx-auto max-w-[1440px]">
           <Reveal>
             <SectionHeading
@@ -172,7 +163,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
           <div className="mt-11 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-6">
             {GOOD_KECH_LOCATIONS.map((location, index) => (
               <Reveal key={location.name} delay={Math.min(index * 0.04, 0.12)} className="min-w-[76vw] snap-center sm:min-w-[44vw] md:min-w-0">
-                <Link href="/biens" className="group relative block aspect-[3/4] overflow-hidden bg-[#ded6ca]">
+                <Link href={getBrandHref(brand, '/biens')} className="group relative block aspect-[3/4] overflow-hidden bg-[#ded6ca]">
                   <Image src={location.image} alt={location.name} fill sizes="(max-width: 640px) 76vw, (max-width: 768px) 44vw, 17vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/8 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
@@ -186,9 +177,9 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
         </div>
       </section>
 
-      <section id="approche" className="grid bg-[#efe5d6] lg:grid-cols-2">
+      <section id="approche" className="gki-deferred-section grid bg-[#efe5d6] lg:grid-cols-2">
         <div className="relative min-h-[430px] lg:min-h-[720px]">
-          <Image src="https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=1600&q=88" alt="Architecture et art de vivre à Marrakech" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+          <Image src="/demos/good-kech-immo/marrakech-architecture.webp" alt="Architecture et art de vivre à Marrakech" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
           <div className="absolute inset-0 bg-[#6c3f2d]/10" />
         </div>
         <div className="flex items-center px-4 py-16 sm:px-10 sm:py-20 lg:px-16 xl:px-24">
@@ -214,7 +205,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
         </div>
       </section>
 
-      <section className="bg-[#fcfaf6] px-4 py-20 sm:px-7 sm:py-28 lg:px-12">
+      <section className="gki-deferred-section bg-[#fcfaf6] px-4 py-20 sm:px-7 sm:py-28 lg:px-12">
         <div className="mx-auto grid max-w-[1440px] gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-end">
           <Reveal>
             <div className="flex h-14 w-14 items-center justify-center border border-[#b28a55]/45 text-[#9a7241]">
@@ -241,7 +232,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[#9a5b44] px-4 py-20 text-white sm:px-7 sm:py-24 lg:px-12">
+      <section className="gki-deferred-section relative overflow-hidden bg-[#9a5b44] px-4 py-20 text-white sm:px-7 sm:py-24 lg:px-12">
         <div className="absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle_at_20%_20%,white_0,transparent_38%),radial-gradient(circle_at_80%_80%,white_0,transparent_35%)]" />
         <Reveal className="relative mx-auto flex max-w-[1100px] flex-col items-center text-center">
           <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/65">Votre prochain bien à Marrakech</p>

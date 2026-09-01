@@ -21,8 +21,6 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from './demoBranding'
-import GoodKechHome from './goodKech/GoodKechHome'
-import ImmoBuiltHome from './immoBuilt/ImmoBuiltHome'
 
 const CONTACT = 'https://wa.me/212723037305?text=Bonjour%20LeadFlow%2C%20j%27aimerais%20discuter%20d%27un%20projet%20web.'
 
@@ -116,14 +114,6 @@ export default function AgencyHome() {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
     setMenuOpen(false)
-  }
-
-  if (demoBrand?.experience === 'good-kech-immo') {
-    return <GoodKechHome brand={demoBrand} />
-  }
-
-  if (demoBrand?.experience === 'immo-built') {
-    return <ImmoBuiltHome brand={demoBrand} />
   }
 
   return (

@@ -17,7 +17,7 @@ import {
   Phone,
 } from 'lucide-react'
 import type { DemoBrand } from '../demoBrands'
-import { getWhatsAppUrl } from '../demoBrands'
+import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
 import type { Property } from '../lib/properties'
 import {
   GoodKechFooter,
@@ -42,7 +42,7 @@ export default function GoodKechPropertyDetail({ brand, property, similar }: { b
 
       <section className="bg-[#171512] px-4 pb-8 pt-[104px] text-white sm:px-7 sm:pb-10 sm:pt-[118px] lg:px-12">
         <div className="mx-auto max-w-[1440px]">
-          <Link href="/biens" className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.06em] text-white/48 transition-colors hover:text-white">
+          <Link href={getBrandHref(brand, '/biens')} className="inline-flex items-center gap-2 text-[10px] font-semibold tracking-[0.06em] text-white/48 transition-colors hover:text-white">
             <ArrowLeft className="h-3.5 w-3.5" /> Retour aux propriétés
           </Link>
           <div className="mt-7 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">

@@ -10,6 +10,7 @@ import {
 } from 'react'
 import {
   getDemoBrand,
+  getDemoBrandBySlug,
   getWhatsAppUrl,
   type DemoBrand,
 } from './demoBrands'
@@ -29,7 +30,8 @@ export function DemoBrandProvider({
   const [brand, setBrand] = useState<DemoBrand | null>(initialBrand)
 
   useEffect(() => {
-    const activeBrand = getDemoBrand(window.location.hostname)
+    const previewSlug = window.location.pathname.match(/^\/demo-preview\/([^/]+)/)?.[1]
+    const activeBrand = getDemoBrand(window.location.hostname) ?? (previewSlug ? getDemoBrandBySlug(previewSlug) : null)
     const root = document.documentElement
 
     setBrand(activeBrand)
