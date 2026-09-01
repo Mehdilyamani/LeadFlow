@@ -3,7 +3,7 @@ export type DemoBrand = {
   primaryColor: string
   secondaryColor: string
   logoPath: string
-  experience?: 'good-kech-immo'
+  experience?: 'good-kech-immo' | 'immo-built'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -36,6 +36,23 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
       title: 'Good Kech Immo | Immobilier à Marrakech',
       description:
         'Découvrez une sélection de villas, riads, appartements et opportunités immobilières à Marrakech avec Good Kech Immo.',
+    },
+  },
+  'immo-built.leadflowimmo.com': {
+    agencyName: 'Immo Built',
+    primaryColor: '#c69a62',
+    secondaryColor: '#0c2033',
+    logoPath: '/ChatGPT_Image_1_sept._2026__18_02_08-removebg-preview.png',
+    experience: 'immo-built',
+    city: 'Casablanca',
+    whatsappNumber: '212687004021',
+    displayPhone: '+212 6 87 00 40 21',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de Immo Built.",
+    metadata: {
+      title: 'Immo Built | Immobilier à Casablanca',
+      description:
+        'Découvrez une sélection de biens immobiliers à Casablanca avec Immo Built.',
     },
   },
 }

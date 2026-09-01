@@ -27,6 +27,7 @@ import {
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from './demoBranding'
 import GoodKechHome from './goodKech/GoodKechHome'
+import ImmoBuiltHome from './immoBuilt/ImmoBuiltHome'
 import type { Property } from './lib/properties'
 
 const CITIES = [
@@ -235,6 +236,10 @@ export default function HomeClient({
 
   if (demoBrand?.experience === 'good-kech-immo') {
     return <GoodKechHome brand={demoBrand} />
+  }
+
+  if (demoBrand?.experience === 'immo-built') {
+    return <ImmoBuiltHome brand={demoBrand} />
   }
 
   return (

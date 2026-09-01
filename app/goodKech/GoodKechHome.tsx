@@ -75,9 +75,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
                 <span className="h-px w-9 bg-[#ddc397]" /> {brand.agencyName} · Marrakech
               </p>
               <h1 className="max-w-[750px] font-serif text-[46px] leading-[0.98] tracking-[-0.045em] text-white sm:text-[66px] lg:text-[82px]">
-                L’immobilier d’exception à
-                <span className="hidden lg:mt-3 lg:block">Marrakech</span>
-                <span className="lg:hidden"> Marrakech</span>
+                L’immobilier d’exception à Marrakech
               </h1>
               <p className="mt-6 max-w-[590px] text-[15px] leading-7 text-white/68 sm:text-[17px] sm:leading-8">
                 Villas, riads, appartements et opportunités sélectionnés à Marrakech et ses environs.

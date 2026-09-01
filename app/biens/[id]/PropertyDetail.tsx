@@ -27,6 +27,8 @@ import {
 import { DemoBrandMark, useDemoBrand } from '../../demoBranding'
 import GoodKechPropertyDetail from '../../goodKech/GoodKechPropertyDetail'
 import { GOOD_KECH_PROPERTIES } from '../../goodKech/data'
+import ImmoBuiltPropertyDetail from '../../immoBuilt/ImmoBuiltPropertyDetail'
+import { IMMO_BUILT_PROPERTIES } from '../../immoBuilt/data'
 import type { Property } from '../../lib/properties'
 
 const WHATSAPP_URL = 'https://wa.me/212723037305'
@@ -135,6 +137,23 @@ export default function PropertyDetail({
         brand={demoBrand}
         property={presentationProperty}
         similar={goodKechSimilar}
+      />
+    )
+  }
+
+  const immoBuiltProperty = IMMO_BUILT_PROPERTIES.find((item) => item.id === property.id)
+
+  if (demoBrand?.experience === 'immo-built') {
+    const presentationProperty = immoBuiltProperty ?? property
+    const immoBuiltSimilar = IMMO_BUILT_PROPERTIES
+      .filter((item) => item.id !== presentationProperty.id)
+      .slice(0, 3)
+
+    return (
+      <ImmoBuiltPropertyDetail
+        brand={demoBrand}
+        property={presentationProperty}
+        similar={immoBuiltSimilar}
       />
     )
   }

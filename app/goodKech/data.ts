@@ -132,9 +132,9 @@ export const GOOD_KECH_PROPERTIES: Property[] = [
     beds: 0,
     baths: 0,
     area: '2 500 m²',
-    image: 'https://images.unsplash.com/photo-1729442045650-5415faf2f669?w=1200&q=85',
+    image: 'https://images.unsplash.com/photo-1533669955142-6a73332af4db?w=1200&q=85',
     images: [
-      'https://images.unsplash.com/photo-1729442045650-5415faf2f669?w=1600&q=88',
+      'https://images.unsplash.com/photo-1533669955142-6a73332af4db?w=1600&q=88',
       'https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=1600&q=88',
       'https://images.unsplash.com/photo-1548018560-c7196548e84d?w=1600&q=88',
     ],

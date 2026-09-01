@@ -24,6 +24,8 @@ import {
 import { DemoBrandMark, useDemoBrand } from '../demoBranding'
 import GoodKechCatalogue from '../goodKech/GoodKechCatalogue'
 import { GOOD_KECH_PROPERTIES } from '../goodKech/data'
+import ImmoBuiltCatalogue from '../immoBuilt/ImmoBuiltCatalogue'
+import { IMMO_BUILT_PROPERTIES } from '../immoBuilt/data'
 import type { Property, PropertyType } from '../lib/properties'
 
 const WHATSAPP_URL = 'https://wa.me/212723037305'
@@ -115,6 +117,10 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
 
   if (demoBrand?.experience === 'good-kech-immo') {
     return <GoodKechCatalogue brand={demoBrand} properties={GOOD_KECH_PROPERTIES} />
+  }
+
+  if (demoBrand?.experience === 'immo-built') {
+    return <ImmoBuiltCatalogue brand={demoBrand} properties={IMMO_BUILT_PROPERTIES} />
   }
 
   return (
