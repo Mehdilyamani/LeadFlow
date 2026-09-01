@@ -42,7 +42,7 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
     agencyName: 'Immo Built',
     primaryColor: '#c69a62',
     secondaryColor: '#0c2033',
-    logoPath: '/ChatGPT_Image_1_sept._2026__18_02_08-removebg-preview.png',
+    logoPath: '/ChatGPT Image 1 sept. 2026, 18_56_59.png',
     experience: 'immo-built',
     city: 'Casablanca',
     whatsappNumber: '212687004021',

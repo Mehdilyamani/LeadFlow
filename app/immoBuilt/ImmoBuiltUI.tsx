@@ -22,13 +22,13 @@ import type { Property } from '../lib/properties'
 export function ImmoBuiltLogo({ brand, light = false }: { brand: DemoBrand; light?: boolean }) {
   return (
     <span className="inline-flex min-w-0 items-center gap-2.5">
-      <span className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
+      <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-[#081a2b] ring-1 ring-[#c69a62]/55 sm:h-14 sm:w-14">
         <Image
           src={brand.logoPath}
           alt={`${brand.agencyName} logo`}
           fill
           sizes="56px"
-          className="object-contain"
+          className="scale-[1.055] object-cover"
           priority
         />
       </span>
