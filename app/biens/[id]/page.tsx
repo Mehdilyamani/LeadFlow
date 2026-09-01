@@ -5,6 +5,7 @@ import {
 } from '../../lib/supabaseProperties'
 import { PROPERTIES } from '../../lib/properties'
 import { DEMO_PROPERTIES } from '../../lib/demoProperties'
+import { GOOD_KECH_PROPERTIES } from '../../goodKech/data'
 import PropertyDetail from './PropertyDetail'
 
 export default async function PropertyPage({
@@ -14,7 +15,8 @@ export default async function PropertyPage({
 }) {
   const { id } = await params
 
-  let property = await getProperty(id).catch(() => null)
+  const goodKechProperty = GOOD_KECH_PROPERTIES.find((item) => item.id === id) ?? null
+  let property = goodKechProperty ?? await getProperty(id).catch(() => null)
 
   // Normal static fallback
   if (!property) {
@@ -30,13 +32,15 @@ export default async function PropertyPage({
     notFound()
   }
 
-  const similar = await getSimilarProperties(id, property.type).catch(() => {
+  const similar = goodKechProperty
+    ? GOOD_KECH_PROPERTIES.filter((item) => item.id !== id).slice(0, 3)
+    : await getSimilarProperties(id, property.type).catch(() => {
     const allFallbackProperties = [...PROPERTIES, ...DEMO_PROPERTIES]
 
     return allFallbackProperties
       .filter((p) => p.id !== id && p.type === property!.type)
       .slice(0, 3)
-  })
+      })
 
   return <PropertyDetail property={property} similar={similar} />
 }

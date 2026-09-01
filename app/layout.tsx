@@ -1,18 +1,32 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import { DemoBrandProvider } from './demoBranding'
+import { DemoBrandProvider, DemoWhatsAppButton } from './demoBranding'
+import { getDemoBrand, getHostname, getWhatsAppUrl } from './demoBrands'
 import './global.css'
 
 const WHATSAPP_URL =
   'https://wa.me/212723037305?text=Bonjour%2C%20je%20souhaite%20des%20informations%20sur%20vos%20services%20immobiliers'
 
-export const metadata: Metadata = {
+const DEFAULT_METADATA: Metadata = {
   title: 'LeadFlow — Studio web au Maroc',
   description: 'Design et développement de sites web premium, rapides et pensés pour convertir.',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+async function requestBrand() {
+  const requestHeaders = await headers()
+  return getDemoBrand(getHostname(requestHeaders.get('host')))
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await requestBrand()
+  return brand?.metadata ?? DEFAULT_METADATA
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialBrand = await requestBrand()
+
   return (
     <html lang="fr">
       <head>
@@ -22,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="antialiased">
         <Analytics />
         <SpeedInsights />
-        <DemoBrandProvider>{children}</DemoBrandProvider>
+        <DemoBrandProvider initialBrand={initialBrand}>{children}</DemoBrandProvider>
         <style>{`
           .whatsapp-float {
             position: fixed;
@@ -78,25 +92,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             .whatsapp-float:hover { animation: none; }
           }
         `}</style>
-        <a
-          className="whatsapp-float"
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Nous contacter sur WhatsApp"
-          title="Nous contacter sur WhatsApp"
-        >
-          <svg
-            aria-hidden="true"
-            width="30"
-            height="30"
-            viewBox="0 0 32 32"
-            fill="currentColor"
-            style={{ color: '#ffffff' }}
-          >
-            <path d="M16.04 3A12.9 12.9 0 0 0 5.13 22.77L3 29l6.45-2.07A12.96 12.96 0 1 0 16.04 3Zm0 23.72a10.7 10.7 0 0 1-5.45-1.49l-.39-.23-3.83 1.23 1.25-3.72-.25-.39a10.73 10.73 0 1 1 8.67 4.6Zm5.89-8.04c-.32-.16-1.91-.94-2.21-1.05-.29-.11-.51-.16-.72.16-.22.32-.83 1.05-1.02 1.27-.19.21-.38.24-.7.08-.33-.16-1.37-.5-2.61-1.61a9.77 9.77 0 0 1-1.81-2.25c-.19-.32-.02-.5.14-.66.15-.14.32-.38.49-.56.16-.19.21-.32.32-.54.11-.21.05-.4-.03-.56-.08-.16-.72-1.73-.99-2.37-.26-.62-.53-.54-.72-.55h-.62c-.22 0-.57.08-.87.4-.3.32-1.13 1.1-1.13 2.69s1.16 3.12 1.32 3.34c.16.21 2.28 3.48 5.52 4.88.77.33 1.37.53 1.84.68.77.24 1.48.21 2.03.13.62-.09 1.91-.78 2.18-1.53.27-.75.27-1.4.19-1.53-.08-.14-.3-.22-.62-.38Z" />
-          </svg>
-        </a>
+        <DemoWhatsAppButton
+          defaultHref={initialBrand?.whatsappNumber ? getWhatsAppUrl(initialBrand) : WHATSAPP_URL}
+        />
       </body>
     </html>
   )
