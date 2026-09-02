@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { DEMO_PROPERTIES } from '../lib/demoProperties'
 import HomeClient from '../HomeClient'
 import GoodKechHome from '../goodKech/GoodKechHome'
-import ImmoBuiltHome from '../immoBuilt/ImmoBuiltHome'
+import { IMMO_BUILT_AREAS, IMMO_BUILT_PROPERTIES } from '../immoBuilt/data'
 import { getRequestDemoBrand } from '../requestDemoBrand'
 
 const DEFAULT_METADATA: Metadata = {
@@ -23,7 +23,15 @@ export default async function DemoPage() {
   }
 
   if (brand?.experience === 'immo-built') {
-    return <ImmoBuiltHome brand={brand} />
+    return (
+      <GoodKechHome
+        brand={brand}
+        properties={IMMO_BUILT_PROPERTIES}
+        locations={IMMO_BUILT_AREAS}
+        heroImage="/demos/immo-built/hero-cfc.webp"
+        featureImage="/demos/immo-built/office.webp"
+      />
+    )
   }
 
   return <HomeClient properties={DEMO_PROPERTIES} />

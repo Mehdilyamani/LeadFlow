@@ -24,6 +24,10 @@ const FILTERS: { label: string; value: 'Tous' | PropertyType }[] = [
 export default function GoodKechCatalogue({ brand, properties }: { brand: DemoBrand; properties: Property[] }) {
   const [activeFilter, setActiveFilter] = useState<'Tous' | PropertyType>('Tous')
   const [query, setQuery] = useState('')
+  const city = brand.city ?? 'Marrakech'
+  const catalogueCopy = city === 'Marrakech'
+    ? 'Villas, riads, appartements et opportunités de démonstration sélectionnés dans les secteurs les plus recherchés de Marrakech.'
+    : `Villas, appartements et opportunités de démonstration sélectionnés dans différents secteurs de ${city}.`
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('fr')
@@ -42,9 +46,9 @@ export default function GoodKechCatalogue({ brand, properties }: { brand: DemoBr
         <div className="mx-auto max-w-[1440px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Catalogue Marrakech"
+              eyebrow={`Catalogue ${city}`}
               title="Nos propriétés"
-              copy="Villas, riads, appartements et opportunités de démonstration sélectionnés dans les secteurs les plus recherchés de Marrakech."
+              copy={catalogueCopy}
               inverse
             />
           </Reveal>

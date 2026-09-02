@@ -8,7 +8,6 @@ import { DEMO_PROPERTIES } from '../../lib/demoProperties'
 import { GOOD_KECH_PROPERTIES } from '../../goodKech/data'
 import { IMMO_BUILT_PROPERTIES } from '../../immoBuilt/data'
 import GoodKechPropertyDetail from '../../goodKech/GoodKechPropertyDetail'
-import ImmoBuiltPropertyDetail from '../../immoBuilt/ImmoBuiltPropertyDetail'
 import { getRequestDemoBrand } from '../../requestDemoBrand'
 import PropertyDetail from './PropertyDetail'
 
@@ -40,7 +39,7 @@ export default async function PropertyPage({
       .filter((item) => item.id !== id)
       .slice(0, 3)
 
-    return <ImmoBuiltPropertyDetail brand={brand} property={immoBuiltProperty} similar={similar} />
+    return <GoodKechPropertyDetail brand={brand} property={immoBuiltProperty} similar={similar} />
   }
 
   let property = goodKechProperty ?? immoBuiltProperty ?? await getProperty(id).catch(() => null)

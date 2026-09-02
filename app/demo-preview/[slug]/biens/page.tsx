@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import { getDemoBrandBySlug } from '../../../demoBrands'
 import GoodKechCatalogue from '../../../goodKech/GoodKechCatalogue'
 import { GOOD_KECH_PROPERTIES } from '../../../goodKech/data'
-import ImmoBuiltCatalogue from '../../../immoBuilt/ImmoBuiltCatalogue'
 import { IMMO_BUILT_PROPERTIES } from '../../../immoBuilt/data'
 
 export default async function DemoPreviewCatalogue({ params }: { params: Promise<{ slug: string }> }) {
@@ -14,7 +13,7 @@ export default async function DemoPreviewCatalogue({ params }: { params: Promise
   }
 
   if (brand?.experience === 'immo-built') {
-    return <ImmoBuiltCatalogue brand={brand} properties={IMMO_BUILT_PROPERTIES} />
+    return <GoodKechCatalogue brand={brand} properties={IMMO_BUILT_PROPERTIES} />
   }
 
   notFound()

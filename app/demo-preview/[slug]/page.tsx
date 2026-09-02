@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getDemoBrandBySlug } from '../../demoBrands'
 import GoodKechHome from '../../goodKech/GoodKechHome'
-import ImmoBuiltHome from '../../immoBuilt/ImmoBuiltHome'
+import { IMMO_BUILT_AREAS, IMMO_BUILT_PROPERTIES } from '../../immoBuilt/data'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
@@ -25,7 +25,15 @@ export default async function DemoPreviewPage({ params }: { params: Promise<{ sl
   }
 
   if (brand?.experience === 'immo-built') {
-    return <ImmoBuiltHome brand={brand} />
+    return (
+      <GoodKechHome
+        brand={brand}
+        properties={IMMO_BUILT_PROPERTIES}
+        locations={IMMO_BUILT_AREAS}
+        heroImage="/demos/immo-built/hero-cfc.webp"
+        featureImage="/demos/immo-built/office.webp"
+      />
+    )
   }
 
   notFound()

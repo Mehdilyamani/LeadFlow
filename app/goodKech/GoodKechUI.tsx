@@ -24,6 +24,8 @@ export const GKI = {
 }
 
 export function GoodKechLogo({ brand, light = false, priority = false }: { brand: DemoBrand; light?: boolean; priority?: boolean }) {
+  const city = brand.city ?? 'Marrakech'
+
   return (
     <span className="inline-flex min-w-0 items-center gap-3">
       <span className={`relative h-11 w-11 shrink-0 overflow-hidden border ${light ? 'border-white/20' : 'border-black/10'} bg-black sm:h-12 sm:w-12`}>
@@ -41,7 +43,7 @@ export function GoodKechLogo({ brand, light = false, priority = false }: { brand
           {brand.agencyName}
         </span>
         <span className={`mt-1.5 block text-[8px] font-medium uppercase tracking-[0.3em] ${light ? 'text-white/48' : 'text-[#8a7256]'}`}>
-          Immobilier · Marrakech
+          Immobilier · {city}
         </span>
       </span>
     </span>
@@ -178,6 +180,11 @@ export function GoodKechPropertyCard({ brand, property, priority = false }: { br
 }
 
 export function GoodKechFooter({ brand }: { brand: DemoBrand }) {
+  const city = brand.city ?? 'Marrakech'
+  const footerCopy = city === 'Marrakech'
+    ? 'Villas, riads, appartements et opportunités immobilières sélectionnés à Marrakech et ses environs.'
+    : `Biens et opportunités immobilières sélectionnés à ${city} et ses environs.`
+
   return (
     <footer className="bg-[#100f0d] px-4 pb-24 pt-14 text-white sm:px-7 sm:pb-16 lg:px-12">
       <div className="mx-auto max-w-[1440px]">
@@ -185,7 +192,7 @@ export function GoodKechFooter({ brand }: { brand: DemoBrand }) {
           <div>
             <GoodKechLogo brand={brand} light />
             <p className="mt-5 max-w-sm text-sm leading-6 text-white/48">
-              Villas, riads, appartements et opportunités immobilières sélectionnés à Marrakech et ses environs.
+              {footerCopy}
             </p>
           </div>
           <div>
@@ -201,13 +208,13 @@ export function GoodKechFooter({ brand }: { brand: DemoBrand }) {
             <div className="mt-4 flex flex-col gap-2.5 text-sm text-white/58">
               <a href={`tel:+${brand.whatsappNumber}`}>{brand.displayPhone}</a>
               <a href={getWhatsAppUrl(brand)} target="_blank" rel="noopener noreferrer">Écrire sur WhatsApp</a>
-              <span>Marrakech, Maroc</span>
+              <span>{city}, Maroc</span>
             </div>
           </div>
         </div>
         <div className="flex flex-col gap-2 pt-6 text-[10px] tracking-[0.08em] text-white/32 sm:flex-row sm:items-center sm:justify-between">
           <span suppressHydrationWarning>© {new Date().getFullYear()} {brand.agencyName}</span>
-          <span>Immobilier · Marrakech</span>
+          <span>Immobilier · {city}</span>
         </div>
       </div>
     </footer>

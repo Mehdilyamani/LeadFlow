@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import type { DemoBrand } from '../demoBrands'
 import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
+import type { Property } from '../lib/properties'
 import { GOOD_KECH_LOCATIONS, GOOD_KECH_PROPERTIES } from './data'
 import {
   GoodKechFooter,
@@ -42,8 +43,30 @@ const BENEFITS = [
   'Un accompagnement à chaque étape du projet',
 ]
 
-export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
+type DemoLocation = {
+  name: string
+  image: string
+  detail?: string
+}
+
+type GoodKechHomeProps = {
+  brand: DemoBrand
+  properties?: Property[]
+  locations?: DemoLocation[]
+  heroImage?: string
+  featureImage?: string
+}
+
+export default function GoodKechHome({
+  brand,
+  properties = GOOD_KECH_PROPERTIES,
+  locations = GOOD_KECH_LOCATIONS,
+  heroImage = '/demos/good-kech-immo/hero.webp',
+  featureImage = '/demos/good-kech-immo/marrakech-architecture.webp',
+}: GoodKechHomeProps) {
   const whatsapp = getWhatsAppUrl(brand)
+  const city = brand.city ?? 'Marrakech'
+  const isMarrakech = city === 'Marrakech'
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f6f0e6] text-[#171512] selection:bg-[#b28a55] selection:text-white">
@@ -51,8 +74,8 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
 
       <section className="relative h-[100svh] min-h-[680px] max-h-[860px] overflow-hidden bg-[#171512] text-white sm:min-h-[820px] lg:h-auto lg:min-h-[780px] lg:max-h-none">
         <Image
-          src="/demos/good-kech-immo/hero.webp"
-          alt="Villa contemporaine à Marrakech"
+          src={heroImage}
+          alt={isMarrakech ? 'Villa contemporaine à Marrakech' : `Bien immobilier à ${city}`}
           fill
           priority
           sizes="100vw"
@@ -63,13 +86,15 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
           <div className="mx-auto flex h-full max-w-[1440px] items-end px-4 pb-16 sm:px-7 sm:pb-20 lg:items-center lg:px-12 lg:pb-0">
             <div className="gki-hero-enter w-full min-w-0 max-w-[760px]">
               <p className="mb-6 flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.3em] text-[#ddc397] sm:text-[10px]">
-                <span className="h-px w-9 bg-[#ddc397]" /> {brand.agencyName} · Marrakech
+                <span className="h-px w-9 bg-[#ddc397]" /> {brand.agencyName} · {city}
               </p>
               <h1 className="max-w-full text-balance font-serif text-[40px] leading-[0.98] tracking-[-0.04em] text-white min-[360px]:text-[43px] sm:max-w-[750px] sm:text-[66px] lg:text-[82px]">
-                L’immobilier d’exception à Marrakech
+                L’immobilier d’exception à {city}
               </h1>
               <p className="mt-6 max-w-[590px] text-[15px] leading-7 text-white/68 sm:text-[17px] sm:leading-8">
-                Villas, riads, appartements et opportunités sélectionnés à Marrakech et ses environs.
+                {isMarrakech
+                  ? 'Villas, riads, appartements et opportunités sélectionnés à Marrakech et ses environs.'
+                  : `Appartements, villas et opportunités sélectionnés à ${city} et ses environs.`}
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -102,7 +127,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
               <SectionHeading
                 eyebrow="Sélection du moment"
                 title="Des propriétés pensées pour votre projet"
-                copy="Une sélection de démonstration représentative des différents styles de vie et projets immobiliers à Marrakech."
+                copy={`Une sélection de démonstration représentative des différents styles de vie et projets immobiliers à ${city}.`}
               />
             </Reveal>
             <Reveal delay={0.08}>
@@ -112,7 +137,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
             </Reveal>
           </div>
           <div className="mt-12 grid gap-x-5 gap-y-9 md:grid-cols-2 lg:grid-cols-3">
-            {GOOD_KECH_PROPERTIES.slice(0, 6).map((property, index) => (
+            {properties.slice(0, 6).map((property, index) => (
               <Reveal key={property.id} delay={Math.min(index * 0.045, 0.14)}>
                 <GoodKechPropertyCard brand={brand} property={property} />
               </Reveal>
@@ -126,7 +151,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
           <Reveal>
             <SectionHeading
               eyebrow="Votre recherche"
-              title="Un marché, plusieurs façons d’habiter Marrakech"
+              title={`Un marché, plusieurs façons d’habiter ${city}`}
               copy="Explorez les formats de biens qui correspondent à votre rythme de vie, à votre projet familial ou à votre stratégie d’investissement."
               inverse
             />
@@ -155,19 +180,21 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
         <div className="mx-auto max-w-[1440px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Adresses marrakchies"
-              title="Trouvez votre bien à Marrakech"
-              copy="Du cœur urbain aux domaines paysagés, chaque secteur offre une manière différente de vivre la ville ocre."
+              eyebrow={isMarrakech ? 'Adresses marrakchies' : `Adresses de ${city}`}
+              title={`Trouvez votre bien à ${city}`}
+              copy={isMarrakech
+                ? 'Du cœur urbain aux domaines paysagés, chaque secteur offre une manière différente de vivre la ville ocre.'
+                : `Du cœur urbain aux quartiers résidentiels, chaque secteur offre une manière différente de vivre ${city}.`}
             />
           </Reveal>
           <div className="mt-11 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:grid md:grid-cols-3 md:overflow-visible lg:grid-cols-6">
-            {GOOD_KECH_LOCATIONS.map((location, index) => (
+            {locations.map((location, index) => (
               <Reveal key={location.name} delay={Math.min(index * 0.04, 0.12)} className="min-w-[76vw] snap-center sm:min-w-[44vw] md:min-w-0">
                 <Link href={getBrandHref(brand, '/biens')} className="group relative block aspect-[3/4] overflow-hidden bg-[#ded6ca]">
                   <Image src={location.image} alt={location.name} fill sizes="(max-width: 640px) 76vw, (max-width: 768px) 44vw, 17vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/72 via-black/8 to-transparent" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
-                    <p className="text-[8px] uppercase tracking-[0.23em] text-white/55">Marrakech</p>
+                    <p className="text-[8px] uppercase tracking-[0.23em] text-white/55">{city}</p>
                     <h3 className="mt-1.5 font-serif text-[22px] text-white">{location.name}</h3>
                   </div>
                 </Link>
@@ -179,7 +206,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
 
       <section id="approche" className="gki-deferred-section grid bg-[#efe5d6] lg:grid-cols-2">
         <div className="relative min-h-[430px] lg:min-h-[720px]">
-          <Image src="/demos/good-kech-immo/marrakech-architecture.webp" alt="Architecture et art de vivre à Marrakech" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+          <Image src={featureImage} alt={`Architecture et art de vivre à ${city}`} fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
           <div className="absolute inset-0 bg-[#6c3f2d]/10" />
         </div>
         <div className="flex items-center px-4 py-16 sm:px-10 sm:py-20 lg:px-16 xl:px-24">
@@ -189,7 +216,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
               Votre projet immobilier, présenté avec clarté
             </h2>
             <p className="mt-6 max-w-xl text-[15px] leading-7 text-[#665f56]">
-              {brand.agencyName} vous aide à préciser votre recherche, découvrir des biens cohérents avec vos critères et avancer avec un interlocuteur direct à Marrakech.
+              {brand.agencyName} vous aide à préciser votre recherche, découvrir des biens cohérents avec vos critères et avancer avec un interlocuteur direct à {city}.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {BENEFITS.map((benefit) => (
@@ -212,7 +239,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
               <Gem className="h-5 w-5" strokeWidth={1.35} />
             </div>
             <h2 className="mt-7 max-w-lg font-serif text-[36px] leading-[1.04] tracking-[-0.035em] sm:text-5xl">
-              Une sélection adaptée à votre manière de vivre Marrakech
+              Une sélection adaptée à votre manière de vivre {city}
             </h2>
           </Reveal>
           <Reveal delay={0.08}>
@@ -235,7 +262,7 @@ export default function GoodKechHome({ brand }: { brand: DemoBrand }) {
       <section className="gki-deferred-section relative overflow-hidden bg-[#9a5b44] px-4 py-20 text-white sm:px-7 sm:py-24 lg:px-12">
         <div className="absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle_at_20%_20%,white_0,transparent_38%),radial-gradient(circle_at_80%_80%,white_0,transparent_35%)]" />
         <Reveal className="relative mx-auto flex max-w-[1100px] flex-col items-center text-center">
-          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/65">Votre prochain bien à Marrakech</p>
+          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] text-white/65">Votre prochain bien à {city}</p>
           <h2 className="mt-5 max-w-4xl font-serif text-[39px] leading-[1.03] tracking-[-0.035em] sm:text-6xl">
             Parlons de ce que vous recherchez
           </h2>

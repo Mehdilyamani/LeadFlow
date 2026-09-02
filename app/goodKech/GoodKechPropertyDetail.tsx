@@ -30,6 +30,7 @@ import {
 export default function GoodKechPropertyDetail({ brand, property, similar }: { brand: DemoBrand; property: Property; similar: Property[] }) {
   const gallery = useMemo(() => property.images?.length ? property.images : [property.image], [property.image, property.images])
   const [activeImage, setActiveImage] = useState(0)
+  const city = brand.city ?? 'Marrakech'
   const propertyMessage = `Bonjour, je souhaite avoir plus d'informations sur le bien « ${property.title} ».`
   const whatsapp = getWhatsAppUrl(brand, propertyMessage)
 
@@ -131,7 +132,7 @@ export default function GoodKechPropertyDetail({ brand, property, similar }: { b
       {similar.length > 0 && (
         <section className="bg-[#fcfaf6] px-4 py-20 sm:px-7 sm:py-24 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
-            <Reveal><SectionHeading eyebrow="À découvrir aussi" title="D’autres propriétés à Marrakech" /></Reveal>
+            <Reveal><SectionHeading eyebrow="À découvrir aussi" title={`D’autres propriétés à ${city}`} /></Reveal>
             <div className="mt-10 grid gap-x-5 gap-y-9 md:grid-cols-2 lg:grid-cols-3">
               {similar.slice(0, 3).map((item, index) => <Reveal key={item.id} delay={index * 0.05}><GoodKechPropertyCard brand={brand} property={item} /></Reveal>)}
             </div>
