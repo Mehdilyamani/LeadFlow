@@ -7,6 +7,9 @@ const checks = [
   { path: '/demo-preview/immo-built', brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo-preview/immo-built/biens', brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo-preview/immo-built/biens/ib-appartement-cfc', brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/immo-built', brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/immo-built/biens', brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/immo-built/biens/ib-appartement-cfc', brand: 'Immo Built', phone: '212687004021' },
 ]
 
 let failed = false

@@ -94,6 +94,9 @@ const cases = [
   { path: '/demo-preview/immo-built', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo-preview/immo-built/biens', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo-preview/immo-built/biens/ib-appartement-cfc', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/immo-built', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/immo-built/biens', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/immo-built/biens/ib-appartement-cfc', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
 ]
 
 let failed = false

@@ -70,10 +70,10 @@ export function getDemoBrand(hostname: string): DemoBrand | null {
   return DEMO_BRANDS[hostname.trim().toLowerCase()] ?? null
 }
 
-export function getDemoBrandBySlug(slug: string): DemoBrand | null {
+export function getDemoBrandBySlug(slug: string, basePath?: string): DemoBrand | null {
   const normalizedSlug = slug.trim().toLowerCase()
   const brand = Object.values(DEMO_BRANDS).find((candidate) => candidate.slug === normalizedSlug)
-  return brand ? { ...brand, basePath: `/demo-preview/${normalizedSlug}` } : null
+  return brand ? { ...brand, basePath: basePath ?? `/demo-preview/${normalizedSlug}` } : null
 }
 
 export function getHostname(hostHeader: string | null): string {

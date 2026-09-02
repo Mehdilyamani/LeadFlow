@@ -30,8 +30,11 @@ export function DemoBrandProvider({
   const [brand, setBrand] = useState<DemoBrand | null>(initialBrand)
 
   useEffect(() => {
-    const previewSlug = window.location.pathname.match(/^\/demo-preview\/([^/]+)/)?.[1]
-    const activeBrand = getDemoBrand(window.location.hostname) ?? (previewSlug ? getDemoBrandBySlug(previewSlug) : null)
+    const pathMatch = window.location.pathname.match(/^\/(demo-preview|demo)\/([^/]+)/)
+    const pathBrand = pathMatch
+      ? getDemoBrandBySlug(pathMatch[2], `/${pathMatch[1]}/${pathMatch[2]}`)
+      : null
+    const activeBrand = getDemoBrand(window.location.hostname) ?? pathBrand
     const root = document.documentElement
 
     setBrand(activeBrand)
