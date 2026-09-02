@@ -17,7 +17,7 @@ export default async function DemoPreviewCatalogue({ params }: { params: Promise
   if (brand?.experience === 'immo-built') {
     return (
       <DemoBrandProvider initialBrand={brand}>
-        <BiensClient properties={IMMO_BUILT_PROPERTIES} heroImage="/demos/immo-built/interior-hero.webp" />
+        <BiensClient properties={IMMO_BUILT_PROPERTIES} heroImage="/demos/immo-built/test-agency-catalogue.webp" />
       </DemoBrandProvider>
     )
   }

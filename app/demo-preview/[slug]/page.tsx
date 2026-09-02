@@ -32,8 +32,8 @@ export default async function DemoPreviewPage({ params }: { params: Promise<{ sl
         <HomeClient
           properties={IMMO_BUILT_PROPERTIES}
           locations={IMMO_BUILT_AREAS.map((area) => ({ ...area, subtitle: area.detail }))}
-          heroImage="/demos/immo-built/hero-cfc.webp"
-          featureImage="/demos/immo-built/office.webp"
+          heroImage="/demos/immo-built/test-agency-hero.webp"
+          featureImage="/demos/immo-built/test-agency-feature.webp"
         />
       </DemoBrandProvider>
     )
