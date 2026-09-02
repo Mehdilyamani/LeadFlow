@@ -14,7 +14,7 @@ export default async function BiensPage() {
   }
 
   if (brand?.experience === 'immo-built') {
-    return <GoodKechCatalogue brand={brand} properties={IMMO_BUILT_PROPERTIES} />
+    return <BiensClient properties={IMMO_BUILT_PROPERTIES} heroImage="/demos/immo-built/interior-hero.webp" />
   }
 
   const properties = await getProperties().catch(() => PROPERTIES)

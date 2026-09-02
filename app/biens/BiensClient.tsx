@@ -22,9 +22,10 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from '../demoBranding'
+import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
 import type { Property, PropertyType } from '../lib/properties'
 
-const WHATSAPP_URL = 'https://wa.me/212723037305'
+const DEFAULT_WHATSAPP_URL = 'https://wa.me/212723037305'
 
 const FILTERS: { label: string; value: 'Tous' | PropertyType }[] = [
   { label: 'Tous les biens', value: 'Tous' },
@@ -95,12 +96,29 @@ function Reveal({
   )
 }
 
-export default function BiensClient({ properties }: { properties: Property[] }) {
+export default function BiensClient({
+  properties,
+  heroImage = 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1800&q=88',
+}: {
+  properties: Property[]
+  heroImage?: string
+}) {
   const [activeFilter, setActiveFilter] = useState<'Tous' | PropertyType>('Tous')
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const demoBrand = useDemoBrand()
+  const immoBuiltBrand = demoBrand?.experience === 'immo-built' ? demoBrand : null
   const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
+  const city = immoBuiltBrand?.city
+  const displayPhone = immoBuiltBrand?.displayPhone ?? '+212 723-037305'
+  const phoneNumber = immoBuiltBrand?.whatsappNumber ?? '212723037305'
+  const phoneHref = `tel:+${phoneNumber}`
+  const whatsappUrl = immoBuiltBrand ? getWhatsAppUrl(immoBuiltBrand) : DEFAULT_WHATSAPP_URL
+  const homeHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/') : '/demo'
+  const propertiesHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/biens') : '/biens'
+  const expertiseHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/#expertise') : '/demo#expertise'
+  const locationsHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/#villes') : '/demo#villes'
+  const contactHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/#contact') : '/demo#contact'
 
   const filtered =
     activeFilter === 'Tous'
@@ -108,7 +126,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       : properties.filter((property) => property.type === activeFilter)
 
   const openWhatsApp = () => {
-    window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer')
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -116,34 +134,34 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
       {/* NAVIGATION */}
       <header className="brand-secondary-bg fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#101916]/90 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
-          <Link href="/demo" aria-label={`Accueil ${agencyName}`}>
+          <Link href={homeHref} aria-label={`Accueil ${agencyName}`}>
             <AgencyLogo light />
           </Link>
 
           <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-wide text-white/65 md:flex">
-            <Link href="/demo" className="transition-colors hover:text-white">
+            <Link href={homeHref} className="transition-colors hover:text-white">
               Accueil
             </Link>
-            <Link href="/biens" className="text-[#d7b57c]">
+            <Link href={propertiesHref} className="text-[#d7b57c]">
               Nos biens
             </Link>
-            <Link href="/demo#expertise" className="transition-colors hover:text-white">
+            <Link href={expertiseHref} className="transition-colors hover:text-white">
               Expertise
             </Link>
-            <Link href="/demo#villes" className="transition-colors hover:text-white">
+            <Link href={locationsHref} className="transition-colors hover:text-white">
               Villes
             </Link>
-            <Link href="/demo#contact" className="transition-colors hover:text-white">
+            <Link href={contactHref} className="transition-colors hover:text-white">
               Contact
             </Link>
           </nav>
 
           <div className="flex items-center gap-2">
             <a
-              href="tel:+212723037305"
+              href={phoneHref}
               className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
             >
-              <Phone className="h-3.5 w-3.5" /> +212 723-037305
+              <Phone className="h-3.5 w-3.5" /> {displayPhone}
             </a>
             <button
               onClick={() => setMenuOpen((value) => !value)}
@@ -166,20 +184,20 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
               className="border-t border-white/10 bg-[#101916] px-5 py-5 md:hidden"
             >
               <div className="mx-auto flex max-w-[1380px] flex-col gap-1 text-sm text-white/85">
-                <Link href="/demo" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                <Link href={homeHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Accueil
                 </Link>
-                <Link href="/biens" onClick={() => setMenuOpen(false)} className="rounded-xl bg-white/5 px-3 py-3 text-[#d7b57c]">
+                <Link href={propertiesHref} onClick={() => setMenuOpen(false)} className="rounded-xl bg-white/5 px-3 py-3 text-[#d7b57c]">
                   Nos biens
                 </Link>
-                <Link href="/demo#expertise" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                <Link href={expertiseHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Expertise
                 </Link>
-                <Link href="/demo#villes" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                <Link href={locationsHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Villes
                 </Link>
-                <a href="tel:+212723037305" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
-                  <Phone className="h-4 w-4" /> +212 723-037305
+                <a href={phoneHref} className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
+                  <Phone className="h-4 w-4" /> {displayPhone}
                 </a>
               </div>
             </motion.div>
@@ -196,7 +214,7 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
           className="absolute inset-0"
         >
           <Image
-            src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1800&q=88"
+            src={heroImage}
             alt="Architecture résidentielle contemporaine"
             fill
             priority
@@ -235,8 +253,9 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
               transition={{ duration: 0.7, delay: 0.26 }}
               className="mt-6 max-w-2xl text-[15px] leading-7 text-white/62 sm:text-base sm:leading-8"
             >
-              Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca,
-              Marrakech, Rabat et Tanger pour leur emplacement, leur architecture et leur potentiel.
+              {city
+                ? `Villas et appartements sélectionnés à ${city} pour leur emplacement, leur architecture et leur potentiel.`
+                : 'Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca, Marrakech, Rabat et Tanger pour leur emplacement, leur architecture et leur potentiel.'}
             </motion.p>
           </div>
         </div>
@@ -376,25 +395,25 @@ export default function BiensClient({ properties }: { properties: Property[] }) 
             <div>
               <AgencyLogo light />
               <p className="mt-5 max-w-sm text-sm leading-6 text-white/45">
-                Conseil et transaction immobilière pour une clientèle exigeante à Casablanca, Marrakech, Rabat et Tanger.
+                Conseil et transaction immobilière {city ? `à ${city}` : 'à Casablanca, Marrakech, Rabat et Tanger'}.
               </p>
             </div>
 
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Navigation</p>
               <div className="space-y-3 text-sm">
-                <Link href="/demo" className="block transition-colors hover:text-white">Accueil</Link>
-                <Link href="/biens" className="block text-[#d7b57c]">Nos biens</Link>
-                <Link href="/demo#expertise" className="block transition-colors hover:text-white">Expertise</Link>
+                <Link href={homeHref} className="block transition-colors hover:text-white">Accueil</Link>
+                <Link href={propertiesHref} className="block text-[#d7b57c]">Nos biens</Link>
+                <Link href={expertiseHref} className="block transition-colors hover:text-white">Expertise</Link>
               </div>
             </div>
 
             <div>
               <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">Contact</p>
               <div className="space-y-3 text-sm">
-                <a href="tel:+212723037305" className="block transition-colors hover:text-white">+212 723-037305</a>
-                <a href="mailto:contact@maisonatlas.ma" className="block transition-colors hover:text-white">contact@maisonatlas.ma</a>
-                <p>Casablanca, Maroc</p>
+                <a href={phoneHref} className="block transition-colors hover:text-white">{displayPhone}</a>
+                {!immoBuiltBrand && <a href="mailto:contact@maisonatlas.ma" className="block transition-colors hover:text-white">contact@maisonatlas.ma</a>}
+                <p>{city ?? 'Casablanca'}, Maroc</p>
               </div>
             </div>
           </div>

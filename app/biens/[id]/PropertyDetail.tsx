@@ -25,9 +25,10 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from '../../demoBranding'
+import { getBrandHref, getWhatsAppUrl } from '../../demoBrands'
 import type { Property } from '../../lib/properties'
 
-const WHATSAPP_URL = 'https://wa.me/212723037305'
+const DEFAULT_WHATSAPP_URL = 'https://wa.me/212723037305'
 
 function AgencyLogo({ light = false }: { light?: boolean }) {
   const demoBrand = useDemoBrand()
@@ -105,11 +106,22 @@ export default function PropertyDetail({
   const [activeImage, setActiveImage] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
   const demoBrand = useDemoBrand()
+  const immoBuiltBrand = demoBrand?.experience === 'immo-built' ? demoBrand : null
   const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
   const shortAgencyName = demoBrand?.agencyName ?? 'Maison Atlas'
+  const city = immoBuiltBrand?.city
+  const displayPhone = immoBuiltBrand?.displayPhone ?? '+212 723-037305'
+  const phoneNumber = immoBuiltBrand?.whatsappNumber ?? '212723037305'
+  const phoneHref = `tel:+${phoneNumber}`
+  const whatsappUrl = immoBuiltBrand ? getWhatsAppUrl(immoBuiltBrand) : DEFAULT_WHATSAPP_URL
+  const homeHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/') : '/demo'
+  const propertiesHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/biens') : '/biens'
+  const expertiseHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/#expertise') : '/demo#expertise'
+  const locationsHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/#villes') : '/demo#villes'
+  const contactHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/#contact') : '/demo#contact'
 
   const openWhatsApp = () => {
-    window.open(WHATSAPP_URL, '_blank', 'noopener,noreferrer')
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer')
   }
 
   const previousImage = () => {
@@ -125,31 +137,31 @@ export default function PropertyDetail({
       {/* NAVIGATION */}
       <header className="brand-secondary-bg fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/92 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
-          <Link href="/demo" aria-label={`Accueil ${agencyName}`}>
+          <Link href={homeHref} aria-label={`Accueil ${agencyName}`}>
             <AgencyLogo light />
           </Link>
 
           <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-wide text-white/65 md:flex">
-            <Link href="/demo" className="transition-colors hover:text-white">
+            <Link href={homeHref} className="transition-colors hover:text-white">
               Accueil
             </Link>
-            <Link href="/biens" className="text-[#d7b57c]">
+            <Link href={propertiesHref} className="text-[#d7b57c]">
               Nos biens
             </Link>
-            <Link href="/demo#expertise" className="transition-colors hover:text-white">
+            <Link href={expertiseHref} className="transition-colors hover:text-white">
               Expertise
             </Link>
-            <Link href="/demo#villes" className="transition-colors hover:text-white">
+            <Link href={locationsHref} className="transition-colors hover:text-white">
               Villes
             </Link>
-            <Link href="/demo#contact" className="transition-colors hover:text-white">
+            <Link href={contactHref} className="transition-colors hover:text-white">
               Contact
             </Link>
           </nav>
 
           <div className="flex items-center gap-2">
             <Link
-              href="/biens"
+              href={propertiesHref}
               className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Tous les biens
@@ -175,20 +187,20 @@ export default function PropertyDetail({
               className="border-t border-white/10 bg-[#101916] px-5 py-5 md:hidden"
             >
               <div className="mx-auto flex max-w-[1380px] flex-col gap-1 text-sm text-white/85">
-                <Link href="/demo" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                <Link href={homeHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Accueil
                 </Link>
-                <Link href="/biens" onClick={() => setMenuOpen(false)} className="rounded-xl bg-white/5 px-3 py-3 text-[#d7b57c]">
+                <Link href={propertiesHref} onClick={() => setMenuOpen(false)} className="rounded-xl bg-white/5 px-3 py-3 text-[#d7b57c]">
                   Nos biens
                 </Link>
-                <Link href="/demo#expertise" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                <Link href={expertiseHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Expertise
                 </Link>
-                <Link href="/demo#contact" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+                <Link href={contactHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                   Contact
                 </Link>
-                <a href="tel:+212723037305" className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
-                  <Phone className="h-4 w-4" /> +212 723-037305
+                <a href={phoneHref} className="mt-2 flex items-center justify-center gap-2 rounded-xl border border-white/12 px-4 py-3">
+                  <Phone className="h-4 w-4" /> {displayPhone}
                 </a>
               </div>
             </motion.div>
@@ -205,9 +217,9 @@ export default function PropertyDetail({
             transition={{ duration: 0.5 }}
             className="flex flex-wrap items-center gap-2 text-[10px] font-medium uppercase tracking-[0.18em] text-white/38"
           >
-            <Link href="/demo" className="transition-colors hover:text-white/75">Accueil</Link>
+            <Link href={homeHref} className="transition-colors hover:text-white/75">Accueil</Link>
             <span>/</span>
-            <Link href="/biens" className="transition-colors hover:text-white/75">Nos biens</Link>
+            <Link href={propertiesHref} className="transition-colors hover:text-white/75">Nos biens</Link>
             <span>/</span>
             <span className="text-[#d7b57c]">{property.city}</span>
           </motion.div>
@@ -489,10 +501,10 @@ export default function PropertyDetail({
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </button>
                   <a
-                    href="tel:+212723037305"
+                    href={phoneHref}
                     className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-[#17221f]/12 bg-[#f8f6f1] px-5 py-3.5 text-xs font-semibold text-[#17221f] transition-all hover:border-[#b9945f]/40 hover:bg-white"
                   >
-                    <Phone className="h-3.5 w-3.5 text-[#9b7949]" /> +212 723-037305
+                    <Phone className="h-3.5 w-3.5 text-[#9b7949]" /> {displayPhone}
                   </a>
 
                   <div className="mt-5 flex items-start gap-3 rounded-2xl bg-[#f3eee5] p-4">
@@ -508,10 +520,13 @@ export default function PropertyDetail({
             <Reveal delay={0.08} className="mt-4">
               <div className="rounded-[24px] border border-[#17221f]/8 bg-[#eee9df] p-5">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-10 w-10 place-items-center rounded-full bg-[#17221f] text-[10px] font-semibold tracking-[0.14em] text-[#d7b57c]">MA</span>
+                  <DemoBrandMark
+                    className="h-10 w-10 rounded-full object-contain"
+                    fallback={<span className="grid h-10 w-10 place-items-center rounded-full bg-[#17221f] text-[10px] font-semibold tracking-[0.14em] text-[#d7b57c]">MA</span>}
+                  />
                   <div>
                     <p className="text-sm font-semibold text-[#17221f]">{agencyName}</p>
-                    <p className="mt-0.5 text-[10px] text-[#898276]">Casablanca · Marrakech · Rabat · Tanger</p>
+                    <p className="mt-0.5 text-[10px] text-[#898276]">{city ?? 'Casablanca · Marrakech · Rabat · Tanger'}</p>
                   </div>
                 </div>
                 <p className="mt-4 text-xs leading-5 text-[#77746c]">
@@ -539,7 +554,7 @@ export default function PropertyDetail({
                   <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#9b7949]">À découvrir aussi</p>
                   <h2 className="mt-3 text-3xl font-medium tracking-[-0.04em] text-[#17221f] sm:text-[42px]">Biens similaires</h2>
                 </div>
-                <Link href="/biens" className="inline-flex w-fit items-center gap-2 text-xs font-semibold text-[#76572e] transition-colors hover:text-[#17221f]">
+                <Link href={propertiesHref} className="inline-flex w-fit items-center gap-2 text-xs font-semibold text-[#76572e] transition-colors hover:text-[#17221f]">
                   Voir toute la collection <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -549,7 +564,7 @@ export default function PropertyDetail({
               {similar.slice(0, 3).map((item, index) => (
                 <Reveal key={item.id} delay={index * 0.07} className="w-[86vw] max-w-[380px] shrink-0 snap-center md:w-auto md:max-w-none">
                   <Link
-                    href={`/biens/${item.id}`}
+                    href={immoBuiltBrand ? getBrandHref(immoBuiltBrand, `/biens/${item.id}`) : `/biens/${item.id}`}
                     className="group block overflow-hidden rounded-[24px] bg-[#f8f6f1] shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl hover:shadow-[#17221f]/8"
                   >
                     <div className="relative h-[220px] overflow-hidden sm:h-[250px]">
@@ -613,7 +628,7 @@ export default function PropertyDetail({
                 Organiser une visite <ArrowRight className="h-4 w-4" />
               </button>
               <a
-                href="tel:+212723037305"
+                href={phoneHref}
                 className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-white/15 px-6 py-3.5 text-xs font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:w-auto"
               >
                 <Phone className="h-3.5 w-3.5" /> Nous appeler
@@ -636,26 +651,26 @@ export default function PropertyDetail({
             <div className="grid grid-cols-2 gap-10 text-xs sm:grid-cols-3">
               <div>
                 <p className="mb-4 font-semibold text-white">Navigation</p>
-                <Link href="/demo" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">Accueil</Link>
-                <Link href="/biens" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">Nos biens</Link>
-                <Link href="/demo#expertise" className="block transition-colors hover:text-[#d7b57c]">Expertise</Link>
+                <Link href={homeHref} className="mb-2.5 block transition-colors hover:text-[#d7b57c]">Accueil</Link>
+                <Link href={propertiesHref} className="mb-2.5 block transition-colors hover:text-[#d7b57c]">Nos biens</Link>
+                <Link href={expertiseHref} className="block transition-colors hover:text-[#d7b57c]">Expertise</Link>
               </div>
               <div>
                 <p className="mb-4 font-semibold text-white">Villes</p>
-                {['Casablanca', 'Marrakech', 'Rabat', 'Tanger'].map((city) => (
-                  <p key={city} className="mb-2.5">{city}</p>
+                {(city ? [city] : ['Casablanca', 'Marrakech', 'Rabat', 'Tanger']).map((location) => (
+                  <p key={location} className="mb-2.5">{location}</p>
                 ))}
               </div>
               <div>
                 <p className="mb-4 font-semibold text-white">Contact</p>
-                <a href="tel:+212723037305" className="mb-2.5 block transition-colors hover:text-[#d7b57c]">+212 723-037305</a>
+                <a href={phoneHref} className="mb-2.5 block transition-colors hover:text-[#d7b57c]">{displayPhone}</a>
                 <p>Maroc</p>
               </div>
             </div>
           </div>
           <div className="flex flex-col justify-between gap-3 pt-6 text-[10px] text-white/25 sm:flex-row">
             <p>© 2026 {agencyName}.</p>
-            <p>Casablanca · Marrakech · Rabat · Tanger</p>
+            <p>{city ?? 'Casablanca · Marrakech · Rabat · Tanger'}</p>
           </div>
         </div>
       </footer>

@@ -39,7 +39,7 @@ export default async function PropertyPage({
       .filter((item) => item.id !== id)
       .slice(0, 3)
 
-    return <GoodKechPropertyDetail brand={brand} property={immoBuiltProperty} similar={similar} />
+    return <PropertyDetail property={immoBuiltProperty} similar={similar} />
   }
 
   let property = goodKechProperty ?? immoBuiltProperty ?? await getProperty(id).catch(() => null)

@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation'
+import { DemoBrandProvider } from '../../../demoBranding'
 import { getDemoBrandBySlug } from '../../../demoBrands'
+import BiensClient from '../../../biens/BiensClient'
 import GoodKechCatalogue from '../../../goodKech/GoodKechCatalogue'
 import { GOOD_KECH_PROPERTIES } from '../../../goodKech/data'
 import { IMMO_BUILT_PROPERTIES } from '../../../immoBuilt/data'
@@ -13,7 +15,11 @@ export default async function DemoPreviewCatalogue({ params }: { params: Promise
   }
 
   if (brand?.experience === 'immo-built') {
-    return <GoodKechCatalogue brand={brand} properties={IMMO_BUILT_PROPERTIES} />
+    return (
+      <DemoBrandProvider initialBrand={brand}>
+        <BiensClient properties={IMMO_BUILT_PROPERTIES} heroImage="/demos/immo-built/interior-hero.webp" />
+      </DemoBrandProvider>
+    )
   }
 
   notFound()

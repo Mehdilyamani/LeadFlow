@@ -26,9 +26,16 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from './demoBranding'
+import { getBrandHref, getWhatsAppUrl } from './demoBrands'
 import type { Property } from './lib/properties'
 
-const CITIES = [
+export type DemoLocationCard = {
+  name: string
+  subtitle: string
+  image: string
+}
+
+const CITIES: DemoLocationCard[] = [
   {
     name: 'Casablanca',
     subtitle: 'Anfa · Aïn Diab · CFC',
@@ -222,26 +229,40 @@ function AgencyLogo({ light = false }: { light?: boolean }) {
 
 export default function HomeClient({
   properties,
+  locations = CITIES,
+  heroImage = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=88',
+  featureImage = 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1400&q=85',
 }: {
   properties: Property[]
+  locations?: DemoLocationCard[]
+  heroImage?: string
+  featureImage?: string
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const demoBrand = useDemoBrand()
+  const immoBuiltBrand = demoBrand?.experience === 'immo-built' ? demoBrand : null
   const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
   const shortAgencyName = demoBrand?.agencyName ?? 'Maison Atlas'
+  const city = immoBuiltBrand?.city
+  const displayPhone = immoBuiltBrand?.displayPhone ?? '+212 723-037305'
+  const phoneNumber = immoBuiltBrand?.whatsappNumber ?? '212723037305'
+  const phoneHref = `tel:+${phoneNumber}`
+  const whatsappUrl = immoBuiltBrand ? getWhatsAppUrl(immoBuiltBrand) : 'https://wa.me/212723037305'
+  const homeHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/') : '/demo'
+  const propertiesHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/biens') : '/biens'
   const propertiesCarousel = useMobileAutoCarousel(properties.length)
-  const citiesCarousel = useMobileAutoCarousel(CITIES.length)
+  const citiesCarousel = useMobileAutoCarousel(locations.length)
 
   return (
     <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
       <header className="brand-secondary-bg fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#101916]/85 text-white backdrop-blur-xl">
         <div className="mx-auto flex h-[68px] max-w-[1380px] items-center justify-between px-4 sm:h-[76px] sm:px-8 lg:px-10">
-          <Link href="/demo" aria-label={`Accueil ${agencyName}`}>
+          <Link href={homeHref} aria-label={`Accueil ${agencyName}`}>
             <AgencyLogo light />
           </Link>
 
           <nav className="hidden items-center gap-8 text-[12px] font-medium tracking-wide text-white/70 md:flex">
-            <Link href="/biens" className="transition-colors hover:text-white">
+            <Link href={propertiesHref} className="transition-colors hover:text-white">
               Nos biens
             </Link>
             <button onClick={() => scrollTo('expertise')} className="transition-colors hover:text-white">
@@ -257,10 +278,10 @@ export default function HomeClient({
 
           <div className="flex items-center gap-2">
             <a
-              href="tel:+212723037305"
+              href={phoneHref}
               className="hidden items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:bg-white hover:text-[#17221f] sm:inline-flex"
             >
-              <Phone className="h-3.5 w-3.5" /> +212 723-037305
+              <Phone className="h-3.5 w-3.5" /> {displayPhone}
             </a>
             <button
               onClick={() => setMenuOpen((value) => !value)}
@@ -280,7 +301,7 @@ export default function HomeClient({
             className="border-t border-white/10 bg-[#101916] px-5 py-5 md:hidden"
           >
             <div className="mx-auto flex max-w-[1380px] flex-col gap-1 text-sm text-white/85">
-              <Link href="/biens" onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
+              <Link href={propertiesHref} onClick={() => setMenuOpen(false)} className="rounded-xl px-3 py-3 hover:bg-white/5">
                 Nos biens
               </Link>
               <button onClick={() => { scrollTo('expertise'); setMenuOpen(false) }} className="rounded-xl px-3 py-3 text-left hover:bg-white/5">
@@ -305,8 +326,8 @@ export default function HomeClient({
           className="absolute inset-0"
         >
           <Image
-            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=88"
-            alt="Villa contemporaine au Maroc"
+            src={heroImage}
+            alt={city ? `Bien immobilier à ${city}` : 'Villa contemporaine au Maroc'}
             fill
             priority
             className="object-cover"
@@ -325,7 +346,7 @@ export default function HomeClient({
                 transition={{ duration: 0.6, delay: 0.12 }}
                 className="mb-4 flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b57c] sm:mb-6 sm:text-[10px] sm:tracking-[0.28em]"
               >
-                <span className="h-px w-9 bg-[#d7b57c]/70" /> Immobilier résidentiel au Maroc
+                <span className="h-px w-9 bg-[#d7b57c]/70" /> Immobilier résidentiel {city ? `à ${city}` : 'au Maroc'}
               </motion.div>
 
               <motion.h1
@@ -345,8 +366,9 @@ export default function HomeClient({
                 transition={{ duration: 0.75, delay: 0.3 }}
                 className="mt-5 max-w-xl text-[14px] leading-6 text-white/68 sm:mt-7 sm:text-base sm:leading-8"
               >
-                Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca,
-                Marrakech, Rabat et Tanger.
+                {city
+                  ? `Une sélection de villas, appartements et propriétés à ${city}.`
+                  : 'Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca, Marrakech, Rabat et Tanger.'}
               </motion.p>
 
               <motion.div
@@ -356,7 +378,7 @@ export default function HomeClient({
                 className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row"
               >
                 <Link
-                  href="/biens"
+                  href={propertiesHref}
                   className="brand-primary-bg brand-secondary-text group inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#d7b57c] px-6 py-3.5 text-[12px] font-bold text-[#17221f] transition-all hover:-translate-y-0.5 hover:bg-[#e4c691] sm:w-auto"
                 >
                   Découvrir les propriétés
@@ -386,7 +408,7 @@ export default function HomeClient({
               </div>
               <div className="grid grid-cols-2 gap-3 py-4">
                 {[
-                  ['Ville', 'Casablanca'],
+                  ['Ville', city ?? 'Casablanca'],
                   ['Type', 'Villa'],
                   ['Budget', 'Sur mesure'],
                   ['Projet', 'Achat'],
@@ -412,11 +434,15 @@ export default function HomeClient({
 
       <section className="border-b border-[#17221f]/8 bg-white">
         <div className="mx-auto grid max-w-[1380px] grid-cols-1 divide-y divide-[#17221f]/8 px-5 sm:px-8 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-10">
-          {[
+          {(city ? [
+            [city, `Une sélection immobilière centrée sur ${city}`],
+            ['Vente · Location', 'Des biens présentés avec leurs informations essentielles'],
+            ['Conseil · Accompagnement', 'Un échange clair du premier contact à la visite'],
+          ] : [
             ['Casablanca · Marrakech', 'Une sélection dans les marchés les plus recherchés'],
             ['Rabat · Tanger', 'Une présence pensée pour vos projets au Maroc'],
             ['Vente · Location · Conseil', 'Un accompagnement clair du premier échange à la signature'],
-          ].map(([title, text]) => (
+          ]).map(([title, text]) => (
             <div key={title} className="px-0 py-6 md:px-7 lg:px-9">
               <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#8b6b3f]">{title}</p>
               <p className="mt-2 max-w-sm text-[13px] leading-5 text-[#58615d]">{text}</p>
@@ -434,7 +460,7 @@ export default function HomeClient({
                 Des propriétés choisies pour leur caractère.
               </h2>
             </div>
-            <Link href="/biens" className="group inline-flex w-fit items-center gap-2 text-[12px] font-bold text-[#76562c]">
+            <Link href={propertiesHref} className="group inline-flex w-fit items-center gap-2 text-[12px] font-bold text-[#76562c]">
               Voir tous les biens
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
@@ -454,7 +480,7 @@ export default function HomeClient({
           {properties.map((property, index) => (
             <Reveal key={property.id} delay={index * 0.08} className="w-[86vw] max-w-[400px] shrink-0 snap-center lg:w-auto lg:max-w-none">
               <Link
-                href={`/biens/${property.id}`}
+                href={immoBuiltBrand ? getBrandHref(immoBuiltBrand, `/biens/${property.id}`) : `/biens/${property.id}`}
                 className="group block overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_55px_rgba(23,34,31,0.06)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_26px_70px_rgba(23,34,31,0.11)]"
               >
                 <div className="relative h-[270px] overflow-hidden sm:h-[330px]">
@@ -509,7 +535,7 @@ export default function HomeClient({
             <div className="max-w-2xl">
               <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-[#d7b57c]">Nos territoires</p>
               <h2 className="text-3xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-4xl md:text-[52px]">
-                Quatre villes, quatre façons d’habiter le Maroc.
+                {city ? `Les adresses à découvrir à ${city}.` : 'Quatre villes, quatre façons d’habiter le Maroc.'}
               </h2>
             </div>
           </Reveal>
@@ -524,26 +550,26 @@ export default function HomeClient({
             onFocusCapture={citiesCarousel.stopAutoSlide}
             className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4"
           >
-            {CITIES.map((city, index) => (
-              <Reveal key={city.name} delay={index * 0.06} className="w-[78vw] max-w-[330px] shrink-0 snap-center sm:w-auto sm:max-w-none">
+            {locations.map((location, index) => (
+              <Reveal key={location.name} delay={index * 0.06} className="w-[78vw] max-w-[330px] shrink-0 snap-center sm:w-auto sm:max-w-none">
                 <button
                   onClick={() => scrollTo('contact')}
                   className="group relative block h-[360px] w-full overflow-hidden rounded-[24px] text-left sm:h-[420px]"
                 >
-                  {city.image.includes('commons.wikimedia.org') ? (
+                  {location.image.includes('commons.wikimedia.org') ? (
                     // Wikimedia is intentionally kept as a lazy native image because it is outside the Next image allowlist.
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
-                      src={city.image}
-                      alt={`Vue de ${city.name}`}
+                      src={location.image}
+                      alt={`Vue de ${location.name}`}
                       loading="lazy"
                       decoding="async"
                       className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
                     />
                   ) : (
                     <Image
-                      src={city.image}
-                      alt={`Vue de ${city.name}`}
+                      src={location.image}
+                      alt={`Vue de ${location.name}`}
                       fill
                       className="object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-[1.06]"
                       sizes="(max-width: 640px) 78vw, (max-width: 1024px) 50vw, 25vw"
@@ -551,8 +577,8 @@ export default function HomeClient({
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/10" />
                   <div className="absolute inset-x-0 bottom-0 p-5">
-                    <p className="text-2xl font-medium tracking-[-0.03em]">{city.name}</p>
-                    <p className="mt-1.5 text-[11px] text-white/60">{city.subtitle}</p>
+                    <p className="text-2xl font-medium tracking-[-0.03em]">{location.name}</p>
+                    <p className="mt-1.5 text-[11px] text-white/60">{location.subtitle}</p>
                     <span className="mt-4 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#e1c795]">
                       Explorer <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </span>
@@ -604,7 +630,7 @@ export default function HomeClient({
         <div className="grid overflow-hidden rounded-[30px] bg-[#e9e2d6] lg:grid-cols-2">
           <div className="relative min-h-[300px] sm:min-h-[420px] lg:min-h-[560px]">
             <Image
-              src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1400&q=85"
+              src={featureImage}
               alt="Intérieur résidentiel haut de gamme"
               fill
               className="object-cover"
@@ -675,7 +701,7 @@ export default function HomeClient({
                 <ArrowRight className="h-4 w-4 text-[#d7b57c]" />
               </div>
               <a
-                href="https://wa.me/212723037305"
+                href={whatsappUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="mt-3 flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-white/12 bg-white/8 px-4 py-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-white/12 sm:text-[11px]"
@@ -693,28 +719,28 @@ export default function HomeClient({
             <div>
               <AgencyLogo light />
               <p className="mt-5 max-w-sm text-[12px] leading-6 text-white/40">
-                Immobilier résidentiel au Maroc. Sélection de propriétés, conseil et accompagnement personnalisé.
+                Immobilier résidentiel {city ? `à ${city}` : 'au Maroc'}. Sélection de propriétés, conseil et accompagnement personnalisé.
               </p>
             </div>
 
             <div className="text-[12px]">
               <p className="mb-4 font-semibold text-white">Navigation</p>
-              <Link href="/biens" className="mb-2.5 block transition-colors hover:text-white">Nos biens</Link>
+              <Link href={propertiesHref} className="mb-2.5 block transition-colors hover:text-white">Nos biens</Link>
               <button onClick={() => scrollTo('expertise')} className="mb-2.5 block transition-colors hover:text-white">Expertise</button>
               <button onClick={() => scrollTo('villes')} className="mb-2.5 block transition-colors hover:text-white">Villes</button>
             </div>
 
             <div className="text-[12px]">
               <p className="mb-4 font-semibold text-white">Contact</p>
-              <a href="tel:+212723037305" className="mb-2.5 block transition-colors hover:text-white">+212 723-037305</a>
-              <a href="mailto:contact@maisonatlas.ma" className="mb-2.5 block transition-colors hover:text-white">contact@maisonatlas.ma</a>
-              <p>Casablanca, Maroc</p>
+              <a href={phoneHref} className="mb-2.5 block transition-colors hover:text-white">{displayPhone}</a>
+              {!immoBuiltBrand && <a href="mailto:contact@maisonatlas.ma" className="mb-2.5 block transition-colors hover:text-white">contact@maisonatlas.ma</a>}
+              <p>{city ?? 'Casablanca'}, Maroc</p>
             </div>
           </div>
 
           <div className="mt-10 flex flex-col justify-between gap-3 border-t border-white/8 pt-6 text-[10px] text-white/25 sm:flex-row">
             <p>© 2026 {agencyName}. Tous droits réservés.</p>
-            <p>Casablanca · Marrakech · Rabat · Tanger</p>
+            <p>{city ?? 'Casablanca · Marrakech · Rabat · Tanger'}</p>
           </div>
         </div>
       </footer>

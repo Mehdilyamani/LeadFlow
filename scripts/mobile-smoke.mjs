@@ -92,6 +92,8 @@ const cases = [
   { path: '/demo-preview/good-kech-immo/biens', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077' },
   { path: '/demo-preview/good-kech-immo/biens/gki-villa-amelkis', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077' },
   { path: '/demo-preview/immo-built', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo-preview/immo-built/biens', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo-preview/immo-built/biens/ib-appartement-cfc', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
 ]
 
 let failed = false

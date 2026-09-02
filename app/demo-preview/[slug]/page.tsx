@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { DemoBrandProvider } from '../../demoBranding'
 import { getDemoBrandBySlug } from '../../demoBrands'
+import HomeClient from '../../HomeClient'
 import GoodKechHome from '../../goodKech/GoodKechHome'
 import { IMMO_BUILT_AREAS, IMMO_BUILT_PROPERTIES } from '../../immoBuilt/data'
 
@@ -26,13 +28,14 @@ export default async function DemoPreviewPage({ params }: { params: Promise<{ sl
 
   if (brand?.experience === 'immo-built') {
     return (
-      <GoodKechHome
-        brand={brand}
-        properties={IMMO_BUILT_PROPERTIES}
-        locations={IMMO_BUILT_AREAS}
-        heroImage="/demos/immo-built/hero-cfc.webp"
-        featureImage="/demos/immo-built/office.webp"
-      />
+      <DemoBrandProvider initialBrand={brand}>
+        <HomeClient
+          properties={IMMO_BUILT_PROPERTIES}
+          locations={IMMO_BUILT_AREAS.map((area) => ({ ...area, subtitle: area.detail }))}
+          heroImage="/demos/immo-built/hero-cfc.webp"
+          featureImage="/demos/immo-built/office.webp"
+        />
+      </DemoBrandProvider>
     )
   }
 

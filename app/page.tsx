@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import AgencyHome from './AgencyHome'
+import HomeClient from './HomeClient'
 import GoodKechHome from './goodKech/GoodKechHome'
 import { IMMO_BUILT_AREAS, IMMO_BUILT_PROPERTIES } from './immoBuilt/data'
 import { getRequestDemoBrand } from './requestDemoBrand'
@@ -23,10 +24,9 @@ export default async function Home() {
 
   if (brand?.experience === 'immo-built') {
     return (
-      <GoodKechHome
-        brand={brand}
+      <HomeClient
         properties={IMMO_BUILT_PROPERTIES}
-        locations={IMMO_BUILT_AREAS}
+        locations={IMMO_BUILT_AREAS.map((area) => ({ ...area, subtitle: area.detail }))}
         heroImage="/demos/immo-built/hero-cfc.webp"
         featureImage="/demos/immo-built/office.webp"
       />

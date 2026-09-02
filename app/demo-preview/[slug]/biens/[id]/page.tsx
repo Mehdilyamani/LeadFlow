@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation'
+import { DemoBrandProvider } from '../../../../demoBranding'
 import { getDemoBrandBySlug } from '../../../../demoBrands'
+import PropertyDetail from '../../../../biens/[id]/PropertyDetail'
 import GoodKechPropertyDetail from '../../../../goodKech/GoodKechPropertyDetail'
 import { GOOD_KECH_PROPERTIES } from '../../../../goodKech/data'
 import { IMMO_BUILT_PROPERTIES } from '../../../../immoBuilt/data'
@@ -19,7 +21,11 @@ export default async function DemoPreviewProperty({ params }: { params: Promise<
     const property = IMMO_BUILT_PROPERTIES.find((item) => item.id === id)
     if (!property) notFound()
     const similar = IMMO_BUILT_PROPERTIES.filter((item) => item.id !== id).slice(0, 3)
-    return <GoodKechPropertyDetail brand={brand} property={property} similar={similar} />
+    return (
+      <DemoBrandProvider initialBrand={brand}>
+        <PropertyDetail property={property} similar={similar} />
+      </DemoBrandProvider>
+    )
   }
 
   notFound()
