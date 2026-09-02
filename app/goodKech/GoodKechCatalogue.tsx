@@ -28,6 +28,9 @@ export default function GoodKechCatalogue({ brand, properties }: { brand: DemoBr
   const catalogueCopy = city === 'Marrakech'
     ? 'Villas, riads, appartements et opportunités de démonstration sélectionnés dans les secteurs les plus recherchés de Marrakech.'
     : `Villas, appartements et opportunités de démonstration sélectionnés dans différents secteurs de ${city}.`
+  const availableFilters = FILTERS.filter((filter) =>
+    filter.value === 'Tous' || properties.some((property) => property.type === filter.value),
+  )
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('fr')
@@ -54,7 +57,7 @@ export default function GoodKechCatalogue({ brand, properties }: { brand: DemoBr
           </Reveal>
           <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex snap-x gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {FILTERS.map((filter) => (
+              {availableFilters.map((filter) => (
                 <button
                   key={filter.value}
                   type="button"

@@ -36,6 +36,15 @@ const CATEGORIES = [
   { label: "Opportunités d’investissement", detail: 'Biens sélectionnés selon votre projet', icon: KeyRound },
 ]
 
+const CASABLANCA_CATEGORIES = [
+  { label: 'Appartements haut standing', detail: 'Adresses centrales et résidences', icon: Building2 },
+  { label: 'Villas', detail: 'Architecture, jardins et espaces de vie', icon: Home },
+  { label: 'Biens avec terrasse', detail: 'Volumes lumineux et extérieurs', icon: Trees },
+  { label: 'Projets résidentiels', detail: 'Programmes et résidences à découvrir', icon: Map },
+  { label: 'Biens familiaux', detail: 'Espaces adaptés à la vie quotidienne', icon: Landmark },
+  { label: 'Opportunités d’investissement', detail: 'Biens sélectionnés selon votre projet', icon: KeyRound },
+]
+
 const BENEFITS = [
   'Une recherche définie autour de vos critères',
   'Une sélection claire et facile à comparer',
@@ -67,6 +76,7 @@ export default function GoodKechHome({
   const whatsapp = getWhatsAppUrl(brand)
   const city = brand.city ?? 'Marrakech'
   const isMarrakech = city === 'Marrakech'
+  const categories = isMarrakech ? CATEGORIES : CASABLANCA_CATEGORIES
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f6f0e6] text-[#171512] selection:bg-[#b28a55] selection:text-white">
@@ -157,7 +167,7 @@ export default function GoodKechHome({
             />
           </Reveal>
           <div className="mt-12 grid border-l border-t border-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {CATEGORIES.map((category, index) => {
+            {categories.map((category, index) => {
               const Icon = category.icon
               return (
                 <Reveal key={category.label} delay={Math.min(index * 0.04, 0.12)}>
