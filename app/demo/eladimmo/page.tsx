@@ -24,6 +24,8 @@ export default function EladimmoDemoPage() {
         heroAccent="notre priorité."
         heroDescription="Appartements, villas et terrains à vendre à Rabat, Témara et leurs environs."
         transactionLabel="Vente immobilière"
+        compactMobileHero
+        autoSlideIntervalMs={3600}
       />
     </DemoBrandProvider>
   )

@@ -86,7 +86,7 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
-function useMobileAutoCarousel(itemCount: number) {
+function useMobileAutoCarousel(itemCount: number, intervalMs = 5200) {
   const carouselRef = useRef<HTMLDivElement>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const stoppedByUserRef = useRef(false)
@@ -149,7 +149,7 @@ function useMobileAutoCarousel(itemCount: number) {
         return
       }
 
-      intervalRef.current = setInterval(advance, 5200)
+      intervalRef.current = setInterval(advance, intervalMs)
     }
 
     syncAutoSlide()
@@ -161,7 +161,7 @@ function useMobileAutoCarousel(itemCount: number) {
       mobileQuery.removeEventListener('change', syncAutoSlide)
       reducedMotionQuery.removeEventListener('change', syncAutoSlide)
     }
-  }, [clearAutoSlide, itemCount])
+  }, [clearAutoSlide, intervalMs, itemCount])
 
   return { carouselRef, stopAutoSlide }
 }
@@ -237,6 +237,8 @@ export default function HomeClient({
   heroAccent = 'Des décisions justes.',
   heroDescription,
   transactionLabel,
+  compactMobileHero = false,
+  autoSlideIntervalMs = 5200,
 }: {
   properties: Property[]
   locations?: DemoLocationCard[]
@@ -247,6 +249,8 @@ export default function HomeClient({
   heroAccent?: string
   heroDescription?: string
   transactionLabel?: string
+  compactMobileHero?: boolean
+  autoSlideIntervalMs?: number
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const demoBrand = useDemoBrand()
@@ -260,8 +264,8 @@ export default function HomeClient({
   const whatsappUrl = immoBuiltBrand ? getWhatsAppUrl(immoBuiltBrand) : 'https://wa.me/212723037305'
   const homeHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/') : '/demo'
   const propertiesHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/biens') : '/biens'
-  const propertiesCarousel = useMobileAutoCarousel(properties.length)
-  const citiesCarousel = useMobileAutoCarousel(locations.length)
+  const propertiesCarousel = useMobileAutoCarousel(properties.length, autoSlideIntervalMs)
+  const citiesCarousel = useMobileAutoCarousel(locations.length, autoSlideIntervalMs)
 
   return (
     <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
@@ -340,14 +344,14 @@ export default function HomeClient({
             alt={city ? `Bien immobilier à ${city}` : 'Villa contemporaine au Maroc'}
             fill
             priority
-            className="object-cover"
+            className={`object-cover ${compactMobileHero ? 'scale-[1.14] object-[56%_center] sm:scale-100 sm:object-center' : ''}`}
             sizes="100vw"
           />
         </motion.div>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(12,20,17,.88)_0%,rgba(12,20,17,.63)_43%,rgba(12,20,17,.17)_72%,rgba(12,20,17,.28)_100%)]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#101916]/80 via-transparent to-[#101916]/30" />
 
-        <div className="relative mx-auto flex min-h-[100svh] max-w-[1380px] items-end px-4 pb-10 pt-28 sm:min-h-[92vh] sm:px-8 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-24">
+        <div className={`relative mx-auto flex min-h-[100svh] max-w-[1380px] px-4 sm:min-h-[92vh] sm:items-end sm:px-8 sm:pb-20 sm:pt-32 lg:px-10 lg:pb-24 ${compactMobileHero ? 'items-center pb-6 pt-[88px]' : 'items-end pb-10 pt-28'}`}>
           <div className="grid w-full gap-12 lg:grid-cols-[1.12fr_.88fr] lg:items-end">
             <div className="max-w-3xl">
               <motion.div
