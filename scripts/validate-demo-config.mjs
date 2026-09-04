@@ -34,9 +34,10 @@ const demoFiles = [
   'app/goodKech/data.ts',
   'app/immoBuilt/ImmoBuiltHome.tsx',
   'app/immoBuilt/data.ts',
+  'app/eladimmo/data.ts',
 ]
 
-const propertySources = ['app/goodKech/data.ts', 'app/immoBuilt/data.ts']
+const propertySources = ['app/goodKech/data.ts', 'app/immoBuilt/data.ts', 'app/eladimmo/data.ts']
 for (const relativePath of propertySources) {
   const ids = [...read(relativePath).matchAll(/\bid:\s*'([^']+)'/g)].map((match) => match[1])
   const duplicates = ids.filter((id, index) => ids.indexOf(id) !== index)

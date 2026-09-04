@@ -6,7 +6,8 @@ export type DemoBrand = {
   primaryColor: string
   secondaryColor: string
   logoPath: string
-  experience?: 'good-kech-immo' | 'immo-built'
+  logoVariant?: 'mark' | 'wordmark'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -64,6 +65,25 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         'Découvrez une sélection de biens immobiliers à Casablanca avec Immo Built.',
     },
   },
+  'path:eladimmo': {
+    slug: 'eladimmo',
+    agencyName: 'ALADIMMO',
+    primaryColor: '#e77b32',
+    secondaryColor: '#082643',
+    logoPath: '/demos/eladimmo-logo.webp',
+    logoVariant: 'wordmark',
+    experience: 'eladimmo',
+    city: 'Rabat et Témara',
+    whatsappNumber: '212662033540',
+    displayPhone: '+212 6 62 03 35 40',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de ALADIMMO.",
+    metadata: {
+      title: 'ALADIMMO | Immobilier à Rabat et Témara',
+      description:
+        'Découvrez une sélection de biens à vendre à Rabat et Témara avec ALADIMMO.',
+    },
+  },
 }
 
 export function getDemoBrand(hostname: string): DemoBrand | null {
@@ -74,6 +94,10 @@ export function getDemoBrandBySlug(slug: string, basePath?: string): DemoBrand |
   const normalizedSlug = slug.trim().toLowerCase()
   const brand = Object.values(DEMO_BRANDS).find((candidate) => candidate.slug === normalizedSlug)
   return brand ? { ...brand, basePath: basePath ?? `/demo-preview/${normalizedSlug}` } : null
+}
+
+export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
+  return brand?.experience === 'immo-built' || brand?.experience === 'eladimmo'
 }
 
 export function getHostname(hostHeader: string | null): string {

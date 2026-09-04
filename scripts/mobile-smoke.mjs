@@ -97,6 +97,9 @@ const cases = [
   { path: '/demo/immo-built', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo/immo-built/biens', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo/immo-built/biens/ib-appartement-cfc', width: 390, height: 844, brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/eladimmo', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
+  { path: '/demo/eladimmo/biens', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
+  { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
 ]
 
 let failed = false

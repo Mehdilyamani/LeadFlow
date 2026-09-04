@@ -10,6 +10,9 @@ const checks = [
   { path: '/demo/immo-built', brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo/immo-built/biens', brand: 'Immo Built', phone: '212687004021' },
   { path: '/demo/immo-built/biens/ib-appartement-cfc', brand: 'Immo Built', phone: '212687004021' },
+  { path: '/demo/eladimmo', brand: 'ALADIMMO', phone: '212662033540' },
+  { path: '/demo/eladimmo/biens', brand: 'ALADIMMO', phone: '212662033540' },
+  { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', brand: 'ALADIMMO', phone: '212662033540' },
 ]
 
 let failed = false

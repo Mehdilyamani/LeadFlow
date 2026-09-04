@@ -22,7 +22,7 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from '../demoBranding'
-import { getBrandHref, getWhatsAppUrl } from '../demoBrands'
+import { getBrandHref, getWhatsAppUrl, isModernDemoBrand } from '../demoBrands'
 import type { Property, PropertyType } from '../lib/properties'
 
 const DEFAULT_WHATSAPP_URL = 'https://wa.me/212723037305'
@@ -54,7 +54,7 @@ function AgencyLogo({ light = false }: { light?: boolean }) {
           </span>
         }
       />
-      <span className="leading-none">
+      {demoBrand?.logoVariant !== 'wordmark' && <span className="leading-none">
         <span
           className={`block text-[13px] font-semibold tracking-[0.17em] ${
             light ? 'text-white' : 'text-[#17221f]'
@@ -69,7 +69,7 @@ function AgencyLogo({ light = false }: { light?: boolean }) {
         >
           Immobilier
         </span>
-      </span>
+      </span>}
     </span>
   )
 }
@@ -107,7 +107,7 @@ export default function BiensClient({
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const demoBrand = useDemoBrand()
-  const immoBuiltBrand = demoBrand?.experience === 'immo-built' ? demoBrand : null
+  const immoBuiltBrand = isModernDemoBrand(demoBrand) ? demoBrand : null
   const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
   const city = immoBuiltBrand?.city
   const displayPhone = immoBuiltBrand?.displayPhone ?? '+212 723-037305'

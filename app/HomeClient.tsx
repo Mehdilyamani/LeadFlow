@@ -26,7 +26,7 @@ import {
   X,
 } from 'lucide-react'
 import { DemoBrandMark, useDemoBrand } from './demoBranding'
-import { getBrandHref, getWhatsAppUrl } from './demoBrands'
+import { getBrandHref, getWhatsAppUrl, isModernDemoBrand } from './demoBrands'
 import type { Property } from './lib/properties'
 
 export type DemoLocationCard = {
@@ -207,7 +207,7 @@ function AgencyLogo({ light = false }: { light?: boolean }) {
           </span>
         }
       />
-      <span className="leading-none">
+      {demoBrand?.logoVariant !== 'wordmark' && <span className="leading-none">
         <span
           className={`block text-[13px] font-semibold tracking-[0.17em] ${
             light ? 'text-white' : 'text-[#17221f]'
@@ -222,7 +222,7 @@ function AgencyLogo({ light = false }: { light?: boolean }) {
         >
           Immobilier
         </span>
-      </span>
+      </span>}
     </span>
   )
 }
@@ -232,15 +232,25 @@ export default function HomeClient({
   locations = CITIES,
   heroImage = 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1800&q=88',
   featureImage = 'https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=1400&q=85',
+  heroEyebrow,
+  heroTitle = 'Des lieux rares.',
+  heroAccent = 'Des décisions justes.',
+  heroDescription,
+  transactionLabel,
 }: {
   properties: Property[]
   locations?: DemoLocationCard[]
   heroImage?: string
   featureImage?: string
+  heroEyebrow?: string
+  heroTitle?: string
+  heroAccent?: string
+  heroDescription?: string
+  transactionLabel?: string
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const demoBrand = useDemoBrand()
-  const immoBuiltBrand = demoBrand?.experience === 'immo-built' ? demoBrand : null
+  const immoBuiltBrand = isModernDemoBrand(demoBrand) ? demoBrand : null
   const agencyName = demoBrand?.agencyName ?? 'Maison Atlas Immobilier'
   const shortAgencyName = demoBrand?.agencyName ?? 'Maison Atlas'
   const city = immoBuiltBrand?.city
@@ -346,7 +356,7 @@ export default function HomeClient({
                 transition={{ duration: 0.6, delay: 0.12 }}
                 className="mb-4 flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b57c] sm:mb-6 sm:text-[10px] sm:tracking-[0.28em]"
               >
-                <span className="h-px w-9 bg-[#d7b57c]/70" /> Immobilier résidentiel {city ? `à ${city}` : 'au Maroc'}
+                <span className="h-px w-9 bg-[#d7b57c]/70" /> {heroEyebrow ?? `Immobilier résidentiel ${city ? `à ${city}` : 'au Maroc'}`}
               </motion.div>
 
               <motion.h1
@@ -355,9 +365,9 @@ export default function HomeClient({
                 transition={{ duration: 0.85, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
                 className="max-w-3xl text-[clamp(2.45rem,12vw,2.875rem)] font-medium leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[78px]"
               >
-                Des lieux rares.
+                {heroTitle}
                 <br />
-                <span className="brand-primary-text font-serif font-normal italic text-[#d7b57c]">Des décisions justes.</span>
+                <span className="brand-primary-text font-serif font-normal italic text-[#d7b57c]">{heroAccent}</span>
               </motion.h1>
 
               <motion.p
@@ -366,9 +376,9 @@ export default function HomeClient({
                 transition={{ duration: 0.75, delay: 0.3 }}
                 className="mt-5 max-w-xl text-[14px] leading-6 text-white/68 sm:mt-7 sm:text-base sm:leading-8"
               >
-                {city
+                {heroDescription ?? (city
                   ? `Une sélection de villas, appartements et propriétés à ${city}.`
-                  : 'Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca, Marrakech, Rabat et Tanger.'}
+                  : 'Villas, appartements de standing, penthouses et riads sélectionnés à Casablanca, Marrakech, Rabat et Tanger.')}
               </motion.p>
 
               <motion.div
@@ -436,7 +446,7 @@ export default function HomeClient({
         <div className="mx-auto grid max-w-[1380px] grid-cols-1 divide-y divide-[#17221f]/8 px-5 sm:px-8 md:grid-cols-3 md:divide-x md:divide-y-0 lg:px-10">
           {(city ? [
             [city, `Une sélection immobilière centrée sur ${city}`],
-            ['Vente · Location', 'Des biens présentés avec leurs informations essentielles'],
+            [transactionLabel ?? 'Vente · Location', 'Des biens présentés avec leurs informations essentielles'],
             ['Conseil · Accompagnement', 'Un échange clair du premier contact à la visite'],
           ] : [
             ['Casablanca · Marrakech', 'Une sélection dans les marchés les plus recherchés'],

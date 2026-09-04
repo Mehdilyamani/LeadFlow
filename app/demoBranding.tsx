@@ -106,13 +106,15 @@ export function DemoBrandMark({
     return <>{fallback}</>
   }
 
+  const isWordmark = brand.logoVariant === 'wordmark'
+
   return (
     <Image
       src={brand.logoPath}
       alt={`${brand.agencyName} logo`}
-      width={48}
-      height={48}
-      className={className}
+      width={isWordmark ? 126 : 48}
+      height={isWordmark ? 62 : 48}
+      className={`${className}${isWordmark ? ' !h-10 !w-auto !rounded-none' : ''}`}
       priority={priority}
       onError={() => setFailedLogo(brand.logoPath)}
     />
