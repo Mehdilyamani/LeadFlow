@@ -86,7 +86,7 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
-function useMobileAutoCarousel(itemCount: number, intervalMs = 5200) {
+function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = true) {
   const carouselRef = useRef<HTMLDivElement>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const stoppedByUserRef = useRef(false)
@@ -141,6 +141,7 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200) {
       clearAutoSlide()
 
       if (
+        !enabled ||
         stoppedByUserRef.current ||
         !mobileQuery.matches ||
         reducedMotionQuery.matches ||
@@ -161,7 +162,7 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200) {
       mobileQuery.removeEventListener('change', syncAutoSlide)
       reducedMotionQuery.removeEventListener('change', syncAutoSlide)
     }
-  }, [clearAutoSlide, intervalMs, itemCount])
+  }, [clearAutoSlide, enabled, intervalMs, itemCount])
 
   return { carouselRef, stopAutoSlide }
 }
@@ -243,6 +244,7 @@ export default function HomeClient({
   compactMobileHero = false,
   instantHeroText = false,
   propertyCardRevealOffset = 24,
+  autoSlideEnabled = true,
   autoSlideIntervalMs = 5200,
 }: {
   properties: Property[]
@@ -258,6 +260,7 @@ export default function HomeClient({
   compactMobileHero?: boolean
   instantHeroText?: boolean
   propertyCardRevealOffset?: number
+  autoSlideEnabled?: boolean
   autoSlideIntervalMs?: number
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -272,8 +275,8 @@ export default function HomeClient({
   const whatsappUrl = immoBuiltBrand ? getWhatsAppUrl(immoBuiltBrand) : 'https://wa.me/212723037305'
   const homeHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/') : '/demo'
   const propertiesHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/biens') : '/biens'
-  const propertiesCarousel = useMobileAutoCarousel(properties.length, autoSlideIntervalMs)
-  const citiesCarousel = useMobileAutoCarousel(locations.length, autoSlideIntervalMs)
+  const propertiesCarousel = useMobileAutoCarousel(properties.length, autoSlideIntervalMs, autoSlideEnabled)
+  const citiesCarousel = useMobileAutoCarousel(locations.length, autoSlideIntervalMs, autoSlideEnabled)
 
   return (
     <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
@@ -512,7 +515,9 @@ export default function HomeClient({
               key={property.id}
               delay={index * 0.08}
               offsetY={propertyCardRevealOffset}
-              className="w-[86vw] max-w-[400px] shrink-0 snap-center lg:w-auto lg:max-w-none"
+              className={`max-w-[400px] shrink-0 lg:w-auto lg:max-w-none ${
+                autoSlideEnabled ? 'w-[86vw] snap-center' : 'w-[84vw] snap-start'
+              }`}
             >
               <Link
                 href={immoBuiltBrand ? getBrandHref(immoBuiltBrand, `/biens/${property.id}`) : `/biens/${property.id}`}
@@ -586,7 +591,13 @@ export default function HomeClient({
             className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4"
           >
             {locations.map((location, index) => (
-              <Reveal key={location.name} delay={index * 0.06} className="w-[78vw] max-w-[330px] shrink-0 snap-center sm:w-auto sm:max-w-none">
+              <Reveal
+                key={location.name}
+                delay={index * 0.06}
+                className={`max-w-[330px] shrink-0 sm:w-auto sm:max-w-none ${
+                  autoSlideEnabled ? 'w-[78vw] snap-center' : 'w-[76vw] snap-start'
+                }`}
+              >
                 <button
                   onClick={() => scrollTo('contact')}
                   className="group relative block h-[360px] w-full overflow-hidden rounded-[24px] text-left sm:h-[420px]"

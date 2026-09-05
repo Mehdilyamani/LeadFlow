@@ -27,8 +27,8 @@ export default function AgenceRedaDemoPage() {
         transactionLabel="Vente · Location"
         compactMobileHero
         instantHeroText
-        propertyCardRevealOffset={52}
-        autoSlideIntervalMs={3800}
+        propertyCardRevealOffset={24}
+        autoSlideEnabled={false}
       />
     </DemoBrandProvider>
   )

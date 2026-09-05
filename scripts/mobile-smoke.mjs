@@ -100,8 +100,8 @@ const cases = [
   { path: '/demo/eladimmo', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
-  { path: '/demo/agence-reda', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
-  { path: '/demo/agence-reda/biens', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
+  { path: '/demo/agence-reda', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', manualCarousels: true },
+  { path: '/demo/agence-reda/biens', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', detailHref: '/demo/agence-reda/biens/reda-appartement-hamria', noPreview: true },
   { path: '/demo/agence-reda/biens/reda-appartement-hamria', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
 ]
 
@@ -148,6 +148,7 @@ try {
       if (imagesReady.result.value) break
       await delay(100)
     }
+    if (testCase.manualCarousels) await delay(4500)
 
     const evaluation = await client.send('Runtime.evaluate', {
       expression: `(() => ({
@@ -156,16 +157,33 @@ try {
         brand: document.body.innerText.includes(${JSON.stringify(testCase.brand)}),
         phone: document.documentElement.innerHTML.includes(${JSON.stringify(testCase.phone)}),
         heroLoaded: [...document.images].filter((image) => { const rect = image.getBoundingClientRect(); return rect.width > 0 && rect.height > 0 && rect.top < innerHeight }).every((image) => image.complete && image.naturalWidth > 0),
-        propertyLink: document.querySelector('a[href*="/biens/"]')?.getAttribute('href') ?? null
+        directPropertyLink: document.querySelector('a[aria-label^="Consulter la fiche complète"]')?.getAttribute('href') ?? null,
+        previewVisible: document.body.innerText.includes('Aperçu'),
+        carousels: [...document.querySelectorAll('[role="region"]')].map((carousel) => {
+          const cards = [...carousel.children]
+          const next = cards[1]?.getBoundingClientRect()
+          return {
+            scrollLeft: carousel.scrollLeft,
+            nextCardVisible: Boolean(next && next.left < innerWidth && next.right > 0),
+          }
+        })
       }))()`,
       returnByValue: true,
     })
     const result = evaluation.result.value
+    const manualCarouselsValid = !testCase.manualCarousels
+      || (result.carousels.length >= 2
+        && result.carousels.slice(0, 2).every((carousel) => carousel.scrollLeft <= 20 && carousel.nextCardVisible))
+    const detailLinkValid = !testCase.detailHref || result.directPropertyLink === testCase.detailHref
+    const previewValid = !testCase.noPreview || !result.previewVisible
     const valid = result.width === testCase.width
       && result.scrollWidth <= result.width
       && result.brand
       && result.phone
       && result.heroLoaded
+      && manualCarouselsValid
+      && detailLinkValid
+      && previewValid
       && runtimeErrors.length === 0
       && failedRequests.length === 0
 
@@ -173,6 +191,9 @@ try {
     if (!valid) {
       if (runtimeErrors.length) console.error(`  runtime: ${runtimeErrors.join('; ')}`)
       if (failedRequests.length) console.error(`  network: ${failedRequests.join('; ')}`)
+      if (!manualCarouselsValid) console.error(`  carousels: ${JSON.stringify(result.carousels)}`)
+      if (!detailLinkValid) console.error(`  detail link: ${result.directPropertyLink}`)
+      if (!previewValid) console.error('  preview button is still visible')
       failed = true
     }
   }

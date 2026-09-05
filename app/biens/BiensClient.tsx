@@ -99,9 +99,11 @@ function Reveal({
 export default function BiensClient({
   properties,
   heroImage = 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1800&q=88',
+  directToDetails = false,
 }: {
   properties: Property[]
   heroImage?: string
+  directToDetails?: boolean
 }) {
   const [activeFilter, setActiveFilter] = useState<'Tous' | PropertyType>('Tous')
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null)
@@ -325,6 +327,10 @@ export default function BiensClient({
                 key={property.id}
                 property={property}
                 index={index}
+                detailHref={immoBuiltBrand
+                  ? getBrandHref(immoBuiltBrand, `/biens/${property.id}`)
+                  : `/biens/${property.id}`}
+                directToDetails={directToDetails}
                 onOpen={() => setSelectedProperty(property)}
               />
             ))}
@@ -430,6 +436,9 @@ export default function BiensClient({
         {selectedProperty && (
           <PropertyModal
             property={selectedProperty}
+            detailHref={immoBuiltBrand
+              ? getBrandHref(immoBuiltBrand, `/biens/${selectedProperty.id}`)
+              : `/biens/${selectedProperty.id}`}
             onClose={() => setSelectedProperty(null)}
             onContact={() => {
               setSelectedProperty(null)
@@ -446,10 +455,14 @@ export default function BiensClient({
 function PropertyCard({
   property: p,
   index,
+  detailHref,
+  directToDetails,
   onOpen,
 }: {
   property: Property
   index: number
+  detailHref: string
+  directToDetails: boolean
   onOpen: () => void
 }) {
   return (
@@ -459,9 +472,25 @@ function PropertyCard({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.97 }}
       transition={{ duration: 0.55, delay: Math.min(index * 0.06, 0.24), ease: [0.22, 1, 0.36, 1] }}
-      className="group flex h-full flex-col overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_50px_rgba(23,34,31,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(23,34,31,0.10)]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_50px_rgba(23,34,31,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_70px_rgba(23,34,31,0.10)]"
     >
-      <button onClick={onOpen} className="relative block h-[260px] w-full overflow-hidden text-left sm:h-[330px]">
+      {directToDetails && (
+        <Link
+          href={detailHref}
+          aria-label={`Consulter la fiche complète : ${p.title}`}
+          className="absolute inset-0 z-20"
+        />
+      )}
+
+      <div
+        role={directToDetails ? undefined : 'button'}
+        tabIndex={directToDetails ? undefined : 0}
+        onClick={directToDetails ? undefined : onOpen}
+        onKeyDown={directToDetails ? undefined : (event) => {
+          if (event.key === 'Enter' || event.key === ' ') onOpen()
+        }}
+        className="relative block h-[260px] w-full overflow-hidden text-left sm:h-[330px]"
+      >
         <Image
           src={p.image}
           alt={p.title}
@@ -489,7 +518,7 @@ function PropertyCard({
             {p.type}
           </span>
         </div>
-      </button>
+      </div>
 
       <div className="flex flex-1 flex-col p-5 sm:p-6">
         <div className="flex items-start justify-between gap-5">
@@ -510,18 +539,26 @@ function PropertyCard({
         </div>
 
         <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-          <button
-            onClick={onOpen}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-[#17221f] transition-colors hover:text-[#9b7949]"
-          >
-            Aperçu <ChevronRight className="h-3.5 w-3.5" />
-          </button>
-          <Link
-            href={`/biens/${p.id}`}
-            className="inline-flex items-center gap-2 rounded-full bg-[#17221f] px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
-          >
-            Voir la fiche <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          {directToDetails ? (
+            <span className="ml-auto inline-flex items-center gap-2 rounded-full bg-[#17221f] px-4 py-2.5 text-[11px] font-semibold text-white transition-all group-hover:-translate-y-0.5 group-hover:bg-[#263a34]">
+              Voir la fiche <ArrowRight className="h-3.5 w-3.5" />
+            </span>
+          ) : (
+            <>
+              <button
+                onClick={onOpen}
+                className="inline-flex items-center gap-2 text-xs font-semibold text-[#17221f] transition-colors hover:text-[#9b7949]"
+              >
+                Aperçu <ChevronRight className="h-3.5 w-3.5" />
+              </button>
+              <Link
+                href={detailHref}
+                className="inline-flex items-center gap-2 rounded-full bg-[#17221f] px-4 py-2.5 text-[11px] font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-[#263a34]"
+              >
+                Voir la fiche <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </motion.article>
@@ -530,10 +567,12 @@ function PropertyCard({
 
 function PropertyModal({
   property: p,
+  detailHref,
   onClose,
   onContact,
 }: {
   property: Property
+  detailHref: string
   onClose: () => void
   onContact: () => void
 }) {
@@ -636,7 +675,7 @@ function PropertyModal({
               <MessageCircle className="h-4 w-4" /> Parler à un conseiller
             </button>
             <Link
-              href={`/biens/${p.id}`}
+              href={detailHref}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#17221f] px-5 py-3 text-xs font-semibold text-white transition-all hover:bg-[#263a34]"
             >
               Consulter la fiche complète <ArrowUpRight className="h-4 w-4" />

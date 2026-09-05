@@ -11,6 +11,7 @@ export default function AgenceRedaCataloguePage() {
       <BiensClient
         properties={AGENCE_REDA_PROPERTIES}
         heroImage="/demos/immo-built/test-agency-catalogue.webp"
+        directToDetails
       />
     </DemoBrandProvider>
   )
