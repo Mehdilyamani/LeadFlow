@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -84,6 +84,24 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         'Découvrez une sélection de biens à vendre à Rabat et Témara avec ALADIMMO.',
     },
   },
+  'path:agence-reda': {
+    slug: 'agence-reda',
+    agencyName: 'Agence Immobilière Reda',
+    primaryColor: '#d13a32',
+    secondaryColor: '#171b1a',
+    logoPath: '/294653680_460343059430775_4173148228228057553_n.png',
+    experience: 'agence-reda',
+    city: 'Meknès',
+    whatsappNumber: '212661249872',
+    displayPhone: '+212 6 61 24 98 72',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de l'Agence Immobilière Reda.",
+    metadata: {
+      title: 'Agence Immobilière Reda | Immobilier à Meknès',
+      description:
+        "Découvrez une sélection de biens immobiliers à Meknès avec l'Agence Immobilière Reda.",
+    },
+  },
 }
 
 export function getDemoBrand(hostname: string): DemoBrand | null {
@@ -97,7 +115,9 @@ export function getDemoBrandBySlug(slug: string, basePath?: string): DemoBrand |
 }
 
 export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
-  return brand?.experience === 'immo-built' || brand?.experience === 'eladimmo'
+  return brand?.experience === 'immo-built'
+    || brand?.experience === 'eladimmo'
+    || brand?.experience === 'agence-reda'
 }
 
 export function getHostname(hostHeader: string | null): string {

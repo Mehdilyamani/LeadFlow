@@ -100,6 +100,9 @@ const cases = [
   { path: '/demo/eladimmo', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
+  { path: '/demo/agence-reda', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
+  { path: '/demo/agence-reda/biens', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
+  { path: '/demo/agence-reda/biens/reda-appartement-hamria', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
 ]
 
 let failed = false

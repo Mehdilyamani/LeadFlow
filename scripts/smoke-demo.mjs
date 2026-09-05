@@ -13,6 +13,9 @@ const checks = [
   { path: '/demo/eladimmo', brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens', brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', brand: 'ALADIMMO', phone: '212662033540' },
+  { path: '/demo/agence-reda', brand: 'Agence Immobilière Reda', phone: '212661249872' },
+  { path: '/demo/agence-reda/biens', brand: 'Agence Immobilière Reda', phone: '212661249872' },
+  { path: '/demo/agence-reda/biens/reda-appartement-hamria', brand: 'Agence Immobilière Reda', phone: '212661249872' },
 ]
 
 let failed = false
