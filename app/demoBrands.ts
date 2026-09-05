@@ -87,7 +87,7 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
   'path:agence-reda': {
     slug: 'agence-reda',
     agencyName: 'Agence Immobilière Reda',
-    primaryColor: '#d13a32',
+    primaryColor: '#d7b57c',
     secondaryColor: '#171b1a',
     logoPath: '/294653680_460343059430775_4173148228228057553_n.png',
     experience: 'agence-reda',

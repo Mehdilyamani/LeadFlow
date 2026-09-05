@@ -22,6 +22,7 @@ export default function AgenceRedaDemoPage() {
         heroEyebrow="AGENCE IMMOBILIÈRE REDA · MEKNÈS"
         heroTitle="Votre bien à Meknès,"
         heroAccent="en toute confiance."
+        heroAccentClassName="tracking-[-0.02em] [font-variant-ligatures:none]"
         heroDescription="Appartements, villas, maisons et terrains à découvrir à Meknès et ses environs."
         transactionLabel="Vente · Location"
         compactMobileHero
