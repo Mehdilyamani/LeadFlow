@@ -26,6 +26,8 @@ export default function AgenceRedaDemoPage() {
         heroDescription="Appartements, villas, maisons et terrains à découvrir à Meknès et ses environs."
         transactionLabel="Vente · Location"
         compactMobileHero
+        instantHeroText
+        propertyCardRevealOffset={52}
         autoSlideIntervalMs={3800}
       />
     </DemoBrandProvider>

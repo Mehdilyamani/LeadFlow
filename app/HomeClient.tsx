@@ -169,15 +169,17 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200) {
 function Reveal({
   children,
   delay = 0,
+  offsetY = 24,
   className = '',
 }: {
   children: React.ReactNode
   delay?: number
+  offsetY?: number
   className?: string
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: offsetY }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.18 }}
       transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -239,6 +241,8 @@ export default function HomeClient({
   heroDescription,
   transactionLabel,
   compactMobileHero = false,
+  instantHeroText = false,
+  propertyCardRevealOffset = 24,
   autoSlideIntervalMs = 5200,
 }: {
   properties: Property[]
@@ -252,6 +256,8 @@ export default function HomeClient({
   heroDescription?: string
   transactionLabel?: string
   compactMobileHero?: boolean
+  instantHeroText?: boolean
+  propertyCardRevealOffset?: number
   autoSlideIntervalMs?: number
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -357,7 +363,7 @@ export default function HomeClient({
           <div className="grid w-full gap-12 lg:grid-cols-[1.12fr_.88fr] lg:items-end">
             <div className="max-w-3xl">
               <motion.div
-                initial={{ opacity: 0, y: 14 }}
+                initial={instantHeroText ? false : { opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.12 }}
                 className="mb-4 flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#d7b57c] sm:mb-6 sm:text-[10px] sm:tracking-[0.28em]"
@@ -366,7 +372,7 @@ export default function HomeClient({
               </motion.div>
 
               <motion.h1
-                initial={{ opacity: 0, y: 24 }}
+                initial={instantHeroText ? false : { opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.85, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
                 className="max-w-3xl text-[clamp(2.45rem,12vw,2.875rem)] font-medium leading-[0.98] tracking-[-0.055em] sm:text-6xl lg:text-[78px]"
@@ -385,7 +391,7 @@ export default function HomeClient({
               </motion.h1>
 
               <motion.p
-                initial={{ opacity: 0, y: 20 }}
+                initial={instantHeroText ? false : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, delay: 0.3 }}
                 className="mt-5 max-w-xl text-[14px] leading-6 text-white/68 sm:mt-7 sm:text-base sm:leading-8"
@@ -396,7 +402,7 @@ export default function HomeClient({
               </motion.p>
 
               <motion.div
-                initial={{ opacity: 0, y: 18 }}
+                initial={instantHeroText ? false : { opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.42 }}
                 className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row"
@@ -502,7 +508,12 @@ export default function HomeClient({
           className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-8 sm:mt-12 sm:gap-6 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0"
         >
           {properties.map((property, index) => (
-            <Reveal key={property.id} delay={index * 0.08} className="w-[86vw] max-w-[400px] shrink-0 snap-center lg:w-auto lg:max-w-none">
+            <Reveal
+              key={property.id}
+              delay={index * 0.08}
+              offsetY={propertyCardRevealOffset}
+              className="w-[86vw] max-w-[400px] shrink-0 snap-center lg:w-auto lg:max-w-none"
+            >
               <Link
                 href={immoBuiltBrand ? getBrandHref(immoBuiltBrand, `/biens/${property.id}`) : `/biens/${property.id}`}
                 className="group block overflow-hidden rounded-[24px] border border-[#17221f]/8 bg-white shadow-[0_18px_55px_rgba(23,34,31,0.06)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_26px_70px_rgba(23,34,31,0.11)]"
