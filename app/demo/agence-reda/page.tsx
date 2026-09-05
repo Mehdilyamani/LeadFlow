@@ -28,7 +28,8 @@ export default function AgenceRedaDemoPage() {
         compactMobileHero
         instantHeroText
         propertyCardRevealOffset={24}
-        autoSlideEnabled={false}
+        continuousAutoSlide
+        continuousSlideSpeed={14}
       />
     </DemoBrandProvider>
   )

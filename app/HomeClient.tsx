@@ -86,9 +86,19 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
-function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = true) {
+function useMobileAutoCarousel(
+  itemCount: number,
+  intervalMs = 5200,
+  enabled = true,
+  continuous = false,
+  continuousSpeed = 14,
+) {
   const carouselRef = useRef<HTMLDivElement>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const lastFrameRef = useRef<number | null>(null)
+  const continuousPositionRef = useRef(0)
+  const directionRef = useRef<1 | -1>(1)
   const stoppedByUserRef = useRef(false)
 
   const clearAutoSlide = useCallback(() => {
@@ -96,6 +106,11 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = t
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+    }
+    lastFrameRef.current = null
   }, [])
 
   const stopAutoSlide = useCallback(() => {
@@ -104,6 +119,7 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = t
   }, [clearAutoSlide])
 
   useEffect(() => {
+    const carouselElement = carouselRef.current
     const mobileQuery = window.matchMedia('(max-width: 639px)')
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
 
@@ -137,6 +153,36 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = t
       })
     }
 
+    const glide = (timestamp: number) => {
+      const carousel = carouselRef.current
+      if (!carousel) return
+
+      if (!document.hidden) {
+        const previousTimestamp = lastFrameRef.current ?? timestamp
+        const elapsed = Math.min(timestamp - previousTimestamp, 50)
+        const maxScroll = Math.max(0, carousel.scrollWidth - carousel.clientWidth)
+
+        if (maxScroll > 0) {
+          let nextPosition = continuousPositionRef.current
+            + directionRef.current * continuousSpeed * (elapsed / 1000)
+
+          if (nextPosition >= maxScroll) {
+            nextPosition = maxScroll
+            directionRef.current = -1
+          } else if (nextPosition <= 0) {
+            nextPosition = 0
+            directionRef.current = 1
+          }
+
+          continuousPositionRef.current = nextPosition
+          carousel.scrollLeft = nextPosition
+        }
+      }
+
+      lastFrameRef.current = timestamp
+      animationFrameRef.current = requestAnimationFrame(glide)
+    }
+
     const syncAutoSlide = () => {
       clearAutoSlide()
 
@@ -150,7 +196,18 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = t
         return
       }
 
-      intervalRef.current = setInterval(advance, intervalMs)
+      if (continuous) {
+        const carousel = carouselRef.current
+        if (carousel) {
+          carousel.style.setProperty('scroll-snap-type', 'none')
+          carousel.style.setProperty('scroll-behavior', 'auto')
+        }
+        continuousPositionRef.current = carousel?.scrollLeft ?? 0
+        directionRef.current = 1
+        animationFrameRef.current = requestAnimationFrame(glide)
+      } else {
+        intervalRef.current = setInterval(advance, intervalMs)
+      }
     }
 
     syncAutoSlide()
@@ -159,10 +216,12 @@ function useMobileAutoCarousel(itemCount: number, intervalMs = 5200, enabled = t
 
     return () => {
       clearAutoSlide()
+      carouselElement?.style.removeProperty('scroll-snap-type')
+      carouselElement?.style.removeProperty('scroll-behavior')
       mobileQuery.removeEventListener('change', syncAutoSlide)
       reducedMotionQuery.removeEventListener('change', syncAutoSlide)
     }
-  }, [clearAutoSlide, enabled, intervalMs, itemCount])
+  }, [clearAutoSlide, continuous, continuousSpeed, enabled, intervalMs, itemCount])
 
   return { carouselRef, stopAutoSlide }
 }
@@ -245,6 +304,8 @@ export default function HomeClient({
   instantHeroText = false,
   propertyCardRevealOffset = 24,
   autoSlideEnabled = true,
+  continuousAutoSlide = false,
+  continuousSlideSpeed = 14,
   autoSlideIntervalMs = 5200,
 }: {
   properties: Property[]
@@ -261,6 +322,8 @@ export default function HomeClient({
   instantHeroText?: boolean
   propertyCardRevealOffset?: number
   autoSlideEnabled?: boolean
+  continuousAutoSlide?: boolean
+  continuousSlideSpeed?: number
   autoSlideIntervalMs?: number
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -275,8 +338,20 @@ export default function HomeClient({
   const whatsappUrl = immoBuiltBrand ? getWhatsAppUrl(immoBuiltBrand) : 'https://wa.me/212723037305'
   const homeHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/') : '/demo'
   const propertiesHref = immoBuiltBrand ? getBrandHref(immoBuiltBrand, '/biens') : '/biens'
-  const propertiesCarousel = useMobileAutoCarousel(properties.length, autoSlideIntervalMs, autoSlideEnabled)
-  const citiesCarousel = useMobileAutoCarousel(locations.length, autoSlideIntervalMs, autoSlideEnabled)
+  const propertiesCarousel = useMobileAutoCarousel(
+    properties.length,
+    autoSlideIntervalMs,
+    autoSlideEnabled,
+    continuousAutoSlide,
+    continuousSlideSpeed,
+  )
+  const citiesCarousel = useMobileAutoCarousel(
+    locations.length,
+    autoSlideIntervalMs,
+    autoSlideEnabled,
+    continuousAutoSlide,
+    continuousSlideSpeed,
+  )
 
   return (
     <main className="brand-secondary-text min-h-screen overflow-x-hidden bg-[#f7f5f0] text-[#17221f] selection:bg-[#b9945f] selection:text-white">
@@ -505,6 +580,7 @@ export default function HomeClient({
           role="region"
           aria-label="Propriétés à la une"
           onPointerDown={propertiesCarousel.stopAutoSlide}
+          onTouchStart={propertiesCarousel.stopAutoSlide}
           onWheel={propertiesCarousel.stopAutoSlide}
           onKeyDown={propertiesCarousel.stopAutoSlide}
           onFocusCapture={propertiesCarousel.stopAutoSlide}
@@ -584,7 +660,8 @@ export default function HomeClient({
             ref={citiesCarousel.carouselRef}
             role="region"
             aria-label="Villes couvertes"
-            onPointerDown={citiesCarousel.stopAutoSlide}
+          onPointerDown={citiesCarousel.stopAutoSlide}
+          onTouchStart={citiesCarousel.stopAutoSlide}
             onWheel={citiesCarousel.stopAutoSlide}
             onKeyDown={citiesCarousel.stopAutoSlide}
             onFocusCapture={citiesCarousel.stopAutoSlide}

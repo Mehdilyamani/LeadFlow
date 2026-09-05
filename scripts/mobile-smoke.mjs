@@ -100,7 +100,7 @@ const cases = [
   { path: '/demo/eladimmo', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
-  { path: '/demo/agence-reda', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', manualCarousels: true },
+  { path: '/demo/agence-reda', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', continuousCarousels: true },
   { path: '/demo/agence-reda/biens', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', detailHref: '/demo/agence-reda/biens/reda-appartement-hamria', noPreview: true },
   { path: '/demo/agence-reda/biens/reda-appartement-hamria', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
 ]
@@ -148,7 +148,23 @@ try {
       if (imagesReady.result.value) break
       await delay(100)
     }
-    if (testCase.manualCarousels) await delay(4500)
+    let carouselMotion = null
+    if (testCase.continuousCarousels) {
+      const initial = await client.send('Runtime.evaluate', {
+        expression: `([...document.querySelectorAll('[role="region"]')].slice(0, 2).map((carousel) => carousel.scrollLeft))`,
+        returnByValue: true,
+      })
+      await delay(7000)
+      const moving = await client.send('Runtime.evaluate', {
+        expression: `([...document.querySelectorAll('[role="region"]')].slice(0, 2).map((carousel) => carousel.scrollLeft))`,
+        returnByValue: true,
+      })
+      await client.send('Runtime.evaluate', {
+        expression: `document.querySelectorAll('[role="region"]').forEach((carousel) => carousel.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' })))`,
+      })
+      await delay(700)
+      carouselMotion = { initial: initial.result.value, moving: moving.result.value }
+    }
 
     const evaluation = await client.send('Runtime.evaluate', {
       expression: `(() => ({
@@ -171,9 +187,13 @@ try {
       returnByValue: true,
     })
     const result = evaluation.result.value
-    const manualCarouselsValid = !testCase.manualCarousels
+    const continuousCarouselsValid = !testCase.continuousCarousels
       || (result.carousels.length >= 2
-        && result.carousels.slice(0, 2).every((carousel) => carousel.scrollLeft <= 20 && carousel.nextCardVisible))
+        && carouselMotion
+        && result.carousels.slice(0, 2).every((carousel, index) =>
+          carouselMotion.moving[index] > carouselMotion.initial[index] + 5
+          && Math.abs(carousel.scrollLeft - carouselMotion.moving[index]) <= 1
+          && carousel.nextCardVisible))
     const detailLinkValid = !testCase.detailHref || result.directPropertyLink === testCase.detailHref
     const previewValid = !testCase.noPreview || !result.previewVisible
     const valid = result.width === testCase.width
@@ -181,7 +201,7 @@ try {
       && result.brand
       && result.phone
       && result.heroLoaded
-      && manualCarouselsValid
+      && continuousCarouselsValid
       && detailLinkValid
       && previewValid
       && runtimeErrors.length === 0
@@ -191,7 +211,7 @@ try {
     if (!valid) {
       if (runtimeErrors.length) console.error(`  runtime: ${runtimeErrors.join('; ')}`)
       if (failedRequests.length) console.error(`  network: ${failedRequests.join('; ')}`)
-      if (!manualCarouselsValid) console.error(`  carousels: ${JSON.stringify(result.carousels)}`)
+      if (!continuousCarouselsValid) console.error(`  carousels: ${JSON.stringify({ carouselMotion, final: result.carousels })}`)
       if (!detailLinkValid) console.error(`  detail link: ${result.directPropertyLink}`)
       if (!previewValid) console.error('  preview button is still visible')
       failed = true
