@@ -235,7 +235,7 @@ export default function HomeClient({
   heroEyebrow,
   heroTitle = 'Des lieux rares.',
   heroAccent = 'Des décisions justes.',
-  heroAccentClassName = '',
+  heroAccentStyle = 'serif',
   heroDescription,
   transactionLabel,
   compactMobileHero = false,
@@ -248,7 +248,7 @@ export default function HomeClient({
   heroEyebrow?: string
   heroTitle?: string
   heroAccent?: string
-  heroAccentClassName?: string
+  heroAccentStyle?: 'serif' | 'sans'
   heroDescription?: string
   transactionLabel?: string
   compactMobileHero?: boolean
@@ -373,7 +373,15 @@ export default function HomeClient({
               >
                 {heroTitle}
                 <br />
-                <span className={`brand-primary-text font-serif font-normal italic text-[#d7b57c] ${heroAccentClassName}`}>{heroAccent}</span>
+                <span
+                  className={`brand-primary-text text-[#d7b57c] ${
+                    heroAccentStyle === 'sans'
+                      ? 'font-sans font-medium not-italic tracking-[-0.025em]'
+                      : 'font-serif font-normal italic'
+                  }`}
+                >
+                  {heroAccent}
+                </span>
               </motion.h1>
 
               <motion.p
