@@ -30,6 +30,7 @@ export default function AgenceRedaDemoPage() {
         propertyCardRevealOffset={24}
         continuousAutoSlide
         continuousSlideSpeed={21}
+        autoSlideResumeDelayMs={3000}
       />
     </DemoBrandProvider>
   )

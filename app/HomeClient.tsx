@@ -92,6 +92,7 @@ function useMobileAutoCarousel(
   enabled = true,
   continuous = false,
   continuousSpeed = 14,
+  resumeAfterInteractionMs: number | null = null,
 ) {
   const carouselRef = useRef<HTMLDivElement>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -99,7 +100,8 @@ function useMobileAutoCarousel(
   const lastFrameRef = useRef<number | null>(null)
   const continuousPositionRef = useRef(0)
   const directionRef = useRef<1 | -1>(1)
-  const stoppedByUserRef = useRef(false)
+  const resumeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [pausedByUser, setPausedByUser] = useState(false)
 
   const clearAutoSlide = useCallback(() => {
     if (intervalRef.current) {
@@ -114,14 +116,30 @@ function useMobileAutoCarousel(
   }, [])
 
   const stopAutoSlide = useCallback(() => {
-    stoppedByUserRef.current = true
     clearAutoSlide()
-  }, [clearAutoSlide])
+    setPausedByUser(true)
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
+    if (resumeAfterInteractionMs !== null) {
+      resumeTimeoutRef.current = setTimeout(() => {
+        resumeTimeoutRef.current = null
+        setPausedByUser(false)
+      }, resumeAfterInteractionMs)
+    }
+  }, [clearAutoSlide, resumeAfterInteractionMs])
+
+  useEffect(() => () => {
+    if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
+  }, [])
 
   useEffect(() => {
     const carouselElement = carouselRef.current
     const mobileQuery = window.matchMedia('(max-width: 639px)')
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    if (continuous && carouselElement) {
+      carouselElement.style.setProperty('scroll-snap-type', 'none')
+      carouselElement.style.setProperty('scroll-behavior', 'auto')
+    }
 
     const advance = () => {
       const carousel = carouselRef.current
@@ -188,8 +206,8 @@ function useMobileAutoCarousel(
 
       if (
         !enabled ||
-        stoppedByUserRef.current ||
-        !mobileQuery.matches ||
+        pausedByUser ||
+        (!continuous && !mobileQuery.matches) ||
         reducedMotionQuery.matches ||
         itemCount < 2
       ) {
@@ -198,10 +216,6 @@ function useMobileAutoCarousel(
 
       if (continuous) {
         const carousel = carouselRef.current
-        if (carousel) {
-          carousel.style.setProperty('scroll-snap-type', 'none')
-          carousel.style.setProperty('scroll-behavior', 'auto')
-        }
         continuousPositionRef.current = carousel?.scrollLeft ?? 0
         directionRef.current = 1
         animationFrameRef.current = requestAnimationFrame(glide)
@@ -221,7 +235,7 @@ function useMobileAutoCarousel(
       mobileQuery.removeEventListener('change', syncAutoSlide)
       reducedMotionQuery.removeEventListener('change', syncAutoSlide)
     }
-  }, [clearAutoSlide, continuous, continuousSpeed, enabled, intervalMs, itemCount])
+  }, [clearAutoSlide, continuous, continuousSpeed, enabled, intervalMs, itemCount, pausedByUser])
 
   return { carouselRef, stopAutoSlide }
 }
@@ -306,6 +320,7 @@ export default function HomeClient({
   autoSlideEnabled = true,
   continuousAutoSlide = false,
   continuousSlideSpeed = 14,
+  autoSlideResumeDelayMs = null,
   autoSlideIntervalMs = 5200,
 }: {
   properties: Property[]
@@ -324,6 +339,7 @@ export default function HomeClient({
   autoSlideEnabled?: boolean
   continuousAutoSlide?: boolean
   continuousSlideSpeed?: number
+  autoSlideResumeDelayMs?: number | null
   autoSlideIntervalMs?: number
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -344,6 +360,7 @@ export default function HomeClient({
     autoSlideEnabled,
     continuousAutoSlide,
     continuousSlideSpeed,
+    autoSlideResumeDelayMs,
   )
   const citiesCarousel = useMobileAutoCarousel(
     locations.length,
@@ -351,6 +368,7 @@ export default function HomeClient({
     autoSlideEnabled,
     continuousAutoSlide,
     continuousSlideSpeed,
+    autoSlideResumeDelayMs,
   )
 
   return (
@@ -584,15 +602,21 @@ export default function HomeClient({
           onWheel={propertiesCarousel.stopAutoSlide}
           onKeyDown={propertiesCarousel.stopAutoSlide}
           onFocusCapture={propertiesCarousel.stopAutoSlide}
-          className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:-mx-8 sm:mt-12 sm:gap-6 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0"
+          className={`-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mt-12 sm:gap-6 ${
+            continuousAutoSlide
+              ? 'sm:mx-0 sm:px-0'
+              : 'sm:-mx-8 sm:px-8 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0 lg:pb-0'
+          }`}
         >
           {properties.map((property, index) => (
             <Reveal
               key={property.id}
               delay={index * 0.08}
               offsetY={propertyCardRevealOffset}
-              className={`max-w-[400px] shrink-0 lg:w-auto lg:max-w-none ${
-                autoSlideEnabled ? 'w-[86vw] snap-center' : 'w-[84vw] snap-start'
+              className={`shrink-0 ${
+                continuousAutoSlide
+                  ? 'w-[84vw] max-w-[400px] snap-start sm:w-[44vw] lg:w-[30%]'
+                  : `max-w-[400px] lg:w-auto lg:max-w-none ${autoSlideEnabled ? 'w-[86vw] snap-center' : 'w-[84vw] snap-start'}`
               }`}
             >
               <Link
@@ -665,14 +689,20 @@ export default function HomeClient({
             onWheel={citiesCarousel.stopAutoSlide}
             onKeyDown={citiesCarousel.stopAutoSlide}
             onFocusCapture={citiesCarousel.stopAutoSlide}
-            className="-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4"
+            className={`-mx-4 mt-9 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overscroll-x-contain px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-12 sm:gap-6 sm:px-0 ${
+              continuousAutoSlide
+                ? ''
+                : 'sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-4'
+            }`}
           >
             {locations.map((location, index) => (
               <Reveal
                 key={location.name}
                 delay={index * 0.06}
-                className={`max-w-[330px] shrink-0 sm:w-auto sm:max-w-none ${
-                  autoSlideEnabled ? 'w-[78vw] snap-center' : 'w-[76vw] snap-start'
+                className={`shrink-0 ${
+                  continuousAutoSlide
+                    ? 'w-[76vw] max-w-[330px] snap-start sm:w-[40vw] lg:w-[22%]'
+                    : `max-w-[330px] sm:w-auto sm:max-w-none ${autoSlideEnabled ? 'w-[78vw] snap-center' : 'w-[76vw] snap-start'}`
                 }`}
               >
                 <button

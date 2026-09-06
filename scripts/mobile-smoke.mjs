@@ -101,6 +101,7 @@ const cases = [
   { path: '/demo/eladimmo/biens', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/eladimmo/biens/ela-appartement-hay-riad', width: 390, height: 844, brand: 'ALADIMMO', phone: '212662033540' },
   { path: '/demo/agence-reda', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', continuousCarousels: true },
+  { path: '/demo/agence-reda', width: 1440, height: 1000, brand: 'Agence Immobilière Reda', phone: '212661249872', continuousCarousels: true },
   { path: '/demo/agence-reda/biens', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', detailHref: '/demo/agence-reda/biens/reda-appartement-hamria', noPreview: true },
   { path: '/demo/agence-reda/biens/reda-appartement-hamria', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
 ]
@@ -163,7 +164,21 @@ try {
         expression: `document.querySelectorAll('[role="region"]').forEach((carousel) => carousel.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' })))`,
       })
       await delay(700)
-      carouselMotion = { initial: initial.result.value, moving: moving.result.value }
+      const paused = await client.send('Runtime.evaluate', {
+        expression: `([...document.querySelectorAll('[role="region"]')].slice(0, 2).map((carousel) => carousel.scrollLeft))`,
+        returnByValue: true,
+      })
+      await delay(3300)
+      const resumed = await client.send('Runtime.evaluate', {
+        expression: `([...document.querySelectorAll('[role="region"]')].slice(0, 2).map((carousel) => carousel.scrollLeft))`,
+        returnByValue: true,
+      })
+      carouselMotion = {
+        initial: initial.result.value,
+        moving: moving.result.value,
+        paused: paused.result.value,
+        resumed: resumed.result.value,
+      }
     }
 
     const evaluation = await client.send('Runtime.evaluate', {
@@ -181,6 +196,8 @@ try {
           return {
             scrollLeft: carousel.scrollLeft,
             nextCardVisible: Boolean(next && next.left < innerWidth && next.right > 0),
+            display: getComputedStyle(carousel).display,
+            scrollable: carousel.scrollWidth > carousel.clientWidth,
           }
         })
       }))()`,
@@ -192,7 +209,10 @@ try {
         && carouselMotion
         && result.carousels.slice(0, 2).every((carousel, index) =>
           carouselMotion.moving[index] > carouselMotion.initial[index] + 5
-          && Math.abs(carousel.scrollLeft - carouselMotion.moving[index]) <= 1
+          && Math.abs(carouselMotion.paused[index] - carouselMotion.moving[index]) <= 1
+          && carouselMotion.resumed[index] > carouselMotion.paused[index] + 5
+          && carousel.display === 'flex'
+          && carousel.scrollable
           && carousel.nextCardVisible))
     const detailLinkValid = !testCase.detailHref || result.directPropertyLink === testCase.detailHref
     const previewValid = !testCase.noPreview || !result.previewVisible
