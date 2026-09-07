@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -102,6 +102,24 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         "Découvrez une sélection de biens immobiliers à Meknès avec l'Agence Immobilière Reda.",
     },
   },
+  'path:asmae-immobilière': {
+    slug: 'asmae-immobilière',
+    agencyName: 'Asmae Immobilière',
+    primaryColor: '#b58a47',
+    secondaryColor: '#3f171b',
+    logoPath: '/257470754_604581807521676_4464621890962302145_n.jpg',
+    experience: 'asmae-immobiliere',
+    city: 'Nador',
+    whatsappNumber: '212606899560',
+    displayPhone: '+212 6 06 89 95 60',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de Asmae Immobilière.",
+    metadata: {
+      title: 'Asmae Immobilière | Immobilier à Nador',
+      description:
+        'Découvrez une sélection de biens immobiliers à Nador avec Asmae Immobilière.',
+    },
+  },
 }
 
 export function getDemoBrand(hostname: string): DemoBrand | null {
@@ -118,6 +136,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
   return brand?.experience === 'immo-built'
     || brand?.experience === 'eladimmo'
     || brand?.experience === 'agence-reda'
+    || brand?.experience === 'asmae-immobiliere'
 }
 
 export function getHostname(hostHeader: string | null): string {

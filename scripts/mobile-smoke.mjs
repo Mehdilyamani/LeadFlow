@@ -17,7 +17,7 @@ if (!chromePath) {
   process.exit(1)
 }
 
-const debugPort = 9333
+const debugPort = Number(process.env.DEMO_DEBUG_PORT ?? 9333)
 const profileDir = mkdtempSync(join(tmpdir(), 'leadflow-mobile-smoke-'))
 const browser = spawn(chromePath, [
   '--headless=new',
@@ -82,7 +82,7 @@ function connect(webSocketUrl) {
   })
 }
 
-const cases = [
+const allCases = [
   ...[
     [375, 667],
     [390, 844],
@@ -104,7 +104,15 @@ const cases = [
   { path: '/demo/agence-reda', width: 1440, height: 1000, brand: 'Agence Immobilière Reda', phone: '212661249872', continuousCarousels: true },
   { path: '/demo/agence-reda/biens', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872', detailHref: '/demo/agence-reda/biens/reda-appartement-hamria', noPreview: true },
   { path: '/demo/agence-reda/biens/reda-appartement-hamria', width: 390, height: 844, brand: 'Agence Immobilière Reda', phone: '212661249872' },
+  { path: '/demo/asmae-immobilière', width: 390, height: 844, brand: 'Asmae Immobilière', phone: '212606899560', continuousCarousels: true },
+  { path: '/demo/asmae-immobilière', width: 1440, height: 1000, brand: 'Asmae Immobilière', phone: '212606899560', continuousCarousels: true },
+  { path: '/demo/asmae-immobilière/biens', width: 390, height: 844, brand: 'Asmae Immobilière', phone: '212606899560', detailHref: '/demo/asmae-immobilière/biens/asmae-appartement-marchica', noPreview: true },
+  { path: '/demo/asmae-immobilière/biens/asmae-appartement-marchica', width: 390, height: 844, brand: 'Asmae Immobilière', phone: '212606899560' },
 ]
+const caseFilter = process.env.DEMO_CASE_FILTER
+const cases = caseFilter
+  ? allCases.filter((testCase) => testCase.path.includes(caseFilter))
+  : allCases
 
 let failed = false
 
@@ -116,7 +124,11 @@ try {
   const runtimeErrors = []
   const failedRequests = []
 
-  client.on('Runtime.exceptionThrown', (event) => runtimeErrors.push(event.exceptionDetails?.text ?? 'Runtime exception'))
+  client.on('Runtime.exceptionThrown', (event) => runtimeErrors.push(
+    event.exceptionDetails?.exception?.description
+      ?? event.exceptionDetails?.text
+      ?? 'Runtime exception'
+  ))
   client.on('Network.loadingFailed', (event) => {
     if (!event.canceled) failedRequests.push(event.errorText ?? 'Network request failed')
   })
@@ -229,6 +241,7 @@ try {
 
     console.log(`${valid ? 'PASS' : 'FAIL'} ${testCase.width}x${testCase.height} ${testCase.path} viewport=${result.width} scroll=${result.scrollWidth} hero=${result.heroLoaded}`)
     if (!valid) {
+      console.error(`  result: ${JSON.stringify(result)}`)
       if (runtimeErrors.length) console.error(`  runtime: ${runtimeErrors.join('; ')}`)
       if (failedRequests.length) console.error(`  network: ${failedRequests.join('; ')}`)
       if (!continuousCarouselsValid) console.error(`  carousels: ${JSON.stringify({ carouselMotion, final: result.carousels })}`)

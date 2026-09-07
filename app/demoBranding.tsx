@@ -31,8 +31,14 @@ export function DemoBrandProvider({
 
   useEffect(() => {
     const pathMatch = window.location.pathname.match(/^\/(demo-preview|demo)\/([^/]+)/)
+    let decodedSlug = pathMatch?.[2] ?? ''
+    try {
+      decodedSlug = decodeURIComponent(decodedSlug)
+    } catch {
+      // Keep the original segment if the URL contains malformed escape sequences.
+    }
     const pathBrand = pathMatch
-      ? getDemoBrandBySlug(pathMatch[2], `/${pathMatch[1]}/${pathMatch[2]}`)
+      ? getDemoBrandBySlug(decodedSlug, `/${pathMatch[1]}/${decodedSlug}`)
       : null
     const activeBrand = getDemoBrand(window.location.hostname) ?? pathBrand
     const root = document.documentElement
