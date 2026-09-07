@@ -108,6 +108,10 @@ const allCases = [
   { path: '/demo/asmae-immobilière', width: 1440, height: 1000, brand: 'Asmae Immobilière', phone: '212606899560', continuousCarousels: true },
   { path: '/demo/asmae-immobilière/biens', width: 390, height: 844, brand: 'Asmae Immobilière', phone: '212606899560', detailHref: '/demo/asmae-immobilière/biens/asmae-appartement-marchica', noPreview: true },
   { path: '/demo/asmae-immobilière/biens/asmae-appartement-marchica', width: 390, height: 844, brand: 'Asmae Immobilière', phone: '212606899560' },
+  { path: '/demo/agence-imran', width: 390, height: 844, brand: "L'agence Imran", phone: '212656863029', continuousCarousels: true },
+  { path: '/demo/agence-imran', width: 1440, height: 1000, brand: "L'agence Imran", phone: '212656863029', continuousCarousels: true },
+  { path: '/demo/agence-imran/biens', width: 390, height: 844, brand: "L'agence Imran", phone: '212656863029', detailHref: '/demo/agence-imran/biens/imran-appartement-sidi-bouzid', noPreview: true },
+  { path: '/demo/agence-imran/biens/imran-appartement-sidi-bouzid', width: 390, height: 844, brand: "L'agence Imran", phone: '212656863029' },
 ]
 const caseFilter = process.env.DEMO_CASE_FILTER
 const cases = caseFilter

@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -120,6 +120,24 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         'Découvrez une sélection de biens immobiliers à Nador avec Asmae Immobilière.',
     },
   },
+  'path:agence-imran': {
+    slug: 'agence-imran',
+    agencyName: "L'agence Imran",
+    primaryColor: '#c8993d',
+    secondaryColor: '#10263d',
+    logoPath: '/1a9e1525-d310-471a-90c2-83b0bf88c998.jpg',
+    experience: 'agence-imran',
+    city: 'Safi',
+    whatsappNumber: '212656863029',
+    displayPhone: '+212 6 56 86 30 29',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de L'agence Imran.",
+    metadata: {
+      title: "L'agence Imran | Immobilier à Safi",
+      description:
+        "Découvrez une sélection de biens immobiliers à Safi avec L'agence Imran.",
+    },
+  },
 }
 
 export function getDemoBrand(hostname: string): DemoBrand | null {
@@ -137,6 +155,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
     || brand?.experience === 'eladimmo'
     || brand?.experience === 'agence-reda'
     || brand?.experience === 'asmae-immobiliere'
+    || brand?.experience === 'agence-imran'
 }
 
 export function getHostname(hostHeader: string | null): string {
