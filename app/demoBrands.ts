@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -156,6 +156,24 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         'Découvrez une sélection de biens immobiliers à Agadir avec Immobaz-Kimma.',
     },
   },
+  'path:danna-immo': {
+    slug: 'danna-immo',
+    agencyName: 'Danna immo',
+    primaryColor: '#e00018',
+    secondaryColor: '#171717',
+    logoPath: '/612317803_1492599082870682_6464772208032041914_n (1).jpg',
+    experience: 'danna-immo',
+    city: 'Casablanca',
+    whatsappNumber: '212614692251',
+    displayPhone: '+212 6 14 69 22 51',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de Danna immo.",
+    metadata: {
+      title: 'Danna immo | Immobilier à Casablanca',
+      description:
+        'Découvrez une sélection de biens immobiliers à Casablanca avec Danna immo.',
+    },
+  },
 }
 
 export function getDemoBrand(hostname: string): DemoBrand | null {
@@ -175,6 +193,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
     || brand?.experience === 'asmae-immobiliere'
     || brand?.experience === 'agence-imran'
     || brand?.experience === 'immobaz-kimma'
+    || brand?.experience === 'danna-immo'
 }
 
 export function getHostname(hostHeader: string | null): string {

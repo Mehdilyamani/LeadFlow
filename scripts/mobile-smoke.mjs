@@ -116,6 +116,10 @@ const allCases = [
   { path: '/demo/immobaz-kimma', width: 1440, height: 1000, brand: 'Immobaz-Kimma', phone: '212667959143', continuousCarousels: true },
   { path: '/demo/immobaz-kimma/biens', width: 390, height: 844, brand: 'Immobaz-Kimma', phone: '212667959143', detailHref: '/demo/immobaz-kimma/biens/immobaz-appartement-marina', noPreview: true },
   { path: '/demo/immobaz-kimma/biens/immobaz-appartement-marina', width: 390, height: 844, brand: 'Immobaz-Kimma', phone: '212667959143' },
+  { path: '/demo/danna-immo', width: 390, height: 844, brand: 'Danna immo', phone: '212614692251', continuousCarousels: true },
+  { path: '/demo/danna-immo', width: 1440, height: 1000, brand: 'Danna immo', phone: '212614692251', continuousCarousels: true },
+  { path: '/demo/danna-immo/biens', width: 390, height: 844, brand: 'Danna immo', phone: '212614692251', detailHref: '/demo/danna-immo/biens/ib-appartement-cfc', noPreview: true },
+  { path: '/demo/danna-immo/biens/ib-appartement-cfc', width: 390, height: 844, brand: 'Danna immo', phone: '212614692251' },
 ]
 const caseFilter = process.env.DEMO_CASE_FILTER
 const cases = caseFilter
