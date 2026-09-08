@@ -159,7 +159,7 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
   'path:danna-immo': {
     slug: 'danna-immo',
     agencyName: 'Danna immo',
-    primaryColor: '#e00018',
+    primaryColor: '#d7b57c',
     secondaryColor: '#171717',
     logoPath: '/612317803_1492599082870682_6464772208032041914_n (1).jpg',
     experience: 'danna-immo',
