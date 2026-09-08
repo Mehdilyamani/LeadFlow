@@ -112,6 +112,10 @@ const allCases = [
   { path: '/demo/agence-imran', width: 1440, height: 1000, brand: "L'agence Imran", phone: '212656863029', continuousCarousels: true },
   { path: '/demo/agence-imran/biens', width: 390, height: 844, brand: "L'agence Imran", phone: '212656863029', detailHref: '/demo/agence-imran/biens/imran-appartement-sidi-bouzid', noPreview: true },
   { path: '/demo/agence-imran/biens/imran-appartement-sidi-bouzid', width: 390, height: 844, brand: "L'agence Imran", phone: '212656863029' },
+  { path: '/demo/immobaz-kimma', width: 390, height: 844, brand: 'Immobaz-Kimma', phone: '212667959143', continuousCarousels: true },
+  { path: '/demo/immobaz-kimma', width: 1440, height: 1000, brand: 'Immobaz-Kimma', phone: '212667959143', continuousCarousels: true },
+  { path: '/demo/immobaz-kimma/biens', width: 390, height: 844, brand: 'Immobaz-Kimma', phone: '212667959143', detailHref: '/demo/immobaz-kimma/biens/immobaz-appartement-marina', noPreview: true },
+  { path: '/demo/immobaz-kimma/biens/immobaz-appartement-marina', width: 390, height: 844, brand: 'Immobaz-Kimma', phone: '212667959143' },
 ]
 const caseFilter = process.env.DEMO_CASE_FILTER
 const cases = caseFilter

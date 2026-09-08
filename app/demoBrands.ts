@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -138,6 +138,24 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         "Découvrez une sélection de biens immobiliers à Safi avec L'agence Imran.",
     },
   },
+  'path:immobaz-kimma': {
+    slug: 'immobaz-kimma',
+    agencyName: 'Immobaz-Kimma',
+    primaryColor: '#d1ad5d',
+    secondaryColor: '#151515',
+    logoPath: '/498285430_687321534021293_6368509815508385870_n.jpg',
+    experience: 'immobaz-kimma',
+    city: 'Agadir',
+    whatsappNumber: '212667959143',
+    displayPhone: '+212 6 67 95 91 43',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de Immobaz-Kimma.",
+    metadata: {
+      title: 'Immobaz-Kimma | Immobilier à Agadir',
+      description:
+        'Découvrez une sélection de biens immobiliers à Agadir avec Immobaz-Kimma.',
+    },
+  },
 }
 
 export function getDemoBrand(hostname: string): DemoBrand | null {
@@ -156,6 +174,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
     || brand?.experience === 'agence-reda'
     || brand?.experience === 'asmae-immobiliere'
     || brand?.experience === 'agence-imran'
+    || brand?.experience === 'immobaz-kimma'
 }
 
 export function getHostname(hostHeader: string | null): string {
