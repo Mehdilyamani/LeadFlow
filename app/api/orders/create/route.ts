@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { createPayPalOrder } from '../../../lib/paypalSandbox';
 import supabaseAdmin from '../../../lib/admin';
 
-export function computeTotal(items: any[] = []) {
+function computeTotal(items: any[] = []) {
   return items.reduce((sum, it) => {
     const price = Number(it?.price ?? 0);
     const qty = Math.max(1, Number(it?.options.quantity ?? 1));

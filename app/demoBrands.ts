@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo' | 'good-kesh-immo'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -176,6 +176,15 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
   },
 }
 
+// The path demo uses the latest template while the original hostname keeps its experience.
+DEMO_BRANDS['path:good-kesh-immo'] = {
+  ...DEMO_BRANDS['good-kech-immo.leadflowimmo.com'],
+  slug: 'good-kesh-immo',
+  hostname: undefined,
+  experience: 'good-kesh-immo',
+  primaryColor: '#d7b57c',
+}
+
 export function getDemoBrand(hostname: string): DemoBrand | null {
   return DEMO_BRANDS[hostname.trim().toLowerCase()] ?? null
 }
@@ -194,6 +203,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
     || brand?.experience === 'agence-imran'
     || brand?.experience === 'immobaz-kimma'
     || brand?.experience === 'danna-immo'
+    || brand?.experience === 'good-kesh-immo'
 }
 
 export function getHostname(hostHeader: string | null): string {

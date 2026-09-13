@@ -121,6 +121,12 @@ const allCases = [
   { path: '/demo/danna-immo/biens', width: 390, height: 844, brand: 'Danna immo', phone: '212614692251', detailHref: '/demo/danna-immo/biens/ib-appartement-cfc', noPreview: true },
   { path: '/demo/danna-immo/biens/ib-appartement-cfc', width: 390, height: 844, brand: 'Danna immo', phone: '212614692251' },
 ]
+allCases.push(
+  { path: '/demo/good-kesh-immo', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077', continuousCarousels: true },
+  { path: '/demo/good-kesh-immo', width: 1440, height: 1000, brand: 'Good Kech Immo', phone: '212675633077', continuousCarousels: true },
+  { path: '/demo/good-kesh-immo/biens', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077', detailHref: '/demo/good-kesh-immo/biens/gki-villa-amelkis', noPreview: true },
+  { path: '/demo/good-kesh-immo/biens/gki-villa-amelkis', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077' },
+)
 const caseFilter = process.env.DEMO_CASE_FILTER
 const cases = caseFilter
   ? allCases.filter((testCase) => testCase.path.includes(caseFilter))

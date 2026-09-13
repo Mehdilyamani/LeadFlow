@@ -2,10 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 import { getOrderByRef } from '../../lib/getOrderbyref'; // adjust path if needed
 
-type Props = { searchParams?: { ref?: string } };
+type Props = { searchParams?: Promise<{ ref?: string }> };
 
 export default async function Page({ searchParams }: Props) {
-  const orderRef = searchParams?.ref ?? 'N/A';
+  const orderRef = (await searchParams)?.ref ?? 'N/A';
 
   // fetch order server-side using service key (see lib/getOrderByRef)
   let order: any = null;
