@@ -7,7 +7,7 @@ export type DemoBrand = {
   secondaryColor: string
   logoPath: string
   logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo' | 'good-kesh-immo'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo' | 'good-kesh-immo' | 'ocean-darb'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -174,6 +174,24 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         'Découvrez une sélection de biens immobiliers à Casablanca avec Danna immo.',
     },
   },
+  'path:ocean-darb': {
+    slug: 'ocean-darb',
+    agencyName: 'Ocean Darb',
+    primaryColor: '#d7b57c',
+    secondaryColor: '#171717',
+    logoPath: '/328880133_758798895240966_5195963295361828626_n.jpg',
+    experience: 'ocean-darb',
+    city: 'Bouskoura',
+    whatsappNumber: '212660881213',
+    displayPhone: '+212 6 60 88 12 13',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de Ocean Darb.",
+    metadata: {
+      title: 'Ocean Darb | Immobilier à Bouskoura',
+      description:
+        'Découvrez une sélection de biens immobiliers à Bouskoura avec Ocean Darb.',
+    },
+  },
 }
 
 // The path demo uses the latest template while the original hostname keeps its experience.
@@ -204,6 +222,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
     || brand?.experience === 'immobaz-kimma'
     || brand?.experience === 'danna-immo'
     || brand?.experience === 'good-kesh-immo'
+    || brand?.experience === 'ocean-darb'
 }
 
 export function getHostname(hostHeader: string | null): string {

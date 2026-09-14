@@ -127,6 +127,12 @@ allCases.push(
   { path: '/demo/good-kesh-immo/biens', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077', detailHref: '/demo/good-kesh-immo/biens/gki-villa-amelkis', noPreview: true },
   { path: '/demo/good-kesh-immo/biens/gki-villa-amelkis', width: 390, height: 844, brand: 'Good Kech Immo', phone: '212675633077' },
 )
+allCases.push(
+  { path: '/demo/ocean-darb', width: 390, height: 844, brand: 'Ocean Darb', phone: '212660881213', continuousCarousels: true },
+  { path: '/demo/ocean-darb', width: 1440, height: 1000, brand: 'Ocean Darb', phone: '212660881213', continuousCarousels: true },
+  { path: '/demo/ocean-darb/biens', width: 390, height: 844, brand: 'Ocean Darb', phone: '212660881213', detailHref: '/demo/ocean-darb/biens/ocean-villa-ville-verte', noPreview: true },
+  { path: '/demo/ocean-darb/biens/ocean-villa-ville-verte', width: 390, height: 844, brand: 'Ocean Darb', phone: '212660881213' },
+)
 const caseFilter = process.env.DEMO_CASE_FILTER
 const cases = caseFilter
   ? allCases.filter((testCase) => testCase.path.includes(caseFilter))
