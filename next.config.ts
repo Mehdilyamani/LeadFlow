@@ -1,5 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: '/project-z', destination: 'https://leadflow-control.vercel.app/project-z' },
+        { source: '/project-z/:path*', destination: 'https://leadflow-control.vercel.app/project-z/:path*' },
+      ],
+    };
+  },
   turbopack: {
     root: process.cwd(),
   },
