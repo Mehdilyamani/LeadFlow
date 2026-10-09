@@ -6,8 +6,8 @@ export type DemoBrand = {
   primaryColor: string
   secondaryColor: string
   logoPath: string
-  logoVariant?: 'mark' | 'wordmark'
-  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo' | 'good-kesh-immo' | 'ocean-darb'
+  logoVariant?: 'mark' | 'wordmark' | 'square'
+  experience?: 'good-kech-immo' | 'immo-built' | 'eladimmo' | 'agence-reda' | 'asmae-immobiliere' | 'agence-imran' | 'immobaz-kimma' | 'danna-immo' | 'good-kesh-immo' | 'ocean-darb' | 'achorafaa-invest'
   city?: string
   whatsappNumber?: string
   displayPhone?: string
@@ -192,6 +192,25 @@ export const DEMO_BRANDS: Record<string, DemoBrand> = {
         'Découvrez une sélection de biens immobiliers à Bouskoura avec Ocean Darb.',
     },
   },
+  'path:achorafaa-invest': {
+    slug: 'achorafaa-invest',
+    agencyName: 'Achorafaa Invest',
+    primaryColor: '#c91f2c',
+    secondaryColor: '#0b0d35',
+    logoPath: '/demos/achorafaa-invest/logo.png',
+    logoVariant: 'square',
+    experience: 'achorafaa-invest',
+    city: 'Marrakech',
+    whatsappNumber: '212663596074',
+    displayPhone: '+212 6 63 59 60 74',
+    whatsappMessage:
+      "Bonjour, je souhaite avoir plus d'informations auprès de Achorafaa Invest.",
+    metadata: {
+      title: 'Achorafaa Invest | Immobilier à Marrakech',
+      description:
+        'Découvrez les biens immobiliers à la vente et à la location proposés par Achorafaa Invest à Marrakech.',
+    },
+  },
 }
 
 // The path demo uses the latest template while the original hostname keeps its experience.
@@ -223,6 +242,7 @@ export function isModernDemoBrand(brand: DemoBrand | null): brand is DemoBrand {
     || brand?.experience === 'danna-immo'
     || brand?.experience === 'good-kesh-immo'
     || brand?.experience === 'ocean-darb'
+    || brand?.experience === 'achorafaa-invest'
 }
 
 export function getHostname(hostHeader: string | null): string {

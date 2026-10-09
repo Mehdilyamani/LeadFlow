@@ -113,6 +113,7 @@ export function DemoBrandMark({
   }
 
   const isWordmark = brand.logoVariant === 'wordmark'
+  const isSquare = brand.logoVariant === 'square'
 
   return (
     <Image
@@ -120,7 +121,7 @@ export function DemoBrandMark({
       alt={`${brand.agencyName} logo`}
       width={isWordmark ? 126 : 48}
       height={isWordmark ? 62 : 48}
-      className={`${className}${isWordmark ? ' !h-10 !w-auto !rounded-none' : ''}`}
+      className={`${className}${isWordmark ? ' !h-10 !w-auto !rounded-none' : ''}${isSquare ? ' !rounded-md bg-white object-contain' : ''}`}
       priority={priority}
       onError={() => setFailedLogo(brand.logoPath)}
     />
